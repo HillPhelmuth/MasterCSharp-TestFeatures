@@ -1,0 +1,92 @@
+﻿@using MasterCsharpHosted.Shared
+
+<button @onclick="@(() => OnCloseMenu.InvokeAsync(true))" class="close-btn">
+    <Tooltip Text="Close"><img width="24" height="24" src="icons/chevron-left-64.png" alt="close menu" /></Tooltip>
+</button>
+<h5 class="text-center">Snippet Menu</h5>
+<ul class="outer-list">
+
+    <li class="top">
+        <span>Collections</span>
+        <ul class="inner-list">
+            @foreach (var snippet in CodeSnippets.CollectionSamples.Samples)
+            {
+                <li class="inner" @key="snippet.Name">
+                    <Tooltip Text="@snippet.ToolTip">
+                        <button @onmouseup="@(()=> MouseOverContent(snippet.Description))" @onclick="@(() => AppState.UpdateSnippet(snippet.Code))">@snippet.Name</button>
+                    </Tooltip>
+                </li>
+            }
+        </ul>
+
+    </li>
+    <li class="top">
+        <span>Strings</span>
+        <ul class="inner-list">
+            @foreach (var snippet in CodeSnippets.StringSamples.Samples)
+            {
+                <li class="inner" @key="snippet.Name">
+                    <Tooltip Text="@snippet.ToolTip">
+                        <button @onmouseup="@(()=> MouseOverContent(snippet.Description))" @onclick="@(() => AppState.UpdateSnippet(snippet.Code))">@snippet.Name</button>
+                    </Tooltip>
+                </li>
+            }
+        </ul>
+
+    </li>
+    <li class="top">
+        <span>Control flow statements (conditionals)</span>
+        <ul class="inner-list">
+            @foreach (var snippet in CodeSnippets.ControlFlowSamples.Samples)
+            {
+
+                <li class="inner" @key="snippet.Name">
+                    <Tooltip Text="@snippet.ToolTip">
+                        <button @onmouseup="@(()=> MouseOverContent(snippet.Description))" @onclick="@(() => AppState.UpdateSnippet(snippet.Code))">@snippet.Name</button>
+                    </Tooltip>
+                </li>
+            }
+        </ul>
+
+    </li>
+    <li class="top">
+        <span>Loops</span>
+        <ul class="inner-list">
+            @foreach (var snippet in CodeSnippets.LoopStatements.Samples)
+            {
+                <li class="inner" @key="snippet.Name">
+                    <Tooltip Text="@snippet.ToolTip">
+                        <button @onmouseup="@(()=> MouseOverContent(snippet.Description))" @onclick="@(() => AppState.UpdateSnippet(snippet.Code))">@snippet.Name</button>
+                    </Tooltip>
+                </li>
+            }
+        </ul>
+
+    </li>
+    <li class="top">
+        <span>Extension Methods</span>
+        <ul class="inner-list">
+            @foreach (var snippet in CodeSnippets.ExtensionSamples.Samples)
+            {
+                <li class="inner" @key="snippet.Name">
+                    <Tooltip Text="@snippet.ToolTip">
+                        <button @onmouseup="@(()=> MouseOverContent(snippet.Description))" @onclick="@(() => AppState.UpdateSnippet(snippet.Code))">@snippet.Name</button>
+                    </Tooltip>
+                </li>
+            }
+        </ul>
+
+    </li>
+
+    @*<li Label="Console App">
+            <hr />
+            @foreach (var snippet in (CodeSnippets.ConsoleSnippets))
+            {
+                <button Label="@snippet.Key" @onclick="@(() => AppState.UpdateSnippet(snippet.Value))"></button>
+
+            }
+        </li>*@
+
+
+    @*<hr />*@
+</ul>

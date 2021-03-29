@@ -1,0 +1,107 @@
+﻿.console {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    grid-column-gap: 6px;
+    width: 100%;
+    z-index: 1;
+}
+
+.menu-slider {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: 95vh;
+}
+
+.menu {
+    position: absolute;
+    background-color: white;
+    height: 90vh;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    z-index: 2;
+}
+
+.active {
+    -webkit-animation: slide 1s;
+    width: 350px;
+    animation: slide 1s;
+}
+
+.inactive {
+    left: -360px;
+    width: 0;
+    -webkit-animation: slide-out 1s;
+    animation: slide-out 1s;
+}
+
+button {
+    background-color: transparent;
+    padding: 0;
+    margin: 0;
+}
+
+.content {
+    font-family: monospace;
+    line-height: 1.2rem;
+}
+
+    .content p {
+        margin-bottom: .3rem;
+    }
+
+    .content .text {
+        margin-left:5%;
+        margin-right: 5%;
+        width:85%;
+        padding: 3px 6px; 
+        box-shadow: -5px 5px 15px 5px #000000;
+    }
+
+@-webkit-keyframes slide {
+    from {
+        left: -360px;
+        width: 0;
+    }
+
+    to {
+        left: 0;
+        width: 350px;
+    }
+}
+
+@keyframes slide {
+    from {
+        left: -360px;
+        width: 0;
+    }
+
+    to {
+        left: 0;
+        width: 350px;
+    }
+}
+
+@-webkit-keyframes slide-out {
+    from {
+        left: 0;
+        width: 350px;
+    }
+
+    to {
+        left: -360px;
+        width: 0;
+    }
+}
+
+@keyframes slide-out {
+    from {
+        left: 0;
+        width: 350px;
+    }
+
+    to {
+        left: -360px;
+        width: 0;
+    }
+}

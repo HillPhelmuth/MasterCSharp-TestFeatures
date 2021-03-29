@@ -1,0 +1,24 @@
+﻿<div class="menu-slider">
+    <div class="menu @cssClass">
+        <SampleMenu OnCloseMenu="CloseMenu"/>
+    </div>
+    <div class="console">
+        <div>
+            <Tooltip Text="Open Menu"><span style="margin-bottom: 0; left:0"><button @onclick="OpenMenu"><img height="24" width="24" src="icons/chevron-right-64.png" alt="menu icon" /></button></span></Tooltip>
+            <CodeEditor/>
+        </div>
+        <div>
+            <Tooltip Text="Clear output window">
+                <span style="margin-bottom: 0; left:0">
+                    <button class="clear" @onclick="AppState.ClearOutput">
+                        <img height="24" width="24" src="icons/delete-100.png" />
+                    </button>
+                </span>
+            </Tooltip><span style="margin-left: 25%; margin-bottom:0">Output window</span>
+            <OutputWindow/>
+        </div>
+        <div class="content">
+            <div class="text">@((MarkupString)AppState.Content)</div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,64 @@
+{
+  "AppHoverContents": [
+    {
+      "Name": "Simple Data Types",
+      "ZIndex": 0,
+      "KeyWordMessages": {
+        "string": [ "#### *string* ####\nSIZE = *2 bytes/char*", "EXAMPLE: **s = \u0022reference\u0022;** " ],
+        "int": [ "#### *integer* ####", "SIZE = 4 bytes", "EXAMPLE: **val = 700;**" ],
+        "bool": [ "#### *boolean* ####", "EXAMPLE: **b = true;**" ],
+        "char": [ "#### *char* ####", "SIZE = 2 bytes ", " EXAMPLE: **ch = \u0027a\u0027;**" ],
+        "byte": [ "#### *byte* ####", "SIZE = 1 byte ", " EXAMPLE: **b = 0x78;**" ],
+        "long": [ "#### *long* ####", "SIZE = 8 bytes ", " EXAMPLE: **val = 70;**" ],
+        "float": [ "#### *float* ####", "SIZE = 4 bytes ", " EXAMPLE: **val = 70.0F;**" ],
+        "double": [ "#### *double* ####", "SIZE = 8 bytes ", " EXAMPLE: **val = 70.0D;**" ],
+        "decimal": [ "#### *decimal* ####", "SIZE = 16 bytes ", "EXAMPLE: **val = 70.0M;**" ]
+      }
+    },
+    {
+      "Name": "String Operations",
+      "ZIndex": 1,
+      "KeyWordMessages": {
+        ".Format": [ "#### *String formatting* ####\nEach additional argument to the function can be referred to in the string using the brackets operator with the index number.", "String.Format(String format, Object arg0);", "format - A composite format string that includes one or more format items", "arg0 - The first or only object to format" ],
+        ".SubString": [ "#### *Substring* ####", "Returns a part of the string, beginning from the index specified as the argument. Substring also accepts a maximum length for the substring", "String.Substring(beginAt);", "String.Substring(beginAt, maximum);" ],
+        ".ToString": [ "#### *ToString function* ####", "It converts an object to its string representation so that it is suitable for display", "Object.ToString();" ],
+        ".Replace": [ "#### *Replace* ####", "string newStr = oldStr.Replace(\u0022old\u0022,\u0022new\u0022);" ],
+        ".IndexOf": [ "#### *IndexOf* ####", "Finds the first ocurrence of a string in a larger string \n Returns -1 if the string is not found", "String.IndexOf(val, start, num)", "val - string to search for", "start - where to begin in string" ],
+        ".LastIndexOf": [ "#### *LastIndexOf* ####", "Search from end of string" ],
+        ".Split": [ "#### *Split* ####", "Split is used to break delimited string into substrings", "String.Split(char);" ],
+        ".ToCharArray": [ "#### *ToCharArray* ####", "Places selected characteres in a string in a char array", "String str = \u0022AaBbCcDd\u0022;", "**create array of 8 vowels**", "var chars = str.ToCharArray();", "**create array of 'B' and 'C'**", "var chars = str.ToCharArray(2,2);" ]
+      }
+    },
+    {
+      "Name": "Loops",
+      "ZIndex": 1,
+      "KeyWordMessages": {
+        "for (": [ "#### *for loop* ####\nfor (initializer; termination condition; iteration;) {", "\t...statements", "}" ],
+        "do {": [ "#### *do while loop* ####", "do {body} while condition;" ],
+        "do{": [ "#### *do while loop* ####", "do {body} while condition;" ],
+        "while (": [ "#### *while loop* ####", "while (condition) {body}" ],
+        "foreach": [ "#### *foreach lop* ####", "foreach (type identifier in collection)  {", "\t...statements", "}" ]
+      }
+    },
+    {
+      "Name": "Collections",
+      "ZIndex": 1,
+      "KeyWordMessages": {
+        "List<": [ "#### *List<T>* ####", "A typed list of items. By far, the most common collection class used.", "###### **Useful Methods** ######", "*.Add(T)* - adds a new instance to list", ".Contains(T) - Determines whether the list contains a specific value.", "*.Remove(T)* - Removes the first occurrence of a specific object from the list", "*.Clear()* - Removes all items from the list" ],
+        "Dictionary<": [ "#### *Dictionary<TKey, TValue>* ####", "A collection of unique Key-Value pairs", "###### **Useful Methods** ######", ".Add(TKey, TValue) - Adds the specified key and value to the dictionary.", "*.ContainsKey(TKey)* - checks whether the dictionary contains a specified key", "*.ContainsValue(TValue)* - checks whether the dictionary contains a specified value", "*[TKey]* - returns the value of TValue associated with TKey", ".Remove(TKey) - Removes the value with the specified key from the dictionary" ],
+        "Stack<": [ "#### *Stack<T>* ####", "A last in, first out (LIFO) list of items. Great for storing program process stuff.", "###### **Useful Methods** ######", "*.Push(T)* - Adds a value to the top of the Stack<T>", "*.Pop()* - returns the value of last item added to the Stack<T> and removes that value from the Stack<T>", "*.Peek()* - returns the value of last item added to the Stack<T> without removing it" ],
+        "Queue<": [ "#### *Queue<T>* ####", "A first in, first out (FIFO) list of items. Great for storing program process stuff.", "###### **Useful Methods** ######", ".Enqueue(T) - Adds an object to the end of the Queue<T>.", "*.Dequeue()* - Removes and returns the object at the beginning of the Queue<T>.", "*.Peek()* - Returns the object at the beginning of the Queue<T> without removing it." ]
+      }
+    },
+    {
+      "Name": "Linq",
+      "ZIndex": 1,
+      "KeyWordMessages": {
+        ".Where(": [ "#### *Where(Func<TSource,bool> predicate)* ####", "Filters a collection based on the predicate function. Returns a collection **IEnumerable<TSource>**" ],
+        ".Select(": [ "#### *Select(Func<TSource,int,TResult> selector)* ####", "Returns a new collections of type **TResult**" ],
+        ".OrderBy(": [ "#### *OrderBy(Func<TSource,TKey> keySelector)* ####", "Returns the same collection now in ascending order of **TKey**" ],
+        ".First(": [ "#### *First(Func<TSource,bool> predicate)* ####", "Returns the first instance of **TSource** in the colleciton found by the predicate function" ]
+      }
+    }
+  ]
+}
