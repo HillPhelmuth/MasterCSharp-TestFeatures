@@ -68,3 +68,8 @@
         padding-right: 1.5rem !important;
     }
 }
+.title {
+    font-family: Consolas, "Courier New", monospace;
+    margin-left: auto;
+    margin-right: auto;
+}

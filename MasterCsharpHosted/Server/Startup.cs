@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
+using MasterCsharpHosted.Server.Services;
 
 namespace MasterCsharpHosted.Server
 {
@@ -32,6 +34,7 @@ namespace MasterCsharpHosted.Server
                 options.Authority = Configuration["Auth0:Authority"];
                 options.Audience = Configuration["Auth0:ApiIdentifier"];
             });
+            services.AddHttpClient<PublicGithubClient>();
             services.AddControllersWithViews();
             services.AddRazorPages();
         }

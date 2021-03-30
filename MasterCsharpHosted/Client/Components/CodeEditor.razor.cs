@@ -24,10 +24,23 @@ namespace MasterCsharpHosted.Client.Components
         public string CodeSnippet { get; set; }
         private MonacoEditor _editor = new();
         private string[] _deltaDecorationIds;
+        private bool _shouldRender;
+        private int _fontSize = 14;
         protected override Task OnInitializedAsync()
         {
             AppState.PropertyChanged += HandleAppStateStateChange;
             return base.OnInitializedAsync();
+        }
+
+        protected override Task OnAfterRenderAsync(bool firstRender)
+        {
+            _shouldRender = false;
+            return base.OnAfterRenderAsync(firstRender);
+        }
+
+        protected override bool ShouldRender()
+        {
+            return _shouldRender;
         }
 
         protected StandaloneEditorConstructionOptions EditorOptionsRoslyn(MonacoEditor editor)
@@ -56,25 +69,41 @@ namespace MasterCsharpHosted.Client.Components
             {
                 Console.WriteLine("Ctrl+H : Initial editor command is triggered.");
             });
-            await _editor.AddAction("executeAction", "Execute Code (ctrl + enter)",
+            await _editor.AddAction("executeAction", "Execute Code",
                 new[] { (int)KeyMode.CtrlCmd | (int)KeyCode.Enter }, null, null, "navigation", 1.5,
                 async (ed, keyCodes) =>
                 {
                     await SubmitCode();
                     Console.WriteLine("Code Executed from Editor Command");
                 });
-            await _editor.AddAction("Undo", "Undo (ctrl + u)", new[] {(int) KeyMode.CtrlCmd | (int) KeyCode.KEY_U},
+            await _editor.AddAction("Undo", "Undo", new[] {(int) KeyMode.CtrlCmd | (int) KeyCode.KEY_Z},
                 null, null, "navigation", 2.5,
                 async (e, codes) =>
                 {
                     await Undo();
                     Console.WriteLine("Tried Undo");
                 });
-            await _editor.AddAction("Redo", "Redo (ctrl + r)", new[] { (int)KeyMode.CtrlCmd | (int)KeyCode.KEY_R },
+            await _editor.AddAction("Redo", "Redo", new[] { (int)KeyMode.CtrlCmd | (int)KeyCode.KEY_Y },
                 null, null, "navigation", 3.5,
                 async (e, codes) =>
                 {
                     await Redo();
+                    Console.WriteLine("Tried Redo");
+                });
+            await _editor.AddAction("ZoomIn", "Zoom in", new[] { (int)KeyMode.CtrlCmd | (int)KeyCode.US_DOT },
+                null, null, "navigation", 4.5,
+                async (e, codes) =>
+                {
+                    var editorOptions = new GlobalEditorOptions { FontSize = ++_fontSize };
+                    await _editor.UpdateOptions(editorOptions);
+                    Console.WriteLine("Tried Redo");
+                });
+            await _editor.AddAction("ZoomOut", "Zoom out", new[] { (int)KeyMode.CtrlCmd | (int)KeyCode.US_COMMA },
+                null, null, "navigation", 5.5,
+                async (e, codes) =>
+                {
+                    var editorOptions = new GlobalEditorOptions { FontSize = --_fontSize };
+                    await _editor.UpdateOptions(editorOptions);
                     Console.WriteLine("Tried Redo");
                 });
         }
@@ -131,8 +160,7 @@ namespace MasterCsharpHosted.Client.Components
         private async void HandleAppStateStateChange(object _, PropertyChangedEventArgs args)
         {
             if (args.PropertyName != nameof(AppState.Snippet)) return;
-            var model = await _editor.GetModel();
-            
+            _shouldRender = true;
             await _editor.SetValue(AppState.Snippet);
             StateHasChanged();
         }

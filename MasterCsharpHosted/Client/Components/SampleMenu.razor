@@ -64,6 +64,19 @@
 
     </li>
     <li class="top">
+        <span>Linq</span>
+        <ul class="inner-list">
+            @foreach (var snippet in CodeSnippets.LinqFromGithubSamples.Samples)
+            {
+                <li class="inner" @key="snippet.Name">
+                    <Tooltip Text="@snippet.ToolTip">
+                        <button @onclick="(async() => await GetCodeFromGithub(snippet))">@snippet.Name</button>
+                    </Tooltip>
+                </li>
+            }
+        </ul>
+    </li>
+    <li class="top">
         <span>Extension Methods</span>
         <ul class="inner-list">
             @foreach (var snippet in CodeSnippets.ExtensionSamples.Samples)

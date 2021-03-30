@@ -49,7 +49,7 @@ a, .btn-link {
         top: 0.5rem;
     }
 .my-editor {
-    height: 22em;
+    height: 23em;
     flex-direction: column
 }
 .decorationGlyphMarginClass {
@@ -63,4 +63,7 @@ a, .btn-link {
 .decorationContentClass {
     color: lightcoral;
     font-style: italic;
+}
+.githubIcon {
+    content: url('icons/GitHub-Mark-32px.png');
 }

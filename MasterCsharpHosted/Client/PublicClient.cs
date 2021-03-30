@@ -22,8 +22,25 @@ namespace MasterCsharpHosted.Client
             sw.Start();
             var apiResult = await Client.PostAsJsonAsync("api/code/compile", code);
             if (!apiResult.IsSuccessStatusCode)
+            {
+                sw.Stop();
+                Console.WriteLine($"api/code/compile returned an error in {sw.ElapsedMilliseconds}ms");
                 return $"Error on compile. {apiResult.ReasonPhrase}";
-            return await apiResult.Content.ReadAsStringAsync();
+            }
+            var result = await apiResult.Content.ReadAsStringAsync();
+            sw.Stop();
+            Console.WriteLine($"api/code/compile returned an value in {sw.ElapsedMilliseconds}ms");
+            return result;
+        }
+
+        public async Task<string> GetFromGithubRepo(string fileName)
+        {
+            var sw = new Stopwatch();
+            sw.Start();
+            string apiResult = await Client.GetStringAsync($"api/code/githubCode/{fileName}");
+            sw.Stop();
+            Console.WriteLine($"api/githubCode returned a value in {sw.ElapsedMilliseconds}ms\r\nResult: {apiResult}");
+            return apiResult;
         }
     }
 }

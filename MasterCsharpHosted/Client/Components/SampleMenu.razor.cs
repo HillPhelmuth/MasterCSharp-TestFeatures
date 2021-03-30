@@ -11,12 +11,21 @@ namespace MasterCsharpHosted.Client.Components
     {
         [Inject]
         private AppState AppState { get; set; }
+        [Inject]
+        private PublicClient PublicClient { get; set; }
         [Parameter]
         public EventCallback<bool> OnCloseMenu { get; set; }
 
         private void MouseOverContent(string content)
         {
             AppState.Content = content;
+        }
+
+        private async Task GetCodeFromGithub(CodeSample snippet)
+        {
+            var code = await PublicClient.GetFromGithubRepo(snippet.Code);
+            MouseOverContent(snippet.Description);
+            AppState.UpdateSnippet(code);
         }
     }
 }
