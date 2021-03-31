@@ -16,7 +16,7 @@ namespace MasterCsharpHosted.Client
         public static async Task Main(string[] args)
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
-            builder.RootComponents.Add<App>("#app");
+            //builder.RootComponents.Add<App>("#app");
 
             builder.Services.AddTransient(_ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
             builder.Services.AddOidcAuthentication(options =>
@@ -25,6 +25,7 @@ namespace MasterCsharpHosted.Client
                 options.ProviderOptions.ResponseType = "code";
             });
             builder.Services.AddHttpClient<PublicClient>(c => c.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
+            builder.Services.AddScoped<IPublicClient, PublicClient>();
             builder.Services.AddSingleton<AppState>();
             await builder.Build().RunAsync();
         }

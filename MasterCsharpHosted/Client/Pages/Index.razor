@@ -1,3 +1,26 @@
 ﻿@page "/"
+@if (!isPageReady)
+{
+    <div class="text-center">
+        <AuthorizeView>
+            <Authorized>
+                <h6 class="text-center">Logged in as @context.User.Identity.Name</h6>
+            </Authorized>
+            <NotAuthorized>
+                <a href="authentication/login">Log in</a>
+            </NotAuthorized>
+        </AuthorizeView><br />
+        <button @onclick="@(()=> isPageReady = !isPageReady)" style="margin-left: auto; margin-right:auto;font-family:ui-monospace; background-color: darkviolet;color:white"><h5 style="margin-top: 5px;">Start C# Practice Module</h5></button>
+    </div>
+}
 
-<Console/>
+@if (isPageReady)
+{
+    <Console />
+}
+
+@code{
+
+    private bool isPageReady;
+
+}

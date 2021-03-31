@@ -16,6 +16,7 @@ namespace MasterCsharpHosted.Server.Services
            AppDomain.CurrentDomain.GetAssemblies().Where(x =>
                !x.IsDynamic && !string.IsNullOrWhiteSpace(x.Location)).Select(assembly => MetadataReference.CreateFromFile(assembly.Location)).ToList();
     }
+    
     public static class Extension
     {
         public static IEnumerable<T> Concatenate<T>(this IEnumerable<T> first, IEnumerable<T> second)

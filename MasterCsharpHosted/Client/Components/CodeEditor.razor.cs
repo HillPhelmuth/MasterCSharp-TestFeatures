@@ -14,7 +14,7 @@ namespace MasterCsharpHosted.Client.Components
     public partial class CodeEditor : IDisposable
     {
         [Inject]
-        private PublicClient PublicClient { get; set; }
+        private IPublicClient PublicClient { get; set; }
         [Inject]
         private AppState AppState { get; set; }
         [Inject]
