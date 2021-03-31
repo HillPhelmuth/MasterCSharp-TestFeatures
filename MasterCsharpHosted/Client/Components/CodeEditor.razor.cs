@@ -106,6 +106,13 @@ namespace MasterCsharpHosted.Client.Components
                     await _editor.UpdateOptions(editorOptions);
                     Console.WriteLine("Tried Redo");
                 });
+            await _editor.AddAction("Suggest", "Request Suggestion", new[] { (int)KeyMode.CtrlCmd | (int)KeyCode.KEY_J },
+                null, null, "navigation", 6.5,
+                async (e, codes) =>
+                {
+                    await Suggest();
+                    Console.WriteLine("Tried Redo");
+                });
         }
 
         private async void EditorDidChangeCursorPosition(CursorPositionChangedEvent eventArgs)
@@ -153,6 +160,10 @@ namespace MasterCsharpHosted.Client.Components
 
         private async Task Redo() => await Js.InvokeVoidAsync("blazorMonaco.editor.trigger", _editor.Id, "whatever...", "redo", "whatever...");
 
+        private async Task Suggest()
+        {
+            await Js.InvokeVoidAsync("blazorMonaco.editor.trigger", _editor.Id, "whatever...", "editor.action.triggerSuggest", "whatever...");
+        }
         protected void OnContextMenu(EditorMouseEvent eventArg)
         {
             Console.WriteLine("OnContextMenu : " + JsonSerializer.Serialize(eventArg));
