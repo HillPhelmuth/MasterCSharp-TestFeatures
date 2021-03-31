@@ -12,7 +12,7 @@ namespace MasterCsharpHosted.Client.Components
         [Inject]
         private AppState AppState { get; set; }
         [Inject]
-        private PublicClient PublicClient { get; set; }
+        private IPublicClient PublicClient { get; set; }
         [Parameter]
         public EventCallback<bool> OnCloseMenu { get; set; }
 

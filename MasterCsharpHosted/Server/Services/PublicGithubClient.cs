@@ -41,7 +41,7 @@ namespace MasterCsharpHosted.Server.Services
                 return "Nope!, provide a file extension. I suggest '.cs'";
             var sw = new Stopwatch();
             sw.Start();
-            var code = await Client.GetStringAsync($"{baseUrl}/{githubName}/{repoName}/contents/{filepath}");
+            var code = await Client.GetStringAsync($"repos/{githubName}/{repoName}/contents/{filepath}");
             sw.Stop();
             Console.WriteLine($"Retrieved code from Github in {sw.ElapsedMilliseconds}ms");
             return code;

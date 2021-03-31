@@ -9,6 +9,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
 using MasterCsharpHosted.Server.Services;
+using MasterCsharpHosted.Shared;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 
 namespace MasterCsharpHosted.Server
 {
@@ -35,6 +38,9 @@ namespace MasterCsharpHosted.Server
                 options.Audience = Configuration["Auth0:ApiIdentifier"];
             });
             services.AddHttpClient<PublicGithubClient>();
+            services.AddScoped<IPublicClient, ServerApi>();
+            services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvidor>();
+            services.AddScoped<SignOutSessionStateManager>();
             services.AddControllersWithViews();
             services.AddRazorPages();
         }
@@ -65,7 +71,7 @@ namespace MasterCsharpHosted.Server
             {
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
-                endpoints.MapFallbackToFile("index.html");
+                endpoints.MapFallbackToPage("/_Host");
             });
         }
     }

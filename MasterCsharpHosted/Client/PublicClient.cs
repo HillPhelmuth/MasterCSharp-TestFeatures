@@ -5,10 +5,11 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
+using MasterCsharpHosted.Shared;
 
 namespace MasterCsharpHosted.Client
 {
-    public class PublicClient
+    public class PublicClient : IPublicClient
     {
         public HttpClient Client { get; }
         public PublicClient(HttpClient httpClient)

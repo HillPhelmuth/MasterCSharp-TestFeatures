@@ -73,3 +73,7 @@
     margin-left: auto;
     margin-right: auto;
 }
+.title img {
+    left:0;
+    margin-right:4px;
+}
