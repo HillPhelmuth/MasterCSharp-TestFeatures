@@ -35,15 +35,8 @@ namespace MasterCsharpHosted.Shared
             AllAppHoverContentItems().Find(x => x.Name == "String Operations");
         private static List<AppHoverModel> AllAppHoverContentItems()
         {
-            var assembly = Assembly.GetExecutingAssembly();
-            string appHoverResource = assembly.GetManifestResourceNames()
-                .SingleOrDefault(s => s.EndsWith("AppHoverContentItems.json"));
-            string contentJson = "";
-            using var fileStream = assembly.GetManifestResourceStream(appHoverResource);
-            using (var reader = new StreamReader(fileStream))
-            {
-                contentJson = reader.ReadToEnd();
-            }
+            string fileName = "AppHoverContentItems.json";
+            string contentJson = Helpers.GetJsonContentFromFile(fileName);
             try
             {
                 var allAppHovers = JsonConvert.DeserializeObject<AppHoverContentList>(contentJson);
@@ -57,6 +50,18 @@ namespace MasterCsharpHosted.Shared
             }
         }
 
+        private static string GetJsonContentFromFile(string fileName)
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            string fileResource = assembly.GetManifestResourceNames()
+                .SingleOrDefault(s => s.EndsWith(fileName));
+            string contentJson = "";
+            using var fileStream = assembly.GetManifestResourceStream(fileResource);
+            using var reader = new StreamReader(fileStream);
+            contentJson = reader.ReadToEnd();
+
+            return contentJson;
+        }
     }
 
     public class AppHoverModel
@@ -78,7 +83,7 @@ namespace MasterCsharpHosted.Shared
         [JsonProperty("KeyWordMessages")]
         public Dictionary<string, List<string>> KeyWordMessages { get; set; }
     }
-    public partial class AppHoverContentList
+    public class AppHoverContentList
     {
         [JsonProperty("AppHoverContents")]
         public List<AppHoverModel> AppHoverContents { get; set; }

@@ -1,0 +1,8 @@
+﻿.fail {
+    background-color:red;
+    color:white;
+}
+.pass {
+    background-color:white;
+    color:green;
+}

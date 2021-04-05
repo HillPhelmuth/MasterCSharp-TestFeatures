@@ -1,0 +1,55 @@
+﻿.challenge-area {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-column-gap: .3rem;
+}
+
+    .challenge-area .header {
+        font-family: Consolas, "Courier New", monospace;
+        margin-left: auto;
+        margin-right: auto;
+        font-size: 1.2rem;
+        font-weight: 500;
+    }
+
+.menu-slider {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: 95vh;
+}
+
+.menu {
+    position: absolute;
+    background-color: white;
+    height: 90vh;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    z-index: 2;
+}
+
+.active {
+    -webkit-animation: slide 1s;
+    width: 350px;
+    animation: slide 1s;
+}
+
+.inactive {
+    left: -360px;
+    width: 0;
+    -webkit-animation: slide-out 1s;
+    animation: slide-out 1s;
+}
+
+.button-text {
+    background-color: white;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    color: darkviolet;
+}
+
+    .button-text:hover {
+        color: mediumvioletred;
+        border-bottom: 0;
+    }

@@ -1,0 +1,27 @@
+﻿<div>
+    <ul class="expando">
+        @foreach (var section in _challengeViews)
+        {
+            <li>
+                <div class="header" @onclick="@(() => Open(section))">
+                    Difficulty: @section.Header
+                    <img height="32" width="32" alt="up down ind" src="_content/ChallengeModule/images/@(section.IsActive ? "up":"down").png" />
+                </div>
+                <div class="item @(section.IsActive ? "active" : "")">
+                    <ul class="item-list">
+                        @foreach (var challenge in section.Challenges)
+                        {
+                            <li>
+                                <hr />
+                                <button @onclick="@(() => AppState.SelectChallenge(challenge))">@challenge.Name</button>
+
+                            </li>
+
+                        }
+                    </ul>
+                </div>
+            </li>
+        }
+
+    </ul>
+</div>

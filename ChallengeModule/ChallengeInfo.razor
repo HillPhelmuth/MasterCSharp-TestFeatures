@@ -1,0 +1,12 @@
+﻿<h4 class="text-center">@AppState.ActiveChallenge?.Name</h4>
+<div>
+    @((MarkupString) AppState.ActiveChallenge?.Description)
+</div>
+<br />
+<p>
+    <h5>Examples</h5>
+</p>
+<p style="background-color: black; color: white">
+    @((MarkupString)AppState.ActiveChallenge?.Examples)
+</p>
+<button @onclick="Ready">Start</button>

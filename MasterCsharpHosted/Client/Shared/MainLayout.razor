@@ -1,14 +1,17 @@
-﻿@inherits LayoutComponentBase
-
+﻿@using System.ComponentModel
+@inherits LayoutComponentBase
+@inject NavigationManager Navigation
+@inject AppState AppState
+@implements IDisposable
 <div class="page">
-    @*<div class="sidebar">
-        <NavMenu />
-    </div>*@
-
+   
     <div class="main">
         <div class="top-row px-4">
-            <MasterCsharpHosted.Client.Pages.AuthLogin/>
-            <h3 class="title"><img src="icons/exe-48.png" height="40" width="40" alt="title icon"/> C# Practice Module</h3>
+            <MasterCsharpHosted.Client.Pages.AuthLogin />
+            <h3 class="title"><img src="icons/exe-48.png" height="40" width="40" alt="title icon" /> C# @AppState.Title Module</h3>
+            <a href="@($"{Navigation.BaseUri}")"><i class="home-icon"></i></a>
+            <a href="@($"{Navigation.BaseUri}practice")"><i class="practice-icon"></i></a>
+            <a href="@($"{Navigation.BaseUri}challenges")"><i class="challenge-icon"></i></a>
             <a href="https://github.com/HillPhelmuth/MasterCSharp-TestFeatures" target="_blank" class="ml-md-auto"><i class="githubIcon"></i></a>
         </div>
         <div class="content px-4">
@@ -16,3 +19,26 @@
         </div>
     </div>
 </div>
+@code
+{
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            AppState.PropertyChanged += HandleAppStateStateChange;
+        }
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    private void HandleAppStateStateChange(object _, PropertyChangedEventArgs args)
+    {
+        if (args.PropertyName != nameof(AppState.Title)) return;
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        AppState.PropertyChanged -= HandleAppStateStateChange;
+    }
+
+}

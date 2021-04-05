@@ -22,6 +22,8 @@ namespace MasterCsharpHosted.Client.Components
 
         [Parameter]
         public string CodeSnippet { get; set; }
+        [Parameter]
+        public EventCallback<string> OnSubmit { get; set; }
         private MonacoEditor _editor = new();
         private string[] _deltaDecorationIds;
         private bool _shouldRender;
@@ -65,6 +67,7 @@ namespace MasterCsharpHosted.Client.Components
 
         protected async Task EditorOnDidInit(MonacoEditorBase editorBase)
         {
+            await _editor.SetValue(AppState.Snippet);
             await _editor.AddCommand((int)KeyMode.CtrlCmd | (int)KeyCode.KEY_H, (editor, keyCode) =>
             {
                 Console.WriteLine("Ctrl+H : Initial editor command is triggered.");
@@ -73,7 +76,7 @@ namespace MasterCsharpHosted.Client.Components
                 new[] { (int)KeyMode.CtrlCmd | (int)KeyCode.Enter }, null, null, "navigation", 1.5,
                 async (ed, keyCodes) =>
                 {
-                    await SubmitCode();
+                    await SubmitCodeDefault();
                     Console.WriteLine("Code Executed from Editor Command");
                 });
             await _editor.AddAction("Undo", "Undo", new[] {(int) KeyMode.CtrlCmd | (int) KeyCode.KEY_Z},
@@ -149,9 +152,15 @@ namespace MasterCsharpHosted.Client.Components
             _deltaDecorationIds = await _editor.DeltaDecorations(deltas, listDelta.ToArray());
         }
 
-        private async Task SubmitCode()
+        private async Task SubmitCodeDefault()
         {
             string code = await _editor.GetValue();
+            if (OnSubmit.HasDelegate)
+            {
+                await OnSubmit.InvokeAsync(code);
+                return;
+            }
+            
             string returnedValue = await PublicClient.CompileCodeAsync(code);
             AppState.AddLineToOutput(returnedValue);
         }
@@ -160,10 +169,8 @@ namespace MasterCsharpHosted.Client.Components
 
         private async Task Redo() => await Js.InvokeVoidAsync("blazorMonaco.editor.trigger", _editor.Id, "whatever...", "redo", "whatever...");
 
-        private async Task Suggest()
-        {
-            await Js.InvokeVoidAsync("blazorMonaco.editor.trigger", _editor.Id, "whatever...", "editor.action.triggerSuggest", "whatever...");
-        }
+        private async Task Suggest() => await Js.InvokeVoidAsync("blazorMonaco.editor.trigger", _editor.Id, "whatever...", "editor.action.triggerSuggest", "whatever...");
+
         protected void OnContextMenu(EditorMouseEvent eventArg)
         {
             Console.WriteLine("OnContextMenu : " + JsonSerializer.Serialize(eventArg));

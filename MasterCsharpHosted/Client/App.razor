@@ -1,11 +1,14 @@
-<Router AppAssembly="@typeof(Program).Assembly" PreferExactMatches="@true">
+@using System.Reflection
+@using Microsoft.AspNetCore.Components.WebAssembly.Services
+@inject LazyAssemblyLoader AssemblyLoader
+@inject AppState AppState
+<Router AppAssembly="@typeof(Program).Assembly" PreferExactMatches="@true" AdditionalAssemblies="@_lazyLoadedAssemblies" OnNavigateAsync="@OnNavigateAsync">
     <Found Context="routeData">
-        @*<RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />*@
         <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
             <Authorizing>
                 <p>Determining session state, please wait...</p>
             </Authorizing>
-           
+
             <NotAuthorized>
                 <h1>Sorry</h1>
                 <p>You're not authorized to reach this page. You need to log in.</p>
@@ -17,4 +20,46 @@
             <p>Sorry, there's nothing at this address.</p>
         </LayoutView>
     </NotFound>
+    <Navigating>
+        <div class="text-center">
+            <h5>Heading that way</h5>
+            <div class="lds-spinner">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+    </Navigating>
 </Router>
+
+
+@code {
+    private readonly List<Assembly> _lazyLoadedAssemblies = new();
+
+    private async Task OnNavigateAsync(NavigationContext context)
+    {
+        if (context.Path == "challenges")
+        {
+            var assemblies = await AssemblyLoader.LoadAssembliesAsync(new[] { "ChallengeModule.dll" });
+            _lazyLoadedAssemblies.AddRange(assemblies);
+            AppState.Title = "Challenges";
+        }
+        else if (context.Path == "practice")
+        {
+            AppState.Title = "Practice";
+        }
+        else
+        {
+            AppState.Title = "Home";
+        }
+    }
+}
