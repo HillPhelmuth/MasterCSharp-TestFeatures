@@ -2,18 +2,21 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using MasterCsharpHosted.Shared;
 using Microsoft.AspNetCore.Components;
 
-namespace MasterCsharpHosted.Client.Pages
+namespace ChallengeModule
 {
-    public partial class Console : IDisposable
+    public partial class ChallengeInfo : IDisposable
     {
         [Inject]
         private AppState AppState { get; set; }
-        private string cssClass = "inactive";
-        private bool _isMenuOpen;
+        [Parameter]
+        public EventCallback<bool> OnIsReady { get; set; }
+        //private ChallengeModel _challenge = new();
+
 
         protected override Task OnInitializedAsync()
         {
@@ -21,24 +24,11 @@ namespace MasterCsharpHosted.Client.Pages
             return base.OnInitializedAsync();
         }
 
-        private async Task OpenMenu()
-        {
-            cssClass = "active";
-            StateHasChanged();
-            await Task.Delay(500);
-            _isMenuOpen = true;
-        }
-        private void CloseMenu()
-        {
-            if (!_isMenuOpen) return;
-            cssClass = "inactive";
-            _isMenuOpen = false;
-            StateHasChanged();
-        }
-
+        private void Ready() => OnIsReady.InvokeAsync(true);
         private void HandleAppStateStateChange(object _, PropertyChangedEventArgs args)
         {
-            if (args.PropertyName != nameof(AppState.Content)) return;
+            if (args.PropertyName != nameof(AppState.ActiveChallenge)) return;
+            //_challenge = AppState.ActiveChallenge;
             StateHasChanged();
         }
 

@@ -10,10 +10,14 @@
 
   <ItemGroup>
     <None Remove="HoverContentStore\AppHoverContentItems.json" />
+    <None Remove="HoverContentStore\Challenges.json" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="HoverContentStore\AppHoverContentItems.json" />
+    <EmbeddedResource Include="HoverContentStore\Challenges.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>

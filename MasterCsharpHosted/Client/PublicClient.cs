@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using MasterCsharpHosted.Shared;
 
@@ -33,7 +35,17 @@ namespace MasterCsharpHosted.Client
             Console.WriteLine($"api/code/compile returned an value in {sw.ElapsedMilliseconds}ms");
             return result;
         }
-
+        public async Task<CodeOutputModel> SubmitChallenge(ChallengeModel challenge)
+        {
+            var sw = new Stopwatch();
+            sw.Start();
+            var apiResult = await Client.PostAsJsonAsync($"api/challenge/submit", challenge);
+            var result = await apiResult.Content.ReadAsStringAsync();
+            sw.Stop();
+            Console.WriteLine($"challenge submit too {sw.ElapsedMilliseconds}ms");
+            var output = JsonSerializer.Deserialize<CodeOutputModel>(result);
+            return output;
+        }
         public async Task<string> GetFromGithubRepo(string fileName)
         {
             var sw = new Stopwatch();

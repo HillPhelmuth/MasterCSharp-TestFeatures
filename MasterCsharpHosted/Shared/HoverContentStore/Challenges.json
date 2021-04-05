@@ -1,0 +1,962 @@
+﻿[
+  {
+    "name": "Braces",
+    "difficulty": "Hard",
+    "description": "<p>Write a function that takes a string of braces, and determines if the order of the braces is valid. It should return true if the string is valid, and false if it's invalid. All input strings will be nonempty, and will only consist of parentheses, brackets and curly braces: ()[]{}.</p>",
+    "examples": "<div>\"(){}[]\" => True<br />\"([{}])\" => True<br />\"(}\" => False<br />\"[(])\" => False<br />\"[({})](]\" => False </div>",
+    "snippet": "public static bool validBraces(String braces)\n{\n\treturn false;\n}",
+    "solution": "public static bool validBraces(string braces)\n{\n\tvar st = new Stack<char>();\n\tforeach (var c in braces)\n\t\tswitch (c)\n\t\t{\n\t\t\tcase '(':\n\t\t\tcase '[':\n\t\t\tcase '{':\n\t\t\t\tst.Push(c);\n\t\t\t\tcontinue;\n\t\t\tcase ')':\n\t\t\t\tif (st.Count == 0 || st.Pop() != '(') return false;\n\t\t\t\tcontinue;\n\t\t\tcase ']':\n\t\t\t\tif (st.Count == 0 || st.Pop() != '[') return false;\n\t\t\t\tcontinue;\n\t\t\tcase '}':\n\t\t\t\tif (st.Count == 0 || st.Pop() != '{') return false;\n\t\t\t\tcontinue;\n\t\t}\n\treturn st.Count == 0;\n}",
+    "tests": [
+      {
+        "append": "\nreturn validBraces(\"[()]\");",
+        "testAgainst": "true"
+      },
+      {
+        "append": "\nreturn validBraces(\"[(])\");",
+        "testAgainst": "false"
+      }
+    ],
+    "addedBy": "adam holm",
+    "userCompleted": false
+  },
+  {
+    "name": "Prime",
+    "difficulty": "Mid",
+    "description": "<p>Define a function that takes an integer argument and returns logical value true or false depending on if the integer is a prime.\nPer Wikipedia, a prime number(or a prime) is a natural number greater than 1 that has no positive divisors other than 1 and itself.</p>",
+    "examples": "<div>is_prime(1)  => false<br/>is_prime(2)  => true<br/>is_prime(-1) => false<br/></div>",
+    "snippet": "public static bool IsPrime(int n)\n{\n\treturn false;\n}",
+    "solution": "public static bool IsPrime(int n)\n{\n\tif (n <= 2 || n % 2 == 0) return n == 2;\n\tfor (int i = 3; i <= Math.Sqrt(n); i += 2) if (n % i == 0) return false;\n\treturn true;\n}",
+    "tests": [
+      {
+        "append": "\nreturn IsPrime(11);",
+        "testAgainst": "true"
+      },
+      {
+        "append": "\nreturn IsPrime(16);",
+        "testAgainst": "false"
+      },
+      {
+        "append": "\nreturn IsPrime(2);",
+        "testAgainst": "true"
+      },
+      {
+        "append": "\nreturn IsPrime(1);",
+        "testAgainst": "false"
+      }
+    ],
+    "addedBy": "adam holm",
+    "userCompleted": false
+  },
+  {
+    "name": "Rot13",
+    "difficulty": "Mid",
+    "description": "<p>ROT13 is a simple letter substitution cipher that replaces a letter with the letter 13 letters after it in the alphabet.ROT13 is an example of the Caesar cipher.<br/>Create a function that takes a string and returns the string ciphered with Rot13. If there are numbers or special characters included in the string, they should be returned as they are. Only letters from the latin/english alphabet should be shifted, like in the original Rot13 \"implementation\".</p>",
+    "examples": "<div>Rot13(Grfg) => \"Test\"</div>",
+    "snippet": "public static string Rot13(string message)\n{\n\t// your code here\n}",
+    "solution": "public static string Rot13(string message)\n{\n\treturn String.Join(\"\", message.Select(x => char.IsLetter(x) ? (x >= 65 && x <= 77) || (x >= 97 && x <= 109) ? (char)(x + 13) : (char)(x - 13) : x));\n}",
+    "tests": [
+      {
+        "append": "\nreturn Rot13(\"Grfg\");",
+        "testAgainst": "Test"
+      },
+      {
+        "append": "\nreturn Rot13(\"Grfgf\");",
+        "testAgainst": "Tests"
+      }
+    ],
+    "addedBy": "adam holm",
+    "userCompleted": false
+  },
+  {
+    "name": "Multiple Of 3 or 5",
+    "difficulty": "Easy",
+    "description": "<p>If we list all the natural numbers below 10 that are multiples of 3 or 5, we get 3, 5, 6 and 9. The sum of these multiples is 23.<br/>Finish the solution so that it returns the sum of all the multiples of 3 or 5 below the number passed in.<br/>Note: If the number is a multiple of both 3 and 5, only count it once.</p>",
+    "examples": "<div> Solution(10) => 23</div>",
+    "snippet": "public static int Solution(int value)\n{\n\t// Magic Happens\n}",
+    "solution": "public static int Solution(int value) => Enumerable.Range(0, value).Where(x => x % 3 == 0 || x % 5 == 0).Sum();",
+    "tests": [
+      {
+        "append": "\nreturn Solution(10);",
+        "testAgainst": "23"
+      }
+    ],
+    "addedBy": "adam holm",
+    "userCompleted": false
+  },
+  {
+    "name": "Abbreviate Name",
+    "difficulty": "Easy",
+    "description": "<p>Write a function to convert a name into initials. This kata strictly takes two words with one space in between them.<br/>\nThe output should be two capital letters with a dot separating them.</p>",
+    "examples": "<div>Sam Harris => S.H<br/>Patrick Feeney => P.F</div>",
+    "snippet": "public static string AbbrevName(string name)\n{\n\treturn \"\";\n}",
+    "solution": "public static string AbbrevName(string name)\n{\n\tvar wordArray = name.Split(\" \");\n\tvar firstLetter = wordArray[0][0];\n\tvar secondLetter = wordArray[1][0];\n\treturn $\"{firstLetter.ToString().ToUpper()}.{secondLetter.ToString().ToUpper()}\";\n}",
+    "tests": [
+      {
+        "append": "\nreturn AbbrevName(\"Kdam Holm\");",
+        "testAgainst": "K.H"
+      },
+      {
+        "append": "\nreturn AbbrevName(\"Adam Holm\");",
+        "testAgainst": "A.H"
+      }
+    ],
+    "addedBy": "adam holm",
+    "userCompleted": false
+  },
+  {
+    "name": "Re-weight weights",
+    "difficulty": "Hard",
+    "description": "<p>You are a member of the \"Fat Club (FC)\". Each month a list with the weights of members is published and each month you are the last on the list which means you are the heaviest.\nLuckily you are the one who establishes the list so you decided to attribute a \"weight\" to numbers. The weight of a number will be from now on the sum of its digits.\n For example 99 will have \"weight\" 18, 100 will have \"weight\" 1 so in the list 100 will come before 99. Given a string with the weights of FC members in normal order can you give this string ordered by \"weights\" of these numbers?\n When two numbers have the same \"weight\", order them as if they were strings (alphabetical ordering) and not numbers: 100 is before 180 because its \"weight\" (1) is less than the one of 180 (9) and 180 is before 90 since, having the same \"weight\" (9), its char value comes before it as a string.</p>",
+    "examples": "<div>\"56 65 74 100 99 68 86 180 90\" => \"100 180 90 56 65 74 68 86 99\"</div>",
+    "snippet": "public static string orderWeight(string s) {\n\t// your code\n}",
+    "solution": "public static string orderWeight(string s)\n{\n\treturn string.Join(\" \", s.Split(' ')\n\t\t.OrderBy(n => n.ToCharArray()\n\t\t.Select(c => (int)char.GetNumericValue(c)).Sum())\n\t\t.ThenBy(n => n));\n}",
+    "tests": [
+      {
+        "append": "\nreturn orderWeight(\"2000 10003 1234000 44444444 9999 11 11 22 123\");",
+        "testAgainst": "11 11 2000 10003 22 123 1234000 44444444 9999"
+      },
+      {
+        "append": "\nreturn orderWeight(\"103 123 4444 99 2000\");",
+        "testAgainst": "2000 103 123 4444 99"
+      },
+      {
+        "append": "\nreturn orderWeight(\"56 65 74 100 99 68 86 180 90\");",
+        "testAgainst": "100 180 90 56 65 74 68 86 99"
+      }
+    ],
+    "addedBy": "adam holm",
+    "userCompleted": false
+  },
+  {
+    "name": "Integer ToIPv4",
+    "difficulty": "Mid",
+    "description": "<p>Take the following IPv4 address: 128.32.10.1</p><p>This address has 4 octets where each octet is a single byte (or 8 bits).</p><ul><li>1st octet 128 has the binary representation: 10000000</li><li>2nd octet 32 has the binary representation: 00100000</li><li>3rd octet 10 has the binary representation: 00001010</li><li>4th octet 1 has the binary representation: 00000001</li></ul><p>So 128.32.10.1 == 10000000.00100000.00001010.00000001</p><p>Because the above IP address has 32 bits, we can represent it as the unsigned 32 bit number: 2149583361</p><p>Complete the function that takes an unsigned 32 bit number and returns a string representation of its IPv4 address.</p>",
+    "examples": "<div>2149583361 ==> \"128.32.10.1\"<br/>32         ==> \"0.0.0.32\"<br/>0          ==> \"0.0.0.0\"</div>",
+    "snippet": "public static string UInt32ToIP(uint ip)\n{\n\t//...\n}",
+    "solution": "public static string UInt32ToIP(uint ip)\n{\n\tvar bytter = BitConverter.GetBytes(ip).Reverse().ToArray();\n\treturn new IPAddress(bytter).MapToIPv4().ToString();\n}",
+    "tests": [
+      {
+        "append": "\nreturn UInt32ToIP(2154959208);",
+        "testAgainst": "128.114.17.104"
+      },
+      {
+        "append": "\nreturn UInt32ToIP(0);",
+        "testAgainst": "0.0.0.0"
+      },
+      {
+        "append": "\nreturn UInt32ToIP(2149583361);",
+        "testAgainst": "128.32.10.1"
+      }
+    ],
+    "addedBy": "adam holm",
+    "userCompleted": false
+  },
+  {
+    "name": "Square or cube",
+    "difficulty": "Easy",
+    "description": "<p>Take an int input. If the integer is an even number, return the square of the input. If it's an odd number, return the the cube of the input. If the input is <= 0, return -1</p>",
+    "examples": "<p>2 => 4</p>\n<p>3 => 27</p>\n<p>-4 => -1</p>",
+    "snippet": "public int SquareCube(int input)\n{\n\t//solution here\n}",
+    "solution": "public int SquareCube(int input)\n{\n\tif (input <= 0)\n\t{\n\t\treturn -1;\n\t}\n\tif (input % 2 == 0)\n\t{\n\t\treturn input * input;\n\t}\n\treturn input * input * input;\n}",
+    "tests": [
+      {
+        "append": "return SquareCube(4);",
+        "testAgainst": "16"
+      },
+      {
+        "append": "return SquareCube(5);",
+        "testAgainst": "125"
+      },
+      {
+        "append": "return SquareCube(0);",
+        "testAgainst": "-1"
+      }
+    ],
+    "addedBy": "adam",
+    "userCompleted": false
+  },
+  {
+    "name": "The Clerk",
+    "difficulty": "Mid",
+    "description": "<p>A new terrible movie has just been released! There are a lot of people standing in a huge line. Each of them has a single 100, 50 or 25 dollar bill. A ticket costs 25 dollars.\n\nYou are currently working as a clerk and want to sell a ticket to every single person in this line.\n\nCan you sell a ticket to every person and give change if you initially have no money and sell the tickets strictly in the order people queue?\n\nReturn YES, if Vasya can sell a ticket to every person and give change with the bills he has at hand at that moment. Otherwise return NO.</p>",
+    "examples": "Tickets(new int[] {25, 25, 50}) // => YES \nTickets(new int[] {25, 100}) // => NO you will not have enough money to give change to 100 dollars\nTickets(new int[] {25, 25, 50, 50, 100}) // => NO. you will not have the right bills to give 75 dollars of change (you can't make two bills of 25 from one of 50)",
+    "snippet": "public static string Tickets(int[] line)\n{\n\t//solution here\n}",
+    "solution": "public static string Tickets(int[] line)\n{\n\tvar bills25 = new List<int>();\n\tvar bills50 = new List<int>();\n\n\tforeach (var person in line)\n\t{\n\t\tswitch (person)\n\t\t{\n\t\t\tcase 100 when (bills50.Any() && bills25.Any()):\n\t\t\t\tbills50.RemoveAt(0);\n\t\t\t\tbills25.RemoveAt(0);\n\t\t\t\tbreak;\n\t\t\tcase 100 when bills25.Count >= 3:\n\t\t\t\tbills25.RemoveRange(0, 3);\n\t\t\t\tbreak;\n\t\t\tcase 100:\n\t\t\t\treturn \"NO\";\n\t\t\tcase 50 when bills25.Any():\n\t\t\t\tbills25.RemoveAt(0);\n\t\t\t\tbills50.Add(person);\n\t\t\t\tbreak;\n\t\t\tcase 50:\n\t\t\t\treturn \"NO\";\n\t\t\tcase 25:\n\t\t\t\tbills25.Add(person);\n\t\t\t\tbreak;\n\t\t}\n\t}\n\treturn \"YES\";\n}",
+    "tests": [
+      {
+        "append": "return Tickets(new int[] {25, 25, 50});",
+        "testAgainst": "\"YES\""
+      },
+      {
+        "append": "return Tickets(new int[] {25, 100});",
+        "testAgainst": "\"NO\""
+      },
+      {
+        "append": "return Tickets(new int[] {25, 25, 50, 50, 100});",
+        "testAgainst": "\"NO\""
+      }
+    ],
+    "addedBy": "adam from app",
+    "userCompleted": false
+  },
+  {
+    "name": "A Palindrome",
+    "difficulty": "Mid",
+    "description": "<p>A palindrome is a word that is the same as its reverse. Write a method to determine if a string input can be read as a palindrome. You can presume the input is a single word (no spaces or special characters). Ignore the case of the chars.</p>",
+    "examples": "kayak ==> true ---------- boat ==>  false",
+    "snippet": "public static bool IsPalindrome(string input)\n{\n\t//solution here\n}",
+    "solution": "public static bool IsPalindrome(string input)\n{\n\tvar inputstr = input.ToUpper();\n\tvar reversed = \"\";\n\tfor (int i = inputstr.Length - 1; i >= 0; i--)  \n\t{  \n\t\treversed += inputstr[i].ToString();\n\t} \n\treturn reversed == inputstr;\n}",
+    "tests": [
+      {
+        "append": "return IsPalindrome(\"kayak\");",
+        "testAgainst": "true"
+      },
+      {
+        "append": "return IsPalindrome(\"civic\");",
+        "testAgainst": "true"
+      },
+      {
+        "append": "return IsPalindrome(\"boo\");",
+        "testAgainst": "false"
+      },
+      {
+        "append": "return IsPalindrome(\"level\");",
+        "testAgainst": "true"
+      },
+      {
+        "append": "return IsPalindrome(\"Check\");",
+        "testAgainst": "false"
+      },
+      {
+        "append": "return IsPalindrome(\"radar\");",
+        "testAgainst": "true"
+      },
+      {
+        "append": "return IsPalindrome(\"Hannah\");",
+        "testAgainst": "true"
+      },
+      {
+        "append": "return IsPalindrome(\"datum\");",
+        "testAgainst": "false"
+      },
+      {
+        "append": "return IsPalindrome(\"killer\");",
+        "testAgainst": "false"
+      },
+      {
+        "append": "return IsPalindrome(\"rotator\");",
+        "testAgainst": "true"
+      },
+      {
+        "append": "return IsPalindrome(\"boob\");",
+        "testAgainst": "true"
+      }
+    ],
+    "addedBy": "Adam",
+    "userCompleted": false
+  },
+  {
+    "name": "Anagram check",
+    "difficulty": "Easy",
+    "description": "<p>An anagram is a word, phrase, or name formed by rearranging the letters of another. Write a method to compare two input strings and determine whether they are anagrams. </p>",
+    "examples": "\"funeral\" and \"real fun\" ==> true",
+    "snippet": "public static bool IsAnagram(string input1, string input2)\n{\n\t//solution here\n}",
+    "solution": "public static bool IsAnagram(string input1, string input2)\n{\n\tvar charArray1 = input1.ToUpper().ToCharArray().Where(x => !char.IsWhiteSpace(x)).ToArray();\n\tvar charArray2 = input2.ToUpper().ToCharArray().Where(x => !char.IsWhiteSpace(x)).ToArray();\n\tArray.Sort(charArray1);\n\tArray.Sort(charArray2);\n\treturn new string(charArray1) == new string(charArray2);\n}",
+    "tests": [
+      {
+        "append": "return IsAnagram(\"Dormitory\",  \"Dirty room\");",
+        "testAgainst": "true"
+      },
+      {
+        "append": "return IsAnagram(\"School master\", \"The classroom\");",
+        "testAgainst": "true"
+      },
+      {
+        "append": "return IsAnagram(\"nope\", \"not this\");",
+        "testAgainst": "false"
+      },
+      {
+        "append": "return IsAnagram(\"definitely nope\", \"nooo\");",
+        "testAgainst": "false"
+      },
+      {
+        "append": "return IsAnagram(\"Listen\", \"Silent\");",
+        "testAgainst": "true"
+      },
+      {
+        "append": "return IsAnagram(\"bob\", \"lob\");",
+        "testAgainst": "false"
+      },
+      {
+        "append": "return IsAnagram(\"Slot machines\", \"Cash lost in me\");",
+        "testAgainst": "true"
+      }
+    ],
+    "addedBy": "Adam",
+    "userCompleted": false
+  },
+  {
+    "name": "Fibonacci number",
+    "difficulty": "Easy",
+    "description": "<p>A Fibonacci sequence is  a series of numbers in which each number is the sum of the two preceding numbers. The simplest is the series 1, 1, 2, 3, 5, 8, 13...  Return the integer value of the Fibonacci number at n place in the sequence.</p>",
+    "examples": "input 1 ==> 1,  input 4 ==> 3, input 7 ==> 13",
+    "snippet": "public static int GetFibonacci(int input)\n{\n\t//solution here\n}",
+    "solution": "public static int GetFibonacci(int n)\n{\n\tint num1 = 0;\n\tint num2 = 1;\n\tint result = 0;\n\n\tif (n == 0 || n == 1) return n;\n\n\tfor (int i = 2; i <= n; i++)\n\t{\n\t\tresult = num1 + num2;\n\t\tnum1 = num2;\n\t\tnum2 = result;\n\t}\n\treturn result;\n}",
+    "tests": [
+      {
+        "append": "return GetFibonacci(5);",
+        "testAgainst": "5"
+      },
+      {
+        "append": "return GetFibonacci(7);",
+        "testAgainst": "13"
+      },
+      {
+        "append": "return GetFibonacci(11);",
+        "testAgainst": "89"
+      },
+      {
+        "append": "return GetFibonacci(15);",
+        "testAgainst": "610"
+      },
+      {
+        "append": "return GetFibonacci(13);",
+        "testAgainst": "233"
+      },
+      {
+        "append": "return GetFibonacci(30);",
+        "testAgainst": "832040"
+      }
+    ],
+    "addedBy": "adam",
+    "userCompleted": false
+  },
+  {
+    "name": "Remove From Place",
+    "difficulty": "Easiest",
+    "description": "<p> Write a C# method to remove the character in a given position of a given string. The given position will be in the range 0.. string length -1 inclusive</p>",
+    "examples": "RemoveFromHere(\"Word\", 1) => Wrd",
+    "snippet": "public static string RemoveFromHere(string word, int letter)\n{\n\t//solution here\n}",
+    "solution": "public static string RemoveFromHere(string word, int letter)\n{\n\treturn word.Replace(word[letter].ToString(), string.Empty);\n}",
+    "tests": [
+      {
+        "append": "return RemoveFromHere(\"abc\", 0);",
+        "testAgainst": "\"bc\""
+      },
+      {
+        "append": "return RemoveFromHere(\"abc\", 1);",
+        "testAgainst": "\"ac\""
+      },
+      {
+        "append": "return RemoveFromHere(\"abc\", 2);",
+        "testAgainst": "\"ab\""
+      },
+      {
+        "append": "return RemoveFromHere(\"BigWord\",0);",
+        "testAgainst": "\"igWord\""
+      },
+      {
+        "append": "return RemoveFromHere(\"BigWord\",1);",
+        "testAgainst": "\"BgWord\""
+      },
+      {
+        "append": "return RemoveFromHere(\"BigWord\", 2);",
+        "testAgainst": "\"BiWord\""
+      },
+      {
+        "append": "return RemoveFromHere(\"BigWord\", 3);",
+        "testAgainst": "\"Bigord\""
+      },
+      {
+        "append": "return RemoveFromHere(\"BigWord\", 4);",
+        "testAgainst": "\"BigWrd\""
+      },
+      {
+        "append": "return RemoveFromHere(\"BigWord\", 5);",
+        "testAgainst": "\"BigWod\""
+      }
+    ],
+    "addedBy": "HillPhelmuth",
+    "userCompleted": false
+  },
+  {
+    "name": "FirstAndLast",
+    "difficulty": "Easiest",
+    "description": "<p>Provide a c# method to exchange the first and last characters in a given string and return the new string.</p>",
+    "examples": "SAMPLE: \"abcd\" EXPECTED \"dbca\" ",
+    "snippet": "public static string SwitchEm(string word)\n{\n\t//solution here\n}",
+    "solution": "public static string SwitchEm(string word)\n{\n\tif (word.Length <= 1)\n\t\treturn word;\n \treturn word.Substring(word.Length - 1) + word.Substring(1, word.Length - 2) + word.Substring(0, 1);\n}",
+    "tests": [
+      {
+        "append": "return SwitchEm(\"abcd\");",
+        "testAgainst": "\"dbca\""
+      },
+      {
+        "append": "return SwitchEm(\"asdf\");",
+        "testAgainst": "\"fsda\""
+      },
+      {
+        "append": "return SwitchEm(\"qwer\");",
+        "testAgainst": "\"rweq\""
+      },
+      {
+        "append": "return SwitchEm(\"zxcv\");",
+        "testAgainst": "\"vxcz\""
+      },
+      {
+        "append": "return SwitchEm(\"a\");",
+        "testAgainst": "\"a\""
+      },
+      {
+        "append": "return SwitchEm(\"pope\");",
+        "testAgainst": "\"eopp\""
+      }
+    ],
+    "addedBy": "HillPhelmuth",
+    "userCompleted": false
+  },
+  {
+    "name": "DecodeRoman",
+    "difficulty": "Hard",
+    "description": "<p>Create a function that takes a Roman numeral as its argument and returns its value as a numeric decimal integer. You don't need to validate the form of the Roman numeral.\n\nModern Roman numerals are written by expressing each decimal digit of the number to be encoded separately, starting with the leftmost digit and skipping any 0s. So 1990 is rendered \"MCMXC\" (1000 = M, 900 = CM, 90 = XC) and 2008 is rendered \"MMVIII\" (2000 = MM, 8 = VIII). The Roman numeral for 1666, \"MDCLXVI\", uses each letter in descending order.</p>",
+    "examples": "Decode(\"XXI\") -- should return 21\nKey:\nSymbol    Value\nI          1\nV          5\nX          10\nL          50\nC          100\nD          500\nM          1,000",
+    "snippet": "public static int Decode(string roman)\n{\n\t//solution here\n}",
+    "solution": "public static int Decode(string roman)\n{\n\tvar convertedNumerals = new Dictionary<char, int>\n  \t{\n      { 'I', 1}, { 'V', 5}, { 'X', 10}, { 'L', 50}, { 'C', 100}, { 'D', 500}, { 'M', 1000}\n  \t};\n\tint total = 0;\n    foreach (var num in roman)\n    {\n        total += convertedNumerals[num];\n    }\n    if (roman.Contains(\"CD\") || roman.Contains(\"CM\"))\n        total -= 200;\n    if (roman.Contains(\"XL\") || roman.Contains(\"XC\"))\n        total -= 20;\n    if (roman.Contains(\"IV\") || roman.Contains(\"IX\"))\n        total -= 2;\n    return total;\n}",
+    "tests": [
+      {
+        "append": "return Decode(\"I\");",
+        "testAgainst": "1"
+      },
+      {
+        "append": "return Decode(\"XXI\");",
+        "testAgainst": "21"
+      },
+      {
+        "append": "return Decode(\"MCMXC\");",
+        "testAgainst": "1990"
+      },
+      {
+        "append": "return Decode(\"MMVIII\");",
+        "testAgainst": "2008"
+      },
+      {
+        "append": "return Decode(\"MDCLXVI\");",
+        "testAgainst": "1666"
+      },
+      {
+        "append": "return Decode(\"XXVII\");",
+        "testAgainst": "27"
+      },
+      {
+        "append": "return Decode(\"DLV\");",
+        "testAgainst": "555"
+      }
+    ],
+    "addedBy": "HillPhelmuth",
+    "userCompleted": false
+  },
+  {
+    "name": "Smart Call",
+    "difficulty": "Easier",
+    "description": "<p>Write a simple method to help determine whether to call a poker bet, i.e. the call will average more than 0. The method will date a double that represents the odds of your hand winning the pot, and integer representing the pot size, and an integer for the bet to call.      To illustrate, IsSmartCall(0.2, 50, 9) should yield true, since the net profit is 1 (0.2 * 50 - 9), and 1 > 0.</p>",
+    "examples": "IsSmartCall(0.2, 50, 9) ➞ true\r\nIsSmartCall(0.9, 1, 2) ➞ false\r\nIsSmartCall(0.9, 3, 2) ➞ true",
+    "snippet": "public static bool IsSmartCall(double odds, int pot, int call)\n{\n\t//solution here\n}",
+    "solution": "public static bool IsSmartCall(double odds, int pot, int call)\n{\n\treturn odds * pot > call;\n}",
+    "tests": [
+      {
+        "append": "return IsSmartCall(0.5, 10, 3);",
+        "testAgainst": "true"
+      },
+      {
+        "append": "return IsSmartCall(0.9, 1, 2);",
+        "testAgainst": "false"
+      },
+      {
+        "append": "return IsSmartCall(0.9, 3, 2);",
+        "testAgainst": "true"
+      },
+      {
+        "append": "return IsSmartCall(0.1, 12, 1);",
+        "testAgainst": "true"
+      },
+      {
+        "append": "return IsSmartCall(0.33, 25, 5);",
+        "testAgainst": "true"
+      },
+      {
+        "append": "return IsSmartCall(0.3, 44, 25);",
+        "testAgainst": "false"
+      }
+    ],
+    "addedBy": "HillPhelmuth",
+    "userCompleted": false
+  },
+  {
+    "name": "Help a Farmer",
+    "difficulty": "Easiest",
+    "description": "<p>A farmer has hired you to help him figure out how many legs can be counted among all his animals. The farmer breeds three species:\n\nchickens = 2 legs\ncows = 4 legs\npigs = 4 legs\nThe farmer has counted his animals and he gives you a subtotal for each species. You have to implement a function that returns the TOTAL number of LEGS of all the animals.</p>",
+    "examples": "<p>GetAnimalLegs(2, 3, 5) ➞ 36</p> <p>GetAnimalLegs(1, 2, 3) ➞ 22</p> <p>GetAnimalLegs(5, 2, 8) ➞ 50</p>",
+    "snippet": "public static int GetAnimalLegs(int chickens, int cows, int pigs)\n{\n\t//solution here\n}",
+    "solution": "public static int GetAnimalLegs(int chickens, int cows, int pigs)\n{\n\treturn (chickens * 2) + (cows * 4) + (pigs * 4);\n}",
+    "tests": [
+      {
+        "append": "return GetAnimalLegs(2,3,5);",
+        "testAgainst": "36"
+      },
+      {
+        "append": "return GetAnimalLegs(1,2,3);",
+        "testAgainst": "22"
+      },
+      {
+        "append": "return GetAnimalLegs(5,3,8);",
+        "testAgainst": "54"
+      },
+      {
+        "append": "return GetAnimalLegs(6,3,8);",
+        "testAgainst": "56"
+      },
+      {
+        "append": "return GetAnimalLegs(1,2,4);",
+        "testAgainst": "26"
+      },
+      {
+        "append": "return GetAnimalLegs(2,4,5);",
+        "testAgainst": "40"
+      },
+      {
+        "append": "return GetAnimalLegs(3,3,3);",
+        "testAgainst": "30"
+      }
+    ],
+    "addedBy": "HillPhelmuth",
+    "userCompleted": false
+  },
+  {
+    "name": "Area of Triangle",
+    "difficulty": "Easiest",
+    "description": "<p>Write a method that takes the (int) base and (int) height of a triangle and return its area.</p>",
+    "examples": "<p>GetArea(3, 2) ➞ 3</p> <p>GetArea(7, 4) ➞ 14\n</p> <p>GetArea(10, 10) ➞ 50</p>",
+    "snippet": "public static int GetArea(int tbase, int height)\n{\n\t//solution here\n}",
+    "solution": "public static int GetArea(int tbase, int height)\n{\n\treturn (tbase * height) /2;\n}",
+    "tests": [
+      {
+        "append": "return GetArea(3,2);",
+        "testAgainst": "3"
+      },
+      {
+        "append": "return GetArea(7,4);",
+        "testAgainst": "14"
+      },
+      {
+        "append": "return GetArea(10,10);",
+        "testAgainst": "50"
+      },
+      {
+        "append": "return GetArea(5,10);",
+        "testAgainst": "25"
+      },
+      {
+        "append": "return GetArea(15,20);",
+        "testAgainst": "150"
+      }
+    ],
+    "addedBy": "HillPhelmuth",
+    "userCompleted": false
+  },
+  {
+    "name": "Divisible by 5",
+    "difficulty": "Easier",
+    "description": "<p>Write a method that takes and integer and returns true if that integer is divisible by 5. A number is divisible by 5 if it can be divided by 5 with no remainder.</p>",
+    "examples": "<p>DivByFive(5) --> True</p> <p>DivByFive(-55) --> True</p> <p>DivByFive(7) --> False</p>",
+    "snippet": "public static bool DivByFive(int num)\n{\n\t//solution here\n}",
+    "solution": "public static bool DivByFive(int num)\n{\n\treturn num % 5 == 0;\n}",
+    "tests": [
+      {
+        "append": "return DivByFive(5);",
+        "testAgainst": "true"
+      },
+      {
+        "append": "return DivByFive(-55);",
+        "testAgainst": "true"
+      },
+      {
+        "append": "return DivByFive(7);",
+        "testAgainst": "false"
+      },
+      {
+        "append": "return DivByFive(33);",
+        "testAgainst": "false"
+      },
+      {
+        "append": "return DivByFive(155);",
+        "testAgainst": "true"
+      },
+      {
+        "append": "return DivByFive(12345);",
+        "testAgainst": "true"
+      }
+    ],
+    "addedBy": "HillPhelmuth",
+    "userCompleted": false
+  },
+  {
+    "name": "Just a Name",
+    "difficulty": "Easiest",
+    "description": "<p>write a method that takes two strings, firstName and lastName, and returns a single string in the format \"last, first\".</p>",
+    "examples": "<p>Name(\"Adam\",\"Holm\") --> \"Holm, Adam\"</p> <p>Name(\"Gob\", \"Bluth\") --> \"Bluth, Gob\"</p>",
+    "snippet": "public static string Name(string first, string last)\n{\n\t//solution here\n}",
+    "solution": "public static string Name(string first, string last)\n{\n\treturn $\"{last}, {first}\";\n}",
+    "tests": [
+      {
+        "append": "return Name(\"Adam\",\"Holm\");",
+        "testAgainst": "\"Holm, Adam\""
+      },
+      {
+        "append": "return Name(\"Gob\", \"Bluth\");",
+        "testAgainst": "\"Bluth, Gob\""
+      },
+      {
+        "append": "return Name(\"Bill\", \"Braski\");",
+        "testAgainst": "\"Braski, Bill\""
+      },
+      {
+        "append": "return Name(\"Bob A\", \"Johnson\");",
+        "testAgainst": "\"Johnson, Bob A\""
+      },
+      {
+        "append": "return Name(\"Kira\", \"Holm\");",
+        "testAgainst": "\"Holm, Kira\""
+      }
+    ],
+    "addedBy": "HillPhelmuth",
+    "userCompleted": false
+  },
+  {
+    "name": "Count Characters",
+    "difficulty": "Easier",
+    "description": "<p>Write a method that will take a char type and a string as arguments and returns the number of times the char is found in the string. NOTE: Your output must be case-sensitive (see second example).</p>",
+    "examples": "<p>CharCount(\"a\", \"edabit\") ➞ 1\n</p> <p>CharCount(\"c\", \"Chamber of secrets\") ➞ 1</p> <p>CharCount(\"b\", \"big fat bubble\") ➞ 4</p>",
+    "snippet": "public static int CharCount(char myChar, string myStr)\n{\n\t//solution here\n}",
+    "solution": "public static int CharCount(char myChar, string myStr)\n{\n\treturn myStr.Count(c => c == myChar);\n}",
+    "tests": [
+      {
+        "append": "return CharCount('b', \"big fat bubble\");",
+        "testAgainst": "4"
+      },
+      {
+        "append": "return CharCount('c', \"Chamber of secrets\");",
+        "testAgainst": "1"
+      },
+      {
+        "append": "return CharCount('d', \"Doobydoobydo\");",
+        "testAgainst": "2"
+      }
+    ],
+    "addedBy": "HillPhelmuth",
+    "userCompleted": false
+  },
+  {
+    "name": "To a Power",
+    "difficulty": "Easier",
+    "description": "<p>write a method that takes a base number and an exponent number and returns the calculation. While both inputs will be of type int32, there is no guarantee that the result will be.</p>",
+    "examples": "<p>ToPower(5, 5) ➞ 3125</p> <p>ToPower(10, 10) ➞ 10000000000</p> <p>ToPower(3, 3) ➞ 27</p>",
+    "snippet": "public static long ToPower(int num, int exp)\n{\n\t//solution here\n}",
+    "solution": "public static long ToPower(int num, int exp)\n{\n\treturn (long)Math.Pow(num, exp);\n}",
+    "tests": [
+      {
+        "append": "return ToPower(5, 5);",
+        "testAgainst": "3125"
+      },
+      {
+        "append": "return ToPower(10, 10);",
+        "testAgainst": "10000000000"
+      },
+      {
+        "append": "return ToPower(3, 3);",
+        "testAgainst": "27"
+      },
+      {
+        "append": "return ToPower(12,9);",
+        "testAgainst": "5159780352"
+      },
+      {
+        "append": "return ToPower(7,5);",
+        "testAgainst": "16807"
+      }
+    ],
+    "addedBy": "HillPhelmuth",
+    "userCompleted": false
+  },
+  {
+    "name": "Count the Vowels",
+    "difficulty": "Easier",
+    "description": "<p>Write a method that takes a string input and returns an integer that is the number (count) of vowels contained within it.</p>",
+    "examples": "<p>CountVowels(\"Celebration\") ➞ 5</p> <p>CountVowels(\"Palm\") ➞ 1</p> <p>CountVowels(\"Prediction\") ➞ 4</p>",
+    "snippet": "public static int CountVowels(string str)\n{\n\t//solution here\n}",
+    "solution": "public static int CountVowels(string str)\n{\n\treturn str.ToLower().Count(x => x == 'a' || x == 'e' || x == 'i' || x == 'o' || x == 'u');\n}",
+    "tests": [
+      {
+        "append": "return CountVowels(\"Celebration\");",
+        "testAgainst": "5"
+      },
+      {
+        "append": "return CountVowels(\"Palm\");",
+        "testAgainst": "1"
+      },
+      {
+        "append": "return CountVowels(\"Prediction\");",
+        "testAgainst": "4"
+      },
+      {
+        "append": "return CountVowels(\"Suite\");",
+        "testAgainst": "3"
+      },
+      {
+        "append": "return CountVowels(\"Quote\");",
+        "testAgainst": "3"
+      },
+      {
+        "append": "return CountVowels(\"Portrait\");",
+        "testAgainst": "3"
+      },
+      {
+        "append": "return CountVowels(\"Steam\");",
+        "testAgainst": "2"
+      }
+    ],
+    "addedBy": "HillPhelmuth",
+    "userCompleted": false
+  },
+  {
+    "name": "Case Check",
+    "difficulty": "Easier",
+    "description": "<p>Write a method that determines if an input string contains only uppercase or only lowercase letters.</p>",
+    "examples": "<p>SameCase(\"hello\") ➞ true</p> <p>SameCase(\"HELLO\") ➞ true</p> <p>SameCase(\"Hello\") ➞ false</p> <p>SameCase(\"ketcHUp\") ➞ false</p>",
+    "snippet": "public static bool IsSameCase(string str)\n{\n\t//solution here\n}",
+    "solution": "public static bool IsSameCase(string str)\n{\n\treturn str.ToLower() == str || str.ToUpper() == str;\t\n}",
+    "tests": [
+      {
+        "append": "return IsSameCase(\"hello\");",
+        "testAgainst": "true"
+      },
+      {
+        "append": "return IsSameCase(\"HELLO\");",
+        "testAgainst": "true"
+      },
+      {
+        "append": "return IsSameCase(\"Hello\");",
+        "testAgainst": "false"
+      },
+      {
+        "append": "return IsSameCase(\"hellO\");",
+        "testAgainst": "false"
+      },
+      {
+        "append": "return IsSameCase(\"boom\");",
+        "testAgainst": "true"
+      },
+      {
+        "append": "return IsSameCase(\"Boom\");",
+        "testAgainst": "false"
+      }
+    ],
+    "addedBy": "HillPhelmuth",
+    "userCompleted": false
+  },
+  {
+    "name": "Count the Binary Ones",
+    "difficulty": "Easy",
+    "description": "<p>Count the amount of ones in the binary representation of an integer. So for example, since 12 is '1100' in binary, the return value should be 2.</p>",
+    "examples": "<p>CountOnes(0) ➞ 0</p> <p>CountOnes(100) ➞ 3</p> <p>CountOnes(999) ➞ 8</p>",
+    "snippet": "public static int CountOnes(int num)\n{\n\t//solution here\n}",
+    "solution": "public static int CountOnes(int num)\n{\n\treturn Convert.ToString(num, 2).Count(x => x == '1');\n}",
+    "tests": [
+      {
+        "append": "return CountOnes(12);",
+        "testAgainst": "2"
+      },
+      {
+        "append": "return CountOnes(0);",
+        "testAgainst": "0"
+      },
+      {
+        "append": "return CountOnes(100);",
+        "testAgainst": "3"
+      },
+      {
+        "append": "return CountOnes(101);",
+        "testAgainst": "4"
+      },
+      {
+        "append": "return CountOnes(999);",
+        "testAgainst": "8"
+      },
+      {
+        "append": "return CountOnes(123456789);",
+        "testAgainst": "16"
+      },
+      {
+        "append": "return CountOnes(1234567890);",
+        "testAgainst": "12"
+      }
+    ],
+    "addedBy": "HillPhelmuth",
+    "userCompleted": false
+  },
+  {
+    "name": "Mask The Input",
+    "difficulty": "Easy",
+    "description": "<p>You've been hired to work on an e-commerce website. When a user signs up for an account to buy something, their credit card number, phone number or answer to a secret question is partially obscured in some way. Since someone could look over their shoulder, you don't want that shown on their screen. \n\nYour task is to create a function that takes a string, transforms all but the last four characters into \"#\" and returns the new masked string.</p>",
+    "examples": "<p>Maskify(\"4556364607935616\") ➞ \"############5616\"</p> <p>Maskify(\"64607935616\") ➞ \"#######5616\"</p> <p>Maskify(\"1\") ➞ \"1\"</p> <p>Maskify(\"\") ➞ \"\"</p>",
+    "snippet": "public static string MaskIt(string input)\n{\n\t//solution here\n}",
+    "solution": "public static string MaskIt(string input)\n{\n\treturn input.Length <= 4\n      ? input\n      : $\"{new string('#', input.Length - 4)}{input.Substring(input.Length - 4)}\";\n}",
+    "tests": [
+      {
+        "append": "return MaskIt(\"4556364607935616\");",
+        "testAgainst": "\"############5616\""
+      },
+      {
+        "append": "return MaskIt(\"64607935616\");",
+        "testAgainst": "\"#######5616\""
+      },
+      {
+        "append": "return MaskIt(\"1\");",
+        "testAgainst": "\"1\""
+      },
+      {
+        "append": "return MaskIt(\"\");",
+        "testAgainst": "\"\""
+      },
+      {
+        "append": "return MaskIt(\"tBy>L/cMe+?<j:6n;C~H\");",
+        "testAgainst": "\"################;C~H\""
+      },
+      {
+        "append": "return MaskIt(\"12\");",
+        "testAgainst": "\"12\""
+      },
+      {
+        "append": "return MaskIt(\"8Ikhlf6yoxPOwi5cB014eWbRumj7vJ\");",
+        "testAgainst": "\"##########################j7vJ\""
+      }
+    ],
+    "addedBy": "HillPhelmuth",
+    "userCompleted": false
+  },
+  {
+    "name": "Factorial Number",
+    "difficulty": "Easy",
+    "description": "<p>Write a method that receives a non-negative integer and returns the factorial of that number. <p> The factorial function says to multiply all whole numbers from our chosen number down to 1.</p></p>",
+    "examples": "<p>Fact(1) ➞ 1</p> <p>Fact(3) ➞ 6</p> <p>Fact(6) ➞ 720</p>",
+    "snippet": "public static long Fact(int n)\n{\n\t//solution here\n}",
+    "solution": "public static long Fact(int n)\n{\n\tif (n == 0)\n\t\treturn 1;\n\tif (n == 1)\n\t\treturn 1;\n\treturn n * Fact(n - 1);\n}",
+    "tests": [
+      {
+        "append": "return Fact(0);",
+        "testAgainst": "1"
+      },
+      {
+        "append": "return Fact(2);",
+        "testAgainst": "2"
+      },
+      {
+        "append": "return Fact(3);",
+        "testAgainst": "6"
+      },
+      {
+        "append": "return Fact(4);",
+        "testAgainst": "24"
+      },
+      {
+        "append": "return Fact(5);",
+        "testAgainst": "120"
+      },
+      {
+        "append": "return Fact(6);",
+        "testAgainst": "720"
+      },
+      {
+        "append": "return Fact(10);",
+        "testAgainst": "3628800"
+      },
+      {
+        "append": "return Fact(13);",
+        "testAgainst": "6227020800"
+      }
+    ],
+    "addedBy": "HillPhelmuth",
+    "userCompleted": false
+  },
+  {
+    "name": "Odd or Even (ish)",
+    "difficulty": "Easy",
+    "description": "<p>Create a method that determines whether an integer is Oddish or Evenish. A number is Oddish if the sum of all of its digits is odd, and a number is Evenish if the sum of all of its digits is even. If a number is Oddish, return a string \"Oddish\". Otherwise, return \"Evenish\". <p>For example, OddishOrEvenish(121) should return \"Evenish\", since 1 + 2 + 1 = 4. OddishOrEvenish(41) should return \"Oddish\", since 4 + 1 = 5. </p></p>",
+    "examples": "<p>OddishOrEvenish(43) ➞ \"Oddish\"</p> <p>OddishOrEvenish(373) ➞ \"Oddish\"</p> <p>OddishOrEvenish(4433) ➞ \"Evenish\"</p>",
+    "snippet": "public static string OddOrEvenIsh(int num)\n{\n\t//solution here\n}",
+    "solution": "public static string OddOrEvenIsh(int num)\n{\n\tvar numchars = num.ToString().Sum(c => Convert.ToInt32(c));\n\treturn numchars % 2 == 0 ? \"Evenish\" : \"Oddish\";\n}",
+    "tests": [
+      {
+        "append": "return OddOrEvenIsh(43);",
+        "testAgainst": "\"Oddish\""
+      },
+      {
+        "append": "return OddOrEvenIsh(373);",
+        "testAgainst": "\"Oddish\""
+      },
+      {
+        "append": "return OddOrEvenIsh(55551);",
+        "testAgainst": "\"Oddish\""
+      },
+      {
+        "append": "return OddOrEvenIsh(694);",
+        "testAgainst": "\"Oddish\""
+      },
+      {
+        "append": "return OddOrEvenIsh(4433);",
+        "testAgainst": "\"Evenish\""
+      },
+      {
+        "append": "return OddOrEvenIsh(11);",
+        "testAgainst": "\"Evenish\""
+      },
+      {
+        "append": "return OddOrEvenIsh(211112);",
+        "testAgainst": "\"Evenish\""
+      }
+    ],
+    "addedBy": "HillPhelmuth",
+    "userCompleted": false
+  },
+  {
+    "name": " Encode Duplicates",
+    "difficulty": "Mid",
+    "description": "<p>The goal of this exercise is to convert a string to a new string where each character in the new string is \"(\" if that character appears only once in the original string, or \")\" if that character appears more than once in the original string. Ignore capitalization when determining if a character is a duplicate.</p>",
+    "examples": "<p>\"din\"      =>  \"(((\"</p> <p>\"recede\"   =>  \"()()()\"</p> <p>\"Success\"  =>  \")())())\"</p> <p>\"(( @\"     =>  \"))((\"</p>",
+    "snippet": "public static string EncodeDups(string word)\n{\n\t//solution here\n}",
+    "solution": "public static string EncodeDups(string word)\n{\n\tvar newWord = \"\";\n\tvar uniqueArray = word.ToUpper().ToCharArray()\n\t\t.GroupBy(p => p)\n\t\t.Where(g => g.Count() > 1)\n\t\t.Select(g => g.Key);\n\n\tforeach (var other in word.ToUpper().ToCharArray())\n\t{\n\t\tif (uniqueArray.Contains(other))\n\t\t\tnewWord = newWord + \")\";\n\t\telse\n\t\t\tnewWord = newWord + \"(\";\n\t}\n\n\treturn newWord;\n\n}",
+    "tests": [
+      {
+        "append": "return EncodeDups(\"din\" );",
+        "testAgainst": "\"(((\""
+      },
+      {
+        "append": "return EncodeDups(\"recede\");",
+        "testAgainst": "\"()()()\""
+      },
+      {
+        "append": "return EncodeDups(\"Success\");",
+        "testAgainst": "\")())())\""
+      },
+      {
+        "append": "return EncodeDups(\"(( @\");",
+        "testAgainst": "\"))((\""
+      },
+      {
+        "append": "return EncodeDups(\"boob\");",
+        "testAgainst": "\"))))\""
+      }
+    ],
+    "addedBy": "HillPhelmuth",
+    "userCompleted": false
+  }
+]

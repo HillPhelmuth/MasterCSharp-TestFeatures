@@ -1,8 +1,9 @@
-﻿<div class="menu-slider">
+﻿@page "/practice"
+<div class="menu-slider">
     <div class="menu @cssClass">
         <SampleMenu OnCloseMenu="CloseMenu"/>
     </div>
-    <div class="console">
+    <div class="console" @onmouseup="CloseMenu">
         <div>
             <Tooltip Text="Open Menu"><span style="margin-bottom: 0; left:0"><button @onclick="OpenMenu"><img height="24" width="24" src="icons/chevron-right-64.png" alt="menu icon" /></button></span></Tooltip>
             <CodeEditor/>

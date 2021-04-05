@@ -12,6 +12,7 @@ using MasterCsharpHosted.Server.Services;
 using MasterCsharpHosted.Shared;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+using Microsoft.AspNetCore.Components.WebAssembly.Services;
 
 namespace MasterCsharpHosted.Server
 {
@@ -41,6 +42,7 @@ namespace MasterCsharpHosted.Server
             services.AddScoped<IPublicClient, ServerApi>();
             services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvidor>();
             services.AddScoped<SignOutSessionStateManager>();
+            services.AddScoped<LazyAssemblyLoader>();
             services.AddControllersWithViews();
             services.AddRazorPages();
         }

@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace MasterCsharpHosted.Shared
 {
     public class AppState : INotifyPropertyChanged
@@ -13,6 +14,9 @@ namespace MasterCsharpHosted.Shared
         private string _currentOutput = "";
         private string _content;
         private string _snippet;
+        private ChallengeModel _activeChallenge;
+        private string _title = "Practice";
+
         public event PropertyChangedEventHandler PropertyChanged;
        
 
@@ -49,32 +53,39 @@ namespace MasterCsharpHosted.Shared
             }
         }
 
-        public void AddLineToOutput(string output)
+        public ChallengeModel ActiveChallenge
         {
-            CurrentOutput += Environment.NewLine + output;
-            //NotifyOutputChange();
+            get => _activeChallenge;
+            set
+            {
+                if (value == _activeChallenge) return;
+                _activeChallenge = value;
+                OnPropertyChanged();
+            }
         }
 
-        public void ClearOutput()
+        public string Title
         {
-            CurrentOutput = "";
-            //NotifyOutputChange();
+            get => _title;
+            set
+            {
+                if (value == _title) return;
+                _title = value;
+                OnPropertyChanged();
+            }
         }
 
-        public void UpdateSnippet(string snippet)
-        {
-            Snippet = snippet;
-            //  NotifyUpdateSnippet();
-        }
-        //public void NotifyOutputChange()
-        //{
-        //    OnOutputChange?.Invoke(CurrentOutput);
-        //}
+        public void AddLineToOutput(string output) => CurrentOutput += Environment.NewLine + output;
 
-        //public void NotifyUpdateSnippet()
-        //{
-        //    OnSnippetChange?.Invoke(Snippet);
-        //}
+        public void ClearOutput() => CurrentOutput = "";
+
+        public void UpdateSnippet(string snippet) => Snippet = snippet;
+
+        public void SelectChallenge(ChallengeModel challenge)
+        {
+            Snippet = challenge.Snippet;
+            ActiveChallenge = challenge;
+        }
 
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)

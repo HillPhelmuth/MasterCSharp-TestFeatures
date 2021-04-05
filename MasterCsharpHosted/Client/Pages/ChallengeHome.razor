@@ -1,0 +1,65 @@
+﻿@page "/challenges"
+@using ChallengeModule
+
+<div class="menu-slider">
+    <div class="menu @_cssClass">
+        <ChallengeList />
+    </div>
+    <div class="challenge-area" @onmouseup="CloseMenu">
+        <div>
+            <div class="text-center">
+                <button class="button-text" @onclick="@(()=> _isReady = !_isReady)">
+                    <h5>@AppState.ActiveChallenge?.Name</h5>
+                </button>
+            </div>
+            <span style="margin-bottom: 0; left:0"><button @onclick="OpenMenu"><img height="24" width="24" src="icons/chevron-right-64.png" alt="menu icon" /></button></span>
+            @if (_isWorking)
+            {
+                <div style="margin-left:auto;margin-right:auto;margin-bottom:-8rem">
+                    <Spin/>
+                </div>
+            }
+            @if (!_isReady)
+            {
+                <ChallengeInfo OnIsReady="@(e => _isReady = e)" />
+            }
+            else
+            {
+                <CodeEditor OnSubmit="HandleSubmit"></CodeEditor>
+            }
+        </div>
+        <div>
+            <button disabled="@(results == null)" class="button-text" @onclick="@(() => _showOutput = !_showOutput)">@(_showOutput ? "Show Results":"Show Output")</button><br />
+            @if (results != null && !_showOutput)
+            {
+                <ResultTable Items="results.Outputs" TItem="Output">
+                    <TableHeader>
+                        <th>Test #</th>
+                        <th>Output</th>
+                        <th>Expected</th>
+                        <th>Passed</th>
+                    </TableHeader>
+                    <RowTemplate>
+                        <td class="@context.CssClass">@context.TestIndex</td>
+                        <td>@context.Codeout</td>
+                        <td>@context.Test.TestAgainst</td>
+                        <td class="@context.CssClass">@context.TestResult</td>
+                    </RowTemplate>
+                </ResultTable>
+            }
+            else
+            {
+                <Tooltip Text="Clear output window">
+                    <span style="margin-bottom: 0; left: 0">
+                        <button class="clear" @onclick="AppState.ClearOutput">
+                            <img height="24" width="24" src="icons/delete-100.png" alt="clear output" />
+                        </button>
+                    </span>
+                </Tooltip>
+                <span style="margin-left: 20%; margin-bottom: 0; font-size: 110%">Output window</span>
+                <OutputWindow />
+            }
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,9 @@
+﻿button {
+    background-color:darkviolet;
+    color: white;
+    border-radius: 8px;
+    padding: 1px 4px;
+}
+    button:hover {
+        background-color: mediumvioletred;
+    }

@@ -40,7 +40,7 @@ namespace MasterCsharpHosted.Server.Services
                 "System.Net",
                 "System.Threading.Tasks",
                 "System.Numerics"};
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(a => !a.IsDynamic && File.Exists(a.Location)).ToList();
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(a => !a.IsDynamic && File.Exists(a.Location) && !a.FullName.Contains("JSInterop.WebAssembly")).ToList();
 
             var partTypes = MefHostServices.DefaultAssemblies.Concat(assemblies)
                     .Distinct()?
