@@ -20,7 +20,7 @@
       "ZIndex": 1,
       "KeyWordMessages": {
         ".Format": [ "##### *String formatting* #####\nEach additional argument to the function can be referred to in the string using the brackets operator with the index number.", "String.Format(String format, Object arg0);", "format - A composite format string that includes one or more format items", "arg0 - The first or only object to format" ],
-        ".SubString": [ "##### *Substring* #####", "Returns a part of the string, beginning from the index specified as the argument. Substring also accepts a maximum length for the substring", "String.Substring(beginAt);", "String.Substring(beginAt, maximum);" ],
+        ".Substring": [ "##### *Substring* #####", "Returns a part of the string, beginning from the index specified as the argument. Substring also accepts a maximum length for the substring", "String.Substring(beginAt);", "String.Substring(beginAt, maximum);" ],
         ".ToString": [ "##### *ToString function* #####", "It converts an object to its string representation so that it is suitable for display", "Object.ToString();" ],
         ".Replace": [ "##### *Replace* #####", "string newStr = oldStr.Replace(\u0022old\u0022,\u0022new\u0022);" ],
         ".IndexOf": [ "##### *IndexOf* #####", "Finds the first ocurrence of a string in a larger string \n Returns -1 if the string is not found", "String.IndexOf(val, start, num)", "val - string to search for", "start - where to begin in string" ],

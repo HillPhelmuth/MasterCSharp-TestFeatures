@@ -75,12 +75,21 @@ a, .btn-link {
 .home-icon {
     content: url('icons/home-40.png');
 }
+    .home-icon:hover {
+        border: 1px solid mediumvioletred;
+    }
 .practice-icon {
     content: url('icons/practice-text-40.png');
 }
+    .practice-icon:hover {
+        border: 1px solid mediumvioletred;
+    }
 .challenge-icon {
     content: url('icons/challenge-text-40.png');
 }
+    .challenge-icon:hover {
+        border: 1px solid mediumvioletred;
+    }
 .fail {
     background-color: red;
     color: white;

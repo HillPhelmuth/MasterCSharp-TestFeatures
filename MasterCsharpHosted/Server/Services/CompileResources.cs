@@ -14,7 +14,7 @@ namespace MasterCsharpHosted.Server.Services
                 (x.FullName.Contains("System"))).Select(assembly => MetadataReference.CreateFromFile(assembly.Location)).ToList();
         public static List<PortableExecutableReference> PortableExecutableCompletionReferences =>
            AppDomain.CurrentDomain.GetAssemblies().Where(x =>
-               !x.IsDynamic && !string.IsNullOrWhiteSpace(x.Location)).Select(assembly => MetadataReference.CreateFromFile(assembly.Location)).ToList();
+               !x.IsDynamic && !string.IsNullOrWhiteSpace(x.Location)).Select(assembly => MetadataReference.CreateFromFile(assembly.Location, documentation:DocumentationProvider.Default)).ToList();
     }
     
     public static class Extension

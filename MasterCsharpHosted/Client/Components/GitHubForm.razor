@@ -1,0 +1,63 @@
+﻿
+<div style="height: auto; max-height: 15rem; overflow: scroll">
+    <h5 class="text-center">From Github Public Repo</h5>
+    <EditForm Model="@ghFrm" OnValidSubmit="@HandleValidSubmit">
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
+
+        <label>
+            Organization<br/>
+            <InputOnInput id="org" @bind-Value="ghFrm.Organization"/>
+        </label>
+        <label>
+            Repository Name<br/>
+            <InputOnInput @bind-Value="ghFrm.Repo"></InputOnInput>
+        </label>
+        <label>
+            <InputCheckbox @bind-Value="ghFrm.InRoot"></InputCheckbox>
+            Code file is in Root directory
+        </label><br/>
+        @if (!ghFrm.InRoot)
+        {
+            <Tooltip Text="Add Folder">
+                 <button type="button" @onclick="AddFolder"><img height="32" width="32" src="icons/plus-40.png" alt="Add"/></button>
+            </Tooltip>
+            <Tooltip Text="Remove Folder">
+                 <button type="button" @onclick="RemoveFolder"><img height="32" width="32" src="icons/minus-40.png" alt="Remove"/></button>
+            </Tooltip><br/>
+
+            @if (folderCount > 0)
+            {
+                <label>
+                    Folder 1<br/>
+                    <InputOnInput @bind-Value="ghFrm.Folder1"/>
+                </label>
+            }
+            @if (folderCount > 1)
+            {
+                <label>
+                    Folder 2<br/>
+                    <InputOnInput @bind-Value="ghFrm.Folder2"/>
+                </label>
+            }
+            @if (folderCount > 2)
+            {
+                <label>
+                    Folder 3<br/>
+                    <InputOnInput @bind-Value="ghFrm.Folder3"/>
+                </label>
+            }
+        }
+        <label>
+            File name
+            <InputOnInput @bind-Value="ghFrm.FileName"/>
+        </label>
+        <button type="submit">Retrieve Code</button>
+    </EditForm>
+    <div class="path-output">
+        @ghFrm.Organization/@ghFrm.Repo @($"{string.Join("", ghFrm.Folders)}")/@ghFrm.FileName
+    </div>
+</div>
+
+
+
