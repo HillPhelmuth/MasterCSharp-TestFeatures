@@ -930,10 +930,13 @@
   {
     "name": " Encode Duplicates",
     "difficulty": "Mid",
-    "description": "<p>The goal of this exercise is to convert a string to a new string where each character in the new string is \"(\" if that character appears only once in the original string, or \")\" if that character appears more than once in the original string. Ignore capitalization when determining if a character is a duplicate.</p>",
-    "examples": "<p>\"din\"      =>  \"(((\"</p> <p>\"recede\"   =>  \"()()()\"</p> <p>\"Success\"  =>  \")())())\"</p> <p>\"(( @\"     =>  \"))((\"</p>",
+    "description":
+      "<p>The goal of this exercise is to convert a string to a new string where each character in the new string is \"(\" if that character appears only once in the original string, or \")\" if that character appears more than once in the original string. Ignore capitalization when determining if a character is a duplicate.</p>",
+    "examples":
+      "<p>\"din\"      =>  \"(((\"</p> <p>\"recede\"   =>  \"()()()\"</p> <p>\"Success\"  =>  \")())())\"</p> <p>\"(( @\"     =>  \"))((\"</p>",
     "snippet": "public static string EncodeDups(string word)\n{\n\t//solution here\n}",
-    "solution": "public static string EncodeDups(string word)\n{\n\tvar newWord = \"\";\n\tvar uniqueArray = word.ToUpper().ToCharArray()\n\t\t.GroupBy(p => p)\n\t\t.Where(g => g.Count() > 1)\n\t\t.Select(g => g.Key);\n\n\tforeach (var other in word.ToUpper().ToCharArray())\n\t{\n\t\tif (uniqueArray.Contains(other))\n\t\t\tnewWord = newWord + \")\";\n\t\telse\n\t\t\tnewWord = newWord + \"(\";\n\t}\n\n\treturn newWord;\n\n}",
+    "solution":
+      "public static string EncodeDups(string word)\n{\n\tvar newWord = \"\";\n\tvar uniqueArray = word.ToUpper().ToCharArray()\n\t\t.GroupBy(p => p)\n\t\t.Where(g => g.Count() > 1)\n\t\t.Select(g => g.Key);\n\n\tforeach (var other in word.ToUpper().ToCharArray())\n\t{\n\t\tif (uniqueArray.Contains(other))\n\t\t\tnewWord = newWord + \")\";\n\t\telse\n\t\t\tnewWord = newWord + \"(\";\n\t}\n\n\treturn newWord;\n\n}",
     "tests": [
       {
         "append": "return EncodeDups(\"din\" );",

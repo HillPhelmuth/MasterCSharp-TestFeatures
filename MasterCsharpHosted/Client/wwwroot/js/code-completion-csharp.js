@@ -22,27 +22,18 @@ function getcsharpCompletionProvider(monaco) {
                     contentType: 'application/json',
                     success: function (data) {
                         var availableResolvers = [];
-                        if (data && data.result && data.result.items) {
-                            for (var i = 0; i < data.result.items.length; i++) {
-                                if (data.result.items[i].properties.SymbolName) {
-                                    var withSymbol = {
-                                        label: data.result.items[i].properties.SymbolName,
-                                        insertText: data.result.items[i].properties.SymbolName,
-                                        kind: convertSymbolKindToMonacoEnum(data.result.items[i].properties.SymbolKind),// monaco.languages.CompletionItemKind.Property,
-                                        detail: data.result.items[i].tags[0],
-                                        documentation: data.result.items[i].tags[1]
-                                    };
-                                    //console.log('with symbolkind: ' + data.result.items[i].properties.SymbolKind);
-                                    availableResolvers.push(withSymbol);
-                                } else {
-                                    var defaultSymbol = {
-                                        label: data.result.items[i].displayText,
-                                        insertText: data.result.items[i].displayText,
-                                        kind: monaco.languages.CompletionItemKind.Property,
-                                        detail: data.result.items[i].displayText
-                                    };
-                                    availableResolvers.push(defaultSymbol);
-                                }
+                        if (data && data.items) {
+                            for (var i = 0; i < data.items.length; i++) {
+                                var withSymbol = {
+                                    label: data.items[i].label,
+                                    insertText: data.items[i].insertText,
+                                    kind: convertSymbolKindToMonacoEnum(data.items[i].kind),
+                                    detail: data.items[i].detail,
+                                    documentation: data.items[i].documentation
+                                };
+                                //console.log('with symbolkind: ' + data.result.items[i].properties.SymbolKind);
+                                availableResolvers.push(withSymbol);
+
                             }
                             console.log("Completions from function: " + availableResolvers.length);
                             var returnObj = {

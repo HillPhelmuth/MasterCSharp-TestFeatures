@@ -14,7 +14,8 @@ namespace MasterCsharpHosted.Client.Pages
         private AppState AppState { get; set; }
         private string cssClass = "inactive";
         private bool _isMenuOpen;
-
+        private bool _showGithubForm;
+        private bool _showContent;
         protected override Task OnInitializedAsync()
         {
             AppState.PropertyChanged += HandleAppStateStateChange;

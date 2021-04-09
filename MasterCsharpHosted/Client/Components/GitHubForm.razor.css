@@ -1,0 +1,13 @@
+﻿.path-output {
+    font-size:.9rem;
+    display: flex;
+    flex-direction: row;
+    height:3rem;
+    padding: 2px 4px;
+    border:1px solid black;
+    width:100%;
+    
+}
+::deep input[type=text] {
+    max-width:120px;
+}

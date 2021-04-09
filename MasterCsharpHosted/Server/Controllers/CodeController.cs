@@ -22,10 +22,10 @@ namespace MasterCsharpHosted.Server.Controllers
         }
         private readonly CompilerService _compilerService = new();
         [HttpPost("sugestComplete")]
-        public dynamic GetSuggest([FromBody] SourceInfo sourceInfo)
+        public async ValueTask<CustomSuggestionList> GetSuggest([FromBody] SourceInfo sourceInfo)
         {
-            var suggestions = CodeCompletion.GetCodeCompletion(sourceInfo);
-            return suggestions;
+            var suggestions = await CodeCompletion.GetCodeCompletion(sourceInfo);
+            return new CustomSuggestionList {Items = suggestions};
         }
 
         [HttpPost("compile")]
@@ -46,5 +46,11 @@ namespace MasterCsharpHosted.Server.Controllers
             return code;
         }
 
+        [HttpPost("githubCode/{org}/{repo}")]
+        public async Task<string> GetFromPublicRepo([FromRoute] string org, [FromRoute] string repo,
+            [FromBody] string filePath)
+        {
+            return await _githubClient.CodeFromPublicRepo(org, repo, filePath);
+        }
     }
 }

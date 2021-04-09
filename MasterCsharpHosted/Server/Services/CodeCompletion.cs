@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Composition.Hosting;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -16,13 +17,14 @@ using Microsoft.CodeAnalysis.Host;
 using Microsoft.CodeAnalysis.Host.Mef;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace MasterCsharpHosted.Server.Services
 {
     public class CodeCompletion
     {
         private static IEnumerable<PortableExecutableReference> _staticRefs;
-        public static async Task<dynamic> GetCodeCompletion(SourceInfo sourceInfo)
+        public static async Task<List<CustomSuggestion>> GetCodeCompletion(SourceInfo sourceInfo)
         {
             var refs = CompileResources.PortableExecutableCompletionReferences;
 
@@ -88,26 +90,58 @@ namespace MasterCsharpHosted.Server.Services
 
             //Method parameters
             var overloads = GetMethodOverloads(scriptCode, position);
-            if (!(overloads?.Count > 0)) return results;
-            var builder = ImmutableArray.CreateBuilder<CompletionItem>();
-            foreach (var ci in overloads.Select(item => new { item, DisplayText = item })
-                .Select(@t => @t.item.Split('(')[1].Split(')')[0])
-                .Select(insertText => CompletionItem.Create(insertText, insertText, insertText)))
+            var suggestionList = new List<CustomSuggestion>();
+            if (results != null)
             {
-                builder.Add(ci);
+                try
+                {
+                    suggestionList.AddRange(results.Items.Select(completion => new CustomSuggestion()
+                    {
+                        Label = completion.Properties.ContainsKey("SymbolName") ? completion.Properties["SymbolName"] : completion.DisplayText,
+                        InsertText = completion.Properties.ContainsKey("SymbolName") ? completion.Properties["SymbolName"] : completion.DisplayText,
+                        Kind = completion.Properties.ContainsKey("SymbolKind") ? completion.Properties["SymbolKind"] : "8",
+                        Detail = completion.Tags != null && completion.Tags.Length > 0 ? completion.Tags[0] : "None",
+                        Documentation = completion.Tags != null && completion.Tags.Length > 1 ? completion.Tags[1] : "None"
+                    }));
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error from: \r\n{JsonConvert.SerializeObject(results)}\r\n{ex.Message}\r\n{ex.StackTrace}");
+                    throw;
+                }
             }
-
-            if (builder.Count <= 0) return results;
-            var itemlist = builder.ToImmutable();
-            return CompletionList.Create(new TextSpan(), itemlist);
+            
+            if (overloads.Count == 0) return suggestionList;
+            suggestionList = new List<CustomSuggestion>();
+            var builder = ImmutableArray.CreateBuilder<CompletionItem>();
+            foreach ((string description, string documentation) in overloads)
+            {
+                suggestionList.Add(new CustomSuggestion()
+                {
+                    Label = description.Split('(', ')')[1],
+                    InsertText = description.Split('(', ')')[1],
+                    Kind = "8",
+                    Detail = documentation,
+                    Documentation = documentation
+                });
+            }
+            //foreach (var ci in overloads.Select(pair => CompletionItem.Create(pair.Key, pair.Key, pair.Key, inlineDescription:pair.Value)))
+            //{
+            //    builder.Add(ci);
+            //}
+            return suggestionList;
+            //if (builder.Count == 0) return suggestionList;
+            //var itemlist = builder.ToImmutable();
+            //return CompletionList.Create(new TextSpan(), itemlist);
            
         }
-        public static List<string> GetMethodOverloads(string scriptCode, int position)
+        public static SortedList<string, string> GetMethodOverloads(string scriptCode, int position)
         {
             //position = position - 2;
             var overloads = new List<string>();
+            var overloadDocs = new SortedList<string, string>();
             var meta = AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES");
-            Console.WriteLine($"Trusted Platform Assemblies: {meta}");
+            //Console.WriteLine($"Trusted Platform Assemblies: {meta}");
             string[] assembliesNames = meta.ToString().Split(';');
             var sourceLanguage = new CSharpLanguage();
             var syntaxTree = sourceLanguage.ParseText(scriptCode, SourceCodeKind.Script);
@@ -130,18 +164,28 @@ namespace MasterCsharpHosted.Server.Services
 
                 if (symbolInfo.CandidateSymbols.Length > 0)
                 {
-                    overloads.AddRange(symbolInfo.CandidateSymbols
-                        .Select(param => new { parameters = param, i = param.ToMinimalDisplayParts(model, position) })
-                        .Where(@t => @t.parameters.Kind == SymbolKind.Method)
-                        .Select(@t => @t.parameters.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)));
+                    var indx = 1;
+                    foreach (ISymbol symb in symbolInfo.CandidateSymbols)
+                    {
+                        if(symb.Kind != SymbolKind.Method) continue;
+                        string valueVal = $"overload {indx}";
+                        string keyVal = symb.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+                        overloadDocs.Add(keyVal,valueVal);
+                        indx++;
+                    }
+                    //overloads.AddRange(symbolInfo.CandidateSymbols
+                    //    .Select(param => new { parameters = param })
+                    //    .Where(@t => @t.parameters.Kind == SymbolKind.Method)
+                    //    .Select(@t => @t.parameters.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)));
+                    //overloads.AddRange(symbolInfo.CandidateSymbols.Select(x => x.GetDocumentationCommentXml()));
                 }
             }
             else
             {
-                overloads = null;
+                overloadDocs = new SortedList<string, string>();
             }
 
-            return overloads;
+            return overloadDocs;
         }
         public class CSharpLanguage : ILanguageService
         {

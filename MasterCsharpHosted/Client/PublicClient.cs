@@ -55,5 +55,19 @@ namespace MasterCsharpHosted.Client
             Console.WriteLine($"api/githubCode returned a value in {sw.ElapsedMilliseconds}ms\r\nResult: {apiResult}");
             return apiResult;
         }
+
+        public async Task<string> GetFromPublicRepo(string org, string repo, string filePath)
+        {
+            var sw = new Stopwatch();
+            sw.Start();
+            var apiResult = await Client.PostAsJsonAsync($"api/code/githubCode/{org}/{repo}",filePath);
+            if (!apiResult.IsSuccessStatusCode)
+                return $"Failed to Retrieve code:\r\n{apiResult.ReasonPhrase}";
+
+            string result = await apiResult.Content.ReadAsStringAsync();
+            sw.Stop();
+            Console.WriteLine($"api/githubCode returned a value in {sw.ElapsedMilliseconds}ms\r\nResult: {result}");
+            return result;
+        }
     }
 }
