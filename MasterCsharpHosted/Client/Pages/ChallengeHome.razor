@@ -28,13 +28,13 @@
                 <CodeEditor OnSubmit="HandleSubmit"></CodeEditor>
             }
         </div>
-        <div>
+        <div style="line-height:1.3rem; font-size:.9rem">
             <button disabled="@(results == null)" class="button-text" @onclick="@(() => _showOutput = !_showOutput)">@(_showOutput ? "Show Results":"Show Output")</button><br />
             @if (results != null && !_showOutput)
             {
                 <ResultTable Items="results.Outputs" TItem="Output">
                     <TableHeader>
-                        <th>Test #</th>
+                        <th>#</th>
                         <th>Output</th>
                         <th>Expected</th>
                         <th>Passed</th>

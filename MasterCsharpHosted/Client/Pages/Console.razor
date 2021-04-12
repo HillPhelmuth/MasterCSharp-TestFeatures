@@ -6,6 +6,12 @@
     <div class="console" @onmouseup="CloseMenu">
         <div>
             <Tooltip Text="Open Menu"><span style="margin-bottom: 0; left:0"><button @onclick="OpenMenu"><img height="24" width="24" src="icons/chevron-right-64.png" alt="menu icon" /></button></span></Tooltip>
+            <button class="standard-btn" @onclick="@(() => _showModal = true)">Get code from Github</button>
+            <Modal @bind-IsOpen="_showModal" ModalLocation="Location.TopLeft">
+                <div class="form">
+                    <GitHubForm />
+                </div>
+            </Modal>
             <CodeEditor />
         </div>
         <div>
@@ -19,21 +25,16 @@
             <OutputWindow />
         </div>
         <div class="content">
-            <label>
-                <input type="checkbox" @bind="_showGithubForm" /> Get Code from public repo
-            </label>
-            <div class="form">
-
-                @if (_showGithubForm)
-                {
-                    <GitHubForm />
-                }
-
-            </div>
+            
+            
+            @if (!string.IsNullOrEmpty(AppState.Content))
+            {
+                <div class="text">@((MarkupString) AppState.Content)</div>
+            }
         </div>
-        <div class="content">
-            <div class="text">@((MarkupString)AppState.Content)</div>
-        </div>
+        @*<div class="content">
+            
+        </div>*@
 
     </div>
 </div>

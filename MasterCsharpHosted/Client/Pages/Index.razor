@@ -1,41 +1,28 @@
 ﻿@page "/"
-@if (!isPageReady)
-{
-    <div class="text-center">
-        <AuthorizeView>
-            <Authorized>
-                <h6 class="text-center">Logged in as @context.User.Identity.Name</h6>
-            </Authorized>
-            <NotAuthorized>
-                <a href="authentication/login">Log in</a>
-            </NotAuthorized>
-        </AuthorizeView><br />
-        @*<button @onclick="@(()=> isPageReady = !isPageReady)" style="margin-left: auto; margin-right:auto;font-family:ui-monospace; background-color: darkviolet;color:white"><h5 style="margin-top: 5px;">Start C# Practice Module</h5></button>*@
-        <hr />
-        <div>
-            <ul class="nav flex-column" style="font-family: ui-monospace; font-size:1.1rem">
-                <li class="nav-item px-3">
-                    <NavLink class="nav-link" href="practice">
-                        <span style="margin-bottom:-.9rem" class="practice-icon" aria-hidden="true"></span> C# Practice Module
-                    </NavLink>
-                </li>
-                <li class="nav-item px-3">
-                    <NavLink class="nav-link" href="challenges">
-                        <span style="margin-bottom:-.9rem" class="challenge-icon" aria-hidden="true"></span> C# Challenges Module
-                    </NavLink>
-                </li>
-            </ul>
-        </div>
+
+<div class="text-center">
+    <AuthorizeView>
+        <Authorized>
+            <h6 class="text-center">Logged in as @context.User.Identity.Name</h6>
+        </Authorized>
+        <NotAuthorized>
+            <a href="authentication/login">Log in</a>
+        </NotAuthorized>
+    </AuthorizeView><br />
+
+    <hr />
+    <div>
+        <ul class="nav flex-column" style="font-family: ui-monospace; font-size:1.1rem">
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="practice">
+                    <span style="margin-bottom:-.9rem" class="practice-icon" aria-hidden="true"></span> C# Practice Module
+                </NavLink>
+            </li>
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="challenges">
+                    <span style="margin-bottom:-.9rem" class="challenge-icon" aria-hidden="true"></span> C# Challenges Module
+                </NavLink>
+            </li>
+        </ul>
     </div>
-}
-
-@if (isPageReady)
-{
-    <Console />
-}
-
-@code{
-
-    private bool isPageReady;
-
-}
+</div>

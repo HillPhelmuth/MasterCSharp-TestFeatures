@@ -57,7 +57,10 @@
         ".Where(": [ "##### *Where(Func<TSource,bool> predicate)* #####", "Filters a collection based on the predicate function. Returns a collection **IEnumerable<TSource>**" ],
         ".Select(": [ "##### *Select(Func<TSource,int,TResult> selector)* #####", "Returns a new collections of type **TResult**" ],
         ".OrderBy(": [ "##### *OrderBy(Func<TSource,TKey> keySelector)* #####", "Returns the same collection now in ascending order of **TKey**" ],
-        ".First(": [ "##### *First(Func<TSource,bool> predicate)* #####", "Returns the first instance of **TSource** in the colleciton found by the predicate function" ]
+        ".First(": [ "##### *First(Func<TSource,bool> predicate)* #####", "Returns the first instance of **TSource** in the colleciton found by the predicate function" ],
+        ".FirstOrDefault(": [ "##### *FirstOrDefault(Func<TSource,bool> predicate)* #####", "Returns the first instance of **TSource** in the colleciton found by the predicate function" ],
+        ".Average(": [ "##### *Average(Func<TSource, number> selector)* #####", "Computes the average of a sequence of numeric values that are obtained by invoking a transform function on each element of the input sequence." ],
+        ".OrderByDescending(": [ "##### *OrderByDescending(Func<TSource,TKey> keySelector)* #####", "Returns the same collection now in descending order of **TKey**" ]
       }
     }
   ]
