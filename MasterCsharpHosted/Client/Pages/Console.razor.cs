@@ -16,12 +16,18 @@ namespace MasterCsharpHosted.Client.Pages
         private bool _isMenuOpen;
         private bool _showGithubForm;
         private bool _showContent;
+        private bool _showModal;
         protected override Task OnInitializedAsync()
         {
             AppState.PropertyChanged += HandleAppStateStateChange;
             return base.OnInitializedAsync();
         }
 
+        private void CloseModal(bool closed)
+        {
+            _showModal = false;
+            //StateHasChanged();
+        }
         private async Task OpenMenu()
         {
             cssClass = "active";

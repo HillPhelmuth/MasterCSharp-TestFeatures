@@ -11,3 +11,15 @@
 ::deep input[type=text] {
     max-width:120px;
 }
+button[type=submit] {
+    border-radius: 5px;
+    background-color: darkviolet;
+    padding: 2px 4px;
+    color:white;
+}
+.form {
+    height: auto;
+    max-height: 20rem;
+    min-width:18rem;
+    background-color: white
+}

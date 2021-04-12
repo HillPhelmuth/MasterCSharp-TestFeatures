@@ -8,15 +8,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>MasterCsharpHosted</title>
     <base href="/" />
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+    <link rel="manifest" href="icons/site.webmanifest">
+    <link rel="mask-icon" href="icons/safari-pinned-tab.svg" color="#5bbad5">
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="css/app.css" rel="stylesheet" />
     <link href="MasterCsharpHosted.Client.styles.css" rel="stylesheet" />
     <link href="_content/BlazorMonaco/lib/monaco-editor/min/vs/editor/editor.main.css" rel="stylesheet" />
-   
+
 </head>
 
 <body>
-<component type="typeof(MasterCsharpHosted.Client.App)" render-mode="WebAssembly" />
+    <component type="typeof(MasterCsharpHosted.Client.App)" render-mode="WebAssembly" />
 
     <div id="blazor-error-ui">
         An unhandled error has occurred.
@@ -24,14 +29,14 @@
         <a class="dismiss">🗙</a>
     </div>
     <script src="_content/Microsoft.AspNetCore.Components.WebAssembly.Authentication/AuthenticationService.js"></script>
-    
+
     <script src="_content/BlazorMonaco/lib/monaco-editor/min/vs/loader.js"></script>
     <script>require.config({ paths: { 'vs': '_content/BlazorMonaco/lib/monaco-editor/min/vs' } });</script>
     <script src="_content/BlazorMonaco/lib/monaco-editor/min/vs/editor/editor.main.js"></script>
     <script src="_content/BlazorMonaco/jsInterop.js"></script>
-<script src="js/code-completion-csharp.js"></script>
-<script src="js/jquery-1.12.2.min.js"></script>
-<script src="_framework/blazor.webassembly.js"></script>
+    <script src="js/code-completion-csharp.js"></script>
+    <script src="js/jquery-1.12.2.min.js"></script>
+    <script src="_framework/blazor.webassembly.js"></script>
 </body>
 
 </html>

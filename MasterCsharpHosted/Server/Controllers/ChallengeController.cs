@@ -40,6 +40,7 @@ namespace MasterCsharpHosted.Server.Controllers
                 Console.WriteLine("\nStart task 2");
                 sw.Restart();
                 output.TestResult = await CompilerService.SubmitSolution(code, CompileResources.PortableExecutableReferences, expected);
+                output.Test = snip;
                 sw.Stop();
                 Console.WriteLine($"Complete task 2 in {sw.ElapsedMilliseconds}ms");
                 index++;

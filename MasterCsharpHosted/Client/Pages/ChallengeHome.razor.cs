@@ -61,7 +61,7 @@ namespace MasterCsharpHosted.Client.Pages
             }
             foreach (var result in output.Outputs)
             {
-                System.Console.WriteLine($"test: {result.TestIndex}, result: {result.TestResult}, output: {result.Codeout}");
+                System.Console.WriteLine($"test: {result.TestIndex}, result: {result.TestResult}, against: {result.Test.TestAgainst}, output: {result.Codeout}");
             }
             bool challengeSucceed = output.Outputs.All(x => x.TestResult);
             _testResult = challengeSucceed ? TestResult.Pass : TestResult.Fail;

@@ -1,0 +1,9 @@
+﻿@if (IsOpen)
+{
+    <div class="modal-overlay">
+        <div class="window @(Enum.GetName(ModalLocation)?.ToLower())">
+            <button class="close" @onclick="Close"><span>&times;</span></button>
+            @ChildContent
+        </div>
+    </div>
+}
