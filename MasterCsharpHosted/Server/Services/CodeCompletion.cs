@@ -23,7 +23,6 @@ namespace MasterCsharpHosted.Server.Services
 {
     public class CodeCompletion
     {
-        private static IEnumerable<PortableExecutableReference> _staticRefs;
         public static async Task<List<CustomSuggestion>> GetCodeCompletion(SourceInfo sourceInfo)
         {
             var refs = CompileResources.PortableExecutableCompletionReferences;
@@ -125,24 +124,14 @@ namespace MasterCsharpHosted.Server.Services
                     Documentation = documentation
                 });
             }
-            //foreach (var ci in overloads.Select(pair => CompletionItem.Create(pair.Key, pair.Key, pair.Key, inlineDescription:pair.Value)))
-            //{
-            //    builder.Add(ci);
-            //}
             return suggestionList;
-            //if (builder.Count == 0) return suggestionList;
-            //var itemlist = builder.ToImmutable();
-            //return CompletionList.Create(new TextSpan(), itemlist);
-           
+            
         }
         public static SortedList<string, string> GetMethodOverloads(string scriptCode, int position)
         {
-            //position = position - 2;
-            var overloads = new List<string>();
             var overloadDocs = new SortedList<string, string>();
             var meta = AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES");
-            //Console.WriteLine($"Trusted Platform Assemblies: {meta}");
-            string[] assembliesNames = meta.ToString().Split(';');
+            string[] assembliesNames = meta.ToString()?.Split(';');
             var sourceLanguage = new CSharpLanguage();
             var syntaxTree = sourceLanguage.ParseText(scriptCode, SourceCodeKind.Script);
             var compilation = CSharpCompilation.Create("MyCompilation",
@@ -158,34 +147,23 @@ namespace MasterCsharpHosted.Server.Services
                 if (theNode == null) break; // There isn't an InvocationExpression in this branch of the tree
             }
 
-            if (theNode != null)
-            {
-                var symbolInfo = model.GetSymbolInfo(theNode);
+            if (theNode == null) return new SortedList<string, string>();
+            var symbolInfo = model.GetSymbolInfo(theNode);
 
-                if (symbolInfo.CandidateSymbols.Length > 0)
-                {
-                    var indx = 1;
-                    foreach (ISymbol symb in symbolInfo.CandidateSymbols)
-                    {
-                        if(symb.Kind != SymbolKind.Method) continue;
-                        string valueVal = $"overload {indx}";
-                        string keyVal = symb.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
-                        overloadDocs.Add(keyVal,valueVal);
-                        indx++;
-                    }
-                    //overloads.AddRange(symbolInfo.CandidateSymbols
-                    //    .Select(param => new { parameters = param })
-                    //    .Where(@t => @t.parameters.Kind == SymbolKind.Method)
-                    //    .Select(@t => @t.parameters.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)));
-                    //overloads.AddRange(symbolInfo.CandidateSymbols.Select(x => x.GetDocumentationCommentXml()));
-                }
-            }
-            else
+            if (symbolInfo.CandidateSymbols.Length == 0) return overloadDocs;
+            var indx = 1;
+            foreach (ISymbol symb in symbolInfo.CandidateSymbols)
             {
-                overloadDocs = new SortedList<string, string>();
+                if(symb.Kind != SymbolKind.Method) continue;
+                string valueVal = $"overload {indx}";
+                string keyVal = symb.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+                overloadDocs.Add(keyVal,valueVal);
+                indx++;
             }
 
             return overloadDocs;
+
+
         }
         public class CSharpLanguage : ILanguageService
         {

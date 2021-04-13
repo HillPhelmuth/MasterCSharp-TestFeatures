@@ -11,6 +11,7 @@
   <ItemGroup>
     <None Remove="HoverContentStore\AppHoverContentItems.json" />
     <None Remove="HoverContentStore\Challenges.json" />
+    <None Remove="HoverContentStore\ClassSnippets.json" />
   </ItemGroup>
 
   <ItemGroup>

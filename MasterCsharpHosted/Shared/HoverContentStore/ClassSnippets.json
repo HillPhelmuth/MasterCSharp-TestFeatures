@@ -1,0 +1,214 @@
+[
+  {
+    "SampleSection": "CollectionSamples",
+    "Samples": [
+      {
+        "Name": "Stack",
+        "Code": "Stack<int> st = new Stack<int>();\nst.Push(1);\nst.Push(2);\nst.Push(3);\nreturn st;",
+        "Description": "<p>Stack is a special type of collection that stores elements in LIFO style (Last In First Out). C# includes the generic <code>Stack<T></code> and non-generic <code>Stack</code>collection classes. It is recommended to use the generic Stack<T> collection.</p><p>Stack is useful to store temporary data in LIFO style, and you might want to delete an element after retrieving its value.</p><p>When you add an item in the list, it is called <code>pushing</code> the item and when you remove it, it is called <code>popping</code> the item.</p>",
+        "ToolTip": "Stack<T>: Represents a last-in-first-out (LIFO) collection of instances of the same specified type.",
+        "IsVisible": false
+      },
+      {
+        "Name": "Queue",
+        "Code": "Queue<int> qt = new Queue<int>();\nqt.Enqueue(1);\nqt.Enqueue(2);\nqt.Enqueue(3);\nreturn qt;",
+        "Description": "<p>Elements can be added using the <code>Enqueue()</code> method. Cannot use collection-initializer syntax.</p><p>Elements can be retrieved using the <code>Dequeue()</code> and the <code>Peek()</code> methods. It does not support an indexer.</p>",
+        "ToolTip": "Queue<T>: Represents a first-in, first-out collection of objects.",
+        "IsVisible": false
+      },
+      {
+        "Name": "HashTable",
+        "Code": "Hashtable ht = new Hashtable();\nht.Add(\"001\",\".Net\");\nht.Add(\"002\",\"c#\");\nht.Add(\"003\",\"ASP.Net\");\nreturn ht;",
+        "Description": "<p>A hash table is used when you need to access elements by using key, and you can identify a useful key value. Each item in the hash table has a key/value pair. The key is used to access the items in the collection.</p><p>It optimizes lookups by computing the hash code of each key and stores it in a different bucket internally and then matches the hash code of the specified key at the time of accessing values.</p>",
+        "ToolTip": "Hashtable: Represents a collection of key/value pairs that are organized based on the hash code of the key.",
+        "IsVisible": false
+      },
+      {
+        "Name": "List",
+        "Code": "List<string> list = new List<string>();\nlist.Add(\"item 1\");\nlist.Add(\"item 2\");\nlist.Add(\"item 3\");\nreturn list;",
+        "Description": "<p>The List<T> is a collection of strongly typed objects that can be accessed by index and having methods for sorting, searching, and modifying list. It is the generic version of the ArrayList that comes under System.Collection.Generic namespace.</p>",
+        "ToolTip": "List<T>: Represents a strongly typed list of objects that can be accessed by index. Provides methods to search, sort, and manipulate lists.",
+        "IsVisible": false
+      },
+      {
+        "Name": "Dictionary",
+        "Code": "Dictionary<int, string> dict = new Dictionary<int, string>();\ndict.Add(1, \"item 1\");\ndict.Add(2, \"item 2\");\ndict.Add(3, \"item 3\");\nreturn dict;",
+        "Description": "<p>The <code>Dictionary<TKey, TValue></code> is a generic collection that stores <code>key-value pairs</code> in no particular order.</p>",
+        "ToolTip": "Dictionary<TKey, TValue>: Collection of unique key/value pairs",
+        "IsVisible": false
+      }
+    ]
+  },
+  {
+    "SampleSection": "ControlFlowSamples",
+    "Samples": [
+      {
+        "Name": "If Statement",
+        "Code": "char[] chars = { 'C', 'S', 'h', 'a', 'r', 'p' };\nstring name = new string(chars);\nif (name.Length > 5)\n{\n\tname = $\"{name} is sometimes easy\";\n}\nreturn name;",
+        "Description": "The if statement contains a boolean condition followed by a single or multi-line code block to be executed. At runtime, if a boolean condition evaluates to true, then the code block will be executed, otherwise not.",
+        "ToolTip": "Single flow control",
+        "IsVisible": false
+      },
+      {
+        "Name": "If-Else Statement",
+        "Code": "char[] chars = { 'C', 'S', 'h', 'a', 'r', 'p' };\nstring name = new string(chars);\nif (name.Length > 6)\n{\n\tname = $\"{name} is sometimes easy\";\n}\nelse\n{\n\tname = $\"{name} is sometimes hard\";\n}\nreturn name;\n",
+        "Description": "The else statement can come only after <code>if</code> or <code>else if</code> statement and can be used only once in the if-else statements. The else statement cannot contain any condition and will be executed when all the previous if and else if conditions evaluate to false.",
+        "ToolTip": "Multiple flow control",
+        "IsVisible": false
+      },
+      {
+        "Name": "If-Else if-Else Statement",
+        "Code": "char[] chars = { 'C', 'S', 'h', 'a', 'r', 'p' };\nstring name = new string(chars);\nint nameLength = name.Length;\nif (nameLength > 7)\n{\n\tname = $\"{name} is sometimes easy\";\n}\nelse if (nameLength > 6)\n{\n\tname = $\"{name} is sometimes hard\";\n}\nelse{\n\tname = $\"{name} is always c#\";\n}\nreturn name;",
+        "Description": "Multiple <code>else if</code> statements can be used after an <code>if</code> statement. It will only be executed when the if condition evaluates to false. So, either <code>if</code> or one of the <code>else if</code> statements can be executed, but not both.",
+        "ToolTip": "Multiple flow control, with default",
+        "IsVisible": false
+      },
+      {
+        "Name": "Switch Statement",
+        "Code": "char[] chars = { 'C', 'S', 'h', 'a', 'r', 'p' };\nstring name = new string(chars);\nint nameLength = name.Length;\nswitch (nameLength)\n{\n\tcase 7:\n\t\tname = $\"{name} is sometimes easy\";\n\t\tbreak;\n\tcase 8:\n\t\tname = $\"{name} is sometimes hard\";\n\t\tbreak;\n\tdefault:\n\t\tname = $\"{name} is always c#\";\n\t\tbreak;\n}\nreturn name;",
+        "Description": "<p>The switch statement can be used instead of <code>if else</code> statement when you want to test a variable against three or more conditions.</p><p>The switch statement starts with the <code>switch</code> keyword that contains a match expression or a variable in the bracket switch(match expression). The result of this match expression or a variable will be tested against conditions specified as cases, inside the curly braces <code> { }</code>. A case must be specified with the unique constant value and ends with the colon :.</p><p>The switch statement can also contain an optional <code>default</code> label. The default label will be executed if no cases executed. The <code>break</code>, <code>return</code>, or <code>goto</code> keyword is used to exit the program control from a <code>switch</code> case.</p>",
+        "ToolTip": "Multiple flow control. Alternative to large if-else if chains",
+        "IsVisible": false
+      }
+    ]
+  },
+  {
+    "SampleSection": "ExtensionSamples",
+    "Samples": [
+      {
+        "Name": "String to words",
+        "Code": "public static int WordCount(this string words)\n{\n\tvar stringToArray = words.Split(' ');\n\tvar wordCount = stringToArray.Length;\n\treturn wordCount;\n}\nreturn \"How many words are here?\".WordCount();",
+        "Description": "<p>Extension methods enable you to \"add\" methods to existing types without creating a new derived type, recompiling, or otherwise modifying the original type. Extension methods are static methods, but they're called as if they were instance methods on the extended type. For client code written in C#, F# and Visual Basic, there's no apparent difference between calling an extension method and the methods defined in a type.</p><p>The most common extension methods are the LINQ standard query operators that add query functionality to the existing <code>System.Collections.IEnumerable</code> and <code>System.Collections.Generic.IEnumerable<T></code> types. To use the standard query operators, first bring them into scope with a <code>using System.Linq</code> directive. Then any type that implements IEnumerable<T> appears to have instance methods such as GroupBy, OrderBy, Average, and so on. You can see these additional methods in IntelliSense statement completion when you type \"dot\" after an instance of an IEnumerable<T> type such as List<T> or Array.</p>",
+        "ToolTip": "Extension method that extends a string to return its word count",
+        "IsVisible": false
+      },
+      {
+        "Name": "Extend Double",
+        "Code": "public static string ExtDoubleToText(this double inp)\n{\n\tif (inp > .8)\n\t\treturn \"very likely\";\n\tif (inp > .5 && inp <= .8)\n\t\treturn \"somewhat likely\";\n\tif (inp > .25 && inp <= .5)\n\t\treturn \"somewhat unlikely\";\n\treturn \"very unlikely\";\n}\nvar myodds = .7;\nreturn myodds.ExtDoubleToText();",
+        "Description": "<p>Extension methods enable you to \"add\" methods to existing types without creating a new derived type, recompiling, or otherwise modifying the original type. Extension methods are static methods, but they're called as if they were instance methods on the extended type. For client code written in C#, F# and Visual Basic, there's no apparent difference between calling an extension method and the methods defined in a type.</p><p>The most common extension methods are the LINQ standard query operators that add query functionality to the existing <code>System.Collections.IEnumerable</code> and <code>System.Collections.Generic.IEnumerable<T></code> types. To use the standard query operators, first bring them into scope with a <code>using System.Linq</code> directive. Then any type that implements IEnumerable<T> appears to have instance methods such as GroupBy, OrderBy, Average, and so on. You can see these additional methods in IntelliSense statement completion when you type \"dot\" after an instance of an IEnumerable<T> type such as List<T> or Array.</p>",
+        "ToolTip": "Extension method that extends a number to return a string description",
+        "IsVisible": false
+      },
+      {
+        "Name": "String to indices",
+        "Code": "public static List<int> AllIndexesOf(this string str, string value)\n{\n\tif (string.IsNullOrEmpty(value))\n\t\treturn new List<int>();\n\tvar indexes = new List<int>();\n\tfor (int index = 0; ; index += value.Length)\n\t{\n\t\tindex = str.IndexOf(value, index, StringComparison.Ordinal);\n\t\tif (index == -1)\n\t\t\treturn indexes;\n\t\tindexes.Add(index);\n\t}\n}\nreturn \"i like it\".AllIndexesOf(\"i\");",
+        "Description": "<p>Extension methods enable you to \"add\" methods to existing types without creating a new derived type, recompiling, or otherwise modifying the original type. Extension methods are static methods, but they're called as if they were instance methods on the extended type. For client code written in C#, F# and Visual Basic, there's no apparent difference between calling an extension method and the methods defined in a type.</p><p>The most common extension methods are the LINQ standard query operators that add query functionality to the existing <code>System.Collections.IEnumerable</code> and <code>System.Collections.Generic.IEnumerable<T></code> types. To use the standard query operators, first bring them into scope with a <code>using System.Linq</code> directive. Then any type that implements IEnumerable<T> appears to have instance methods such as GroupBy, OrderBy, Average, and so on. You can see these additional methods in IntelliSense statement completion when you type \"dot\" after an instance of an IEnumerable<T> type such as List<T> or Array.</p>",
+        "ToolTip": "Extension method that extends a string and returns a List<<int>> of the char indexes",
+        "IsVisible": false
+      },
+      {
+        "Name": "Extend Generic",
+        "Code": "public static void Shuffle<T>(this IList<T> cards)\n{\n\tvar rng = new Random();\n\tint n = cards.Count;\n\twhile (n > 1)\n\t{\n\t\tn--;\n\t\tint k = rng.Next(n + 1);\n\t\tT value = cards[k];\n\t\tcards[k] = cards[n];\n\t\tcards[n] = value;\n\t}\n}\n\nvar list = new List<int> {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};\nlist.Shuffle();\nreturn list;",
+        "Description": "<p>Extension methods enable you to \"add\" methods to existing types without creating a new derived type, recompiling, or otherwise modifying the original type. Extension methods are static methods, but they're called as if they were instance methods on the extended type. For client code written in C#, F# and Visual Basic, there's no apparent difference between calling an extension method and the methods defined in a type.</p><p>The most common extension methods are the LINQ standard query operators that add query functionality to the existing <code>System.Collections.IEnumerable</code> and <code>System.Collections.Generic.IEnumerable<T></code> types. To use the standard query operators, first bring them into scope with a <code>using System.Linq</code> directive. Then any type that implements IEnumerable<T> appears to have instance methods such as GroupBy, OrderBy, Average, and so on. You can see these additional methods in IntelliSense statement completion when you type \"dot\" after an instance of an IEnumerable<T> type such as List<T> or Array.</p>",
+        "ToolTip": "A Generic extension method that extends a generic collection to re-order it randomly (shuffle)",
+        "IsVisible": false
+      }
+    ]
+  },
+  {
+    "SampleSection": "StringSamples",
+    "Samples": [
+      {
+        "Name": "Concatenation",
+        "Code": "string nowDateTime = \"Date: \" + DateTime.Now.ToString(\"D\");\nstring firstName = \"Gob\";\nstring lastName = \"Bluth\";\nstring age = \"33\";\nstring authorDetails = firstName + \" \" + lastName + \" is \" + age + \" years old.\";\nreturn authorDetails;",
+        "Description": "<p>Concatenation is the process of appending one string to the end of another string. You concatenate strings by using the + operator.</p><p> For string literals and string constants, concatenation occurs at compile time; no run-time concatenation occurs. For string variables, concatenation occurs only at run time.</p>",
+        "ToolTip": "Concatenation is the process of appending one string to the end of another string",
+        "IsVisible": false
+      },
+      {
+        "Name": "String.Format",
+        "Code": "string name = \"George Bluth\";\nint age = 33;\nstring authorInfo = string.Format(\"{0} is {1} years old.\", name, age.ToString());\nreturn authorInfo;",
+        "Description": "<p>Converts the value of objects to strings based on the formats specified and inserts them into another string.</p>",
+        "ToolTip": "Convert and Insert to a new string",
+        "IsVisible": false
+      },
+      {
+        "Name": "Interpolation",
+        "Code": "string name = \"George Bluth\";\nint age = 33;\nstring authorInfo = string.Format($\"{name} is {age} years old.\");\nreturn authorInfo;",
+        "Description": "<p>The $ special character identifies a string literal as an interpolated string. An interpolated string is a string literal that might contain interpolation expressions.</p><p> When an interpolated string is resolved to a result string, items with interpolation expressions are replaced by the string representations of the expression results.</p>",
+        "ToolTip": "identified by the $ character, interpolation combines strings and expressions into a single string",
+        "IsVisible": false
+      },
+      {
+        "Name": "SubString",
+        "Code": "string authorInfo = \"Buster Bluth is 33 years old.\";\nint startPosition = authorInfo.IndexOf(\"is \") + 1;\nstring age = authorInfo.Substring(startPosition +2, 2 );\nreturn age;",
+        "Description": "<p>In C#, Substring() is a string method. It is used to retrieve a substring from the current instance of the string.</p><p> This method can be overloaded by passing the different number of parameters to it as follows:</p><p>String.Substring(Int32) - Substring(int startIndex) partial string from char at startIndex to end of the string.</p><p>String.Substring(Int32, Int32) Method Substring(int startIndex, int length) partial string from char at startIndex until the string end or reachs 'length' of chars</p>",
+        "ToolTip": "string.Substring() is used to retrieve a substring from the current instance of the string.",
+        "IsVisible": false
+      },
+      {
+        "Name": "Array to string",
+        "Code": "char[] chars = { 'C', 'S', 'h', 'a', 'r', 'p' };\nstring name = new string(chars);\nreturn name;",
+        "Description": "<p>Using Join() Method: This method is used to concatenate the members of a collection or the elements of the specified array, using the specified separator between each member or element. It can be used to create a new string from the character array.</p><p> Syntax: string str = string.Join(string seperator, collection or object)</p>",
+        "ToolTip": "A common way to merge a char[] into a string Type",
+        "IsVisible": false
+      },
+      {
+        "Name": "String to array",
+        "Code": "string sentence = \"Adam Holm is the author and founder of mastercsharp\";\nchar[] charArr = sentence.ToCharArray();\nreturn charArr;",
+        "Description": "<p>In C#, ToCharArray() is a string method. This method is used to copy the characters from a specified string in the current instance to a Unicode character array or the characters of a specified substring in the current instance to a Unicode character array.</p> ",
+        "ToolTip": "string.ToCharArray() turns a string into a char[]",
+        "IsVisible": false
+      }
+    ]
+  },
+  {
+    "SampleSection": "LoopSamples",
+    "Samples": [
+      {
+        "Name": "While loop",
+        "Code": "int n = 0;\r\nwhile (n < 5)\r\n{\r\n    Console.WriteLine(n);\r\n    n++;\r\n}",
+        "Description": "<p>The while statement executes a statement or a block of statements while a specified Boolean expression evaluates to true. Because that expression is evaluated before each execution of the loop, a while loop executes zero or more times. This differs from the do loop, which executes one or more times.</p><p>At any point within the while statement block, you can break out of the loop by using the break statement.</p><p></p><p>You can step directly to the evaluation of the while expression by using the continue statement. If the expression evaluates to true, execution continues at the first statement in the loop. Otherwise, execution continues at the first statement after the loop.</p><p>You can also exit a while loop by the goto, return, or throw statements.</p>",
+        "ToolTip": "Executes 0 or more times",
+        "IsVisible": false
+      },
+      {
+        "Name": "Do-while loop",
+        "Code": "int n = 0;\r\ndo{\r\nConsole.WriteLine(n);\r\n    n++;\r\n}\r\nwhile (n < 5);",
+        "Description": "<p>The do statement executes a statement or a block of statements while a specified Boolean expression evaluates to true. Because that expression is evaluated after each execution of the loop, a do-while loop executes one or more times. This differs from the while loop, which executes zero or more times.</p>",
+        "ToolTip": "Executes 1 or more times",
+        "IsVisible": false
+      },
+      {
+        "Name": "For Loop",
+        "Code": "char[] chars = { 'C', 'S', 'h', 'a', 'r', 'p' };\nstring name = new string(chars);\nfor (int i = 0; i < chars.Length; i++)\n{\n\tname = name + \"!\";\n}\nreturn name;",
+        "Description": "<p>The for loop contains the following three optional sections, separated by a semicolon ; </p><p><code>Initializer</code> -- The initializer section is used to initialize a variable that will be local to a for loop and cannot be accessed outside loop. It can also be zero or more assignment statements, method call, increment, or decrement expression e.g., ++i or i++, and await expression.</p><p><code>Condition</code> -- The condition is a boolean expression that will return either true or false. If an expression evaluates to true, then it will execute the loop again; otherwise, the loop is exited.</p><p><code>Iterator</code> -- The iterator defines the incremental or decremental of the loop variable.</p>",
+        "ToolTip": "executes over a specified range based on an intiializer, an execution condition, and an increment/decrement",
+        "IsVisible": false
+      },
+      {
+        "Name": "Foreach Loop",
+        "Code": "char[] chars = { 'C', 'S', 'h', 'a', 'r', 'p' };\nstring name = \"\";\nforeach (var str in chars)\n{\n\tname += str;\n}\nreturn name;\n",
+        "Description": "<p>The foreach statement executes a statement or a block of statements for each element in an instance of the type</p><p>The in keyword used along with foreach loop is used to iterate over the iterable-item. The in keyword selects an item from the iterable-item on each iteration and store it in the variable element.</p><p>On first iteration, the first item of iterable-item is stored in element. On second iteration, the second element is selected and so on.</p><p>The number of times the foreach loop will execute is equal to the number of elements in the array or collection.</p>",
+        "ToolTip": "Executes once over each instance of a collection",
+        "IsVisible": false
+      }
+    ]
+  },
+  {
+    "SampleSection": "ClassSamples",
+    "Samples": [
+      {
+        "Name": "Die Class",
+        "Code": "public class Die {\r\n  private int lastRoll;                \r\n  private Random random;     \r\n  private const int maxRoll = 6;   \r\n\r\n  public Die(){  \r\n    random = new Random();\r\n    CurrentDieVal = RollDie();\r\n  }   \r\n    \r\n  public void Toss(){  \r\n    CurrentDieVal = RollDie();\r\n  }\r\n\r\n  private int RollDie(){  \r\n    return random.Next(1,maxRoll + 1);\r\n  }\r\n\r\n  public int CurrentDieVal { get => lastRoll; set => lastRoll = value; }     \r\n \r\n}     \r\nclass DiceApp {\r\n\r\n  public static void Main(){\r\n\r\n    Die d1 = new Die(),\r\n        d2 = new Die(),\r\n        d3 = new Die();\r\n\r\n    for(int i = 1; i < 10; i++){\r\n      Console.WriteLine($\"Roll {i}\");\r\n      Console.WriteLine(\"Die 1: {0}\", d1.CurrentDieVal);  \r\n      Console.WriteLine(\"Die 2: {0}\", d2.CurrentDieVal);  \r\n      Console.WriteLine(\"Die 3: {0}\", d3.CurrentDieVal);  \r\n      d1.Toss();  \r\n\t  d2.Toss();  \r\n\t  d3.Toss(); \r\n    }\r\n\r\n }\r\n}\r\nDiceApp.Main();",
+        "Description": "<p>We program a die such that each given die has a fixed maximum number of sides, determined by the constant <code>maxRoll</code>. The class encapsulates the instance variables: <code>lastRoll</code> (private backing of <code>CurrentDieVal</code>), <code>random</code>, the constant <code>maxRoll</code>, and the property <code>CurrentDieVal</code>. The fields are instance variables that are intended to describe the state of a Die object, which is an instance of the Die class. The instance variable <code>lastRoll</code> is the most important variable. The variable <code>random</code> makes it possible for a Die to request a random number from a Random object.</p><p>After the instance variables comes a constructor. The purpose of the constructor is to initialize a newly create Die object. The constructor makes the random number supplier, which is an instance of the System.Random class. The constructor initializes a normal six-sided die. The value assigned to <code>CurrentDieVal</code> is achieved by tossing the die once via activation of the method <code>RollDie()</code>. The call of <code>RollDie()</code> delivers a number between 1 and 6. In this way, the initial state - the roll value - of a new die is random.</p><p>Then follows three methods. The Toss method modifies the value of the <code>CurrentDieVal</code> property, hereby simulating the tossing of a die. The public <code>Toss()</code> method makes use of a private method called <code>RollDie()</code>, which interacts with the random number supplier. The <code>CurrentDieVal</code> property just accesses the value of the private field <code>lastRoll</code>, making it accessible outside the class.</p>",
+        "ToolTip": "Basic Class Example - private fields, public and private methods, public property - Die class",
+        "IsVisible": false
+      },
+      {
+        "Name": "BankAccount Class",
+        "Code": "public class BankAccount {\r\n\r\n   private double interestRate;\r\n   private string owner;\r\n   private decimal balance;\r\n\r\n   public BankAccount(string owner) {\r\n      this.interestRate = 0.0;\r\n      this.owner = owner; \r\n      this.balance = 0.0M;\r\n   }\r\n\r\n   public BankAccount(string owner, double interestRate) {\r\n      this.interestRate = interestRate;\r\n      this.owner = owner; \r\n      this.balance = 0.0M;\r\n   }\r\n\r\n   public BankAccount(string owner, double interestRate, \r\n                      decimal balance) {\r\n      this.interestRate = interestRate;\r\n      this.owner = owner; \r\n      this.balance = balance;\r\n   }   \r\n\r\n   public decimal Balance () {\r\n      return balance;\r\n   }\r\n\r\n   public void Withdraw (decimal amount) {\r\n      balance -= amount;\r\n   }\r\n\r\n   public void Deposit (decimal amount) {\r\n      balance += amount;\r\n   }\r\n\r\n   public void AddInterests() {\r\n      balance = balance + balance * (decimal)interestRate;\r\n   }    \r\n\r\n   public override string ToString() {\r\n      return owner + \"'s account holds \" +\r\n            + balance + \" dollars\";\r\n   }\r\n} \r\npublic class BankAccountClient {\r\n\r\n  public static void Main(){\r\n    BankAccount a1 = new BankAccount(\"Kurt\", 0.02),\r\n                a2 = new BankAccount(\"Bent\", 0.03),\r\n                a3 = new BankAccount(\"Thomas\", 0.02);\r\n\r\n    a1.Deposit(100.0M);\r\n    a2.Deposit(1000.0M); \r\n\ta2.AddInterests();\r\n    a3.Deposit(3000.0M); \r\n\ta3.AddInterests();\r\n\r\n    Console.WriteLine(a1);   // $100 \r\n    Console.WriteLine(a2);   // $1030\r\n    Console.WriteLine(a3);   // $3060\r\n  }\r\n\r\n}\r\nBankAccountClient.Main();\r\n",
+        "Description": "<p>A field is a variable that is declared directly in a class or struct. A class or struct may have instance fields or static fields or both. Generally, you should use fields only for variables that have private or protected accessibility. Data that your class exposes to client code should be provided through methods, properties and indexers. By using these constructors for indirect access to internal fields, you can guard against invalid input values.</p><p>This is an outline of a BankAccount class programmed in C#. The class has three fields, namely <code>interestRate</code> (of type double), <code>owner</code> (of type string), and <code>balance</code> (of type decimal, a type often used to hold monetary data). In addition the class has three constructors and four methods. The methods are public and provide indirect access to the private fields.</p>",
+        "ToolTip": "Class example - private fields and public methods - BankAccount class",
+        "IsVisible": false
+      },
+      {
+        "Name": "Card Class",
+        "Code": "public class Card{\r\n  public enum CardSuite { Spade, Heart, Club, Diamond};\r\n  public enum CardValue { Ace, Two, Three, Four, Five, \r\n                          Six, Seven, Eight, Nine,\r\n                          Ten, Jack, Queen, King,\r\n                        };\r\n\r\n  private CardSuite suite;\r\n  private CardValue cardVal;\r\n\r\n  public static Card[] AllSpades = new Card[14];\r\n  public static Card[] AllHearts = new Card[14];\r\n  public static Card[] AllClubs = new Card[14];\r\n  public static Card[] AllDiamonds = new Card[14];\r\n\r\n  static Card(){\r\n    foreach(CardValue cv in Enum.GetValues(typeof(CardValue))){        \r\n      AllSpades[(int)cv] = new Card(CardSuite.Spade, cv);\r\n      AllHearts[(int)cv] = new Card(CardSuite.Heart, cv);\r\n      AllClubs[(int)cv] = new Card(CardSuite.Club, cv);\r\n      AllDiamonds[(int)cv] = new Card(CardSuite.Diamond, cv);\r\n    }\r\n    \r\n  }   \r\n\r\n  public Card(CardSuite suite, CardValue val){\r\n    this.suite = suite;\r\n    this.cardVal = val;\r\n  }\r\n\r\n  public CardSuite Suite{\r\n    get { return this.suite; }\r\n  }\r\n\r\n  public CardValue Value{\r\n    get { return this.cardVal; }\r\n  }\r\n\r\n  public override String ToString(){\r\n    return String.Format(\"Suite:{0}, Value:{1}\", suite, cardVal);\r\n  }\r\n}\r\nclass Client{\r\n\r\n  public static void Main(){\r\n    foreach (Card c in Card.AllSpades)\r\n      Console.WriteLine(c);\r\n  }\r\n\r\n}\r\nClient.Main();",
+        "Description": "<p>A static constructor is used to initialize any static data, or to perform a particular action that needs to be performed only once. It is called automatically before the first instance is created or any static members are referenced.</p><p>Constructors initialize new instances of classes. Class instances are objects. Static fields do not belong to any object. They belong to the class as generally, but they can be used from instances of the class as well. Class static fields can be useful even in the case where no instances of the class will ever be made.</p><p>This is a simple playing card class called Card in which we organize all spade cards, all heart cards, all club cards, and all diamond cards in static arrays. The arrays are created in static initializers. It is convenient to initialize the elements of the arrays in a for loops. The right place of these for loops is in a static constructor. </p>",
+        "ToolTip": "Class example - static constructor, instance constructor, public static members, public properties (instance)",
+        "IsVisible": false
+      }
+    ]
+  }
+]

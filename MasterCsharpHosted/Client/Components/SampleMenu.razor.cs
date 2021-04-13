@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Encodings.Web;
+using System.Text.Json;
 using System.Threading.Tasks;
 using MasterCsharpHosted.Shared;
 using Microsoft.AspNetCore.Components;
@@ -15,7 +17,7 @@ namespace MasterCsharpHosted.Client.Components
         private IPublicClient PublicClient { get; set; }
         [Parameter]
         public EventCallback<bool> OnCloseMenu { get; set; }
-
+        
         private void MouseOverContent(string content)
         {
             AppState.Content = content;

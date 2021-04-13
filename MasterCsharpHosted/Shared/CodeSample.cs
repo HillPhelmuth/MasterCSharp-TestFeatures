@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace MasterCsharpHosted.Shared
 {
@@ -32,8 +33,11 @@ namespace MasterCsharpHosted.Shared
 
     public class CodeSamples
     {
+        public string SampleSection { get; set; }
+        [JsonIgnore]
         public SampleSection Section { get; set; }
         public List<CodeSample> Samples { get; set; }
+        [JsonIgnore]
         public Dictionary<string,string> ResourceURLs { get; set; }
     }
 

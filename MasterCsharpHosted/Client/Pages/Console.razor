@@ -1,7 +1,7 @@
 ﻿@page "/practice"
 <div class="menu-slider">
     <div class="menu @cssClass">
-        <SampleMenu OnCloseMenu="CloseMenu"/>
+        <SampleMenu OnCloseMenu="CloseMenu" />
     </div>
     <div class="console" @onmouseup="CloseMenu">
         <div>
@@ -25,16 +25,12 @@
             <OutputWindow />
         </div>
         <div class="content">
-            
-            
             @if (!string.IsNullOrEmpty(AppState.Content))
             {
                 <div class="text">@((MarkupString) AppState.Content)</div>
             }
         </div>
-        @*<div class="content">
-            
-        </div>*@
+       
 
     </div>
 </div>

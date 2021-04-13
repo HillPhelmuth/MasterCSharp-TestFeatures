@@ -88,18 +88,19 @@
                 </li>
             }
         </ul>
-
     </li>
 
-    @*<li Label="Console App">
-            <hr />
-            @foreach (var snippet in (CodeSnippets.ConsoleSnippets))
+    <li class="top">
+        <span>Classes</span>
+        <ul class="inner-list">
+            @foreach (var snippet in CodeSnippets.ClassSamples.Samples)
             {
-                <button Label="@snippet.Key" @onclick="@(() => AppState.UpdateSnippet(snippet.Value))"></button>
-
+                <li class="inner" @key="snippet.Name">
+                    <Tooltip Text="@snippet.ToolTip">
+                        <button @onmouseup="@(()=> MouseOverContent(snippet.Description))" @onclick="@(() => AppState.UpdateSnippet(snippet.Code))">@snippet.Name</button>
+                    </Tooltip>
+                </li>
             }
-        </li>*@
-
-
-    @*<hr />*@
+        </ul>
+    </li>
 </ul>
