@@ -24,6 +24,8 @@ namespace MasterCsharpHosted.Client.Components
         public string CodeSnippet { get; set; }
         [Parameter]
         public EventCallback<string> OnSubmit { get; set; }
+        [Parameter]
+        public EventCallback<string> OnSave { get; set; }
         private MonacoEditor _editor = new();
         private string[] _deltaDecorationIds;
         private bool _shouldRender;
@@ -116,6 +118,17 @@ namespace MasterCsharpHosted.Client.Components
                     await Suggest();
                     Console.WriteLine("Tried Redo");
                 });
+            if (!string.IsNullOrEmpty(AppState.CurrentUser.UserName))
+            {
+                await _editor.AddAction("Save", "Save Code", new[] {(int) KeyMode.CtrlCmd | (int) KeyCode.KEY_S}, null,
+                    null, "navigation", 7.5,
+                    async (e, c) =>
+                    {
+                        string code = await _editor.GetValue();
+                        await OnSave.InvokeAsync(code);
+                        Console.WriteLine("Trigger OnSave");
+                    });
+            }
         }
 
         private async void EditorDidChangeCursorPosition(CursorPositionChangedEvent eventArgs)

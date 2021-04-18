@@ -8,11 +8,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
+using MasterCsharpHosted.Server.Data;
 using MasterCsharpHosted.Server.Services;
 using MasterCsharpHosted.Shared;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace MasterCsharpHosted.Server
 {
@@ -43,6 +45,8 @@ namespace MasterCsharpHosted.Server
             services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvidor>();
             services.AddScoped<SignOutSessionStateManager>();
             services.AddScoped<LazyAssemblyLoader>();
+            services.AddDbContextFactory<AppUserContext>(opts =>
+                opts.UseCosmos(Configuration["Cosmos:Endpoint"], Configuration["Cosmos:Key"], "AppUserDb"));
             services.AddControllersWithViews();
             services.AddRazorPages();
         }

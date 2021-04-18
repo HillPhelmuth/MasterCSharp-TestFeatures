@@ -12,10 +12,13 @@ namespace MasterCsharpHosted.Client.Pages
     {
         [Inject]
         private AppState AppState { get; set; }
+        [Inject]
+        private PublicClient PublicClient { get; set; }
         private string cssClass = "inactive";
         private bool _isMenuOpen;
         private bool _showModal;
-        
+        private bool _showSaveModal;
+
         protected override Task OnInitializedAsync()
         {
             AppState.PropertyChanged += HandleAppStateStateChange;
@@ -42,6 +45,36 @@ namespace MasterCsharpHosted.Client.Pages
             StateHasChanged();
         }
 
+        private string _snippetCode;
+        private void SaveSnippet(string code)
+        {
+            _snippetCode = code;
+            _showSaveModal = true;
+        }
+
+        private void HandleSave(string snippetData)
+        {
+            var splitData = snippetData.Split('|');
+            var name = splitData[0];
+            var description = splitData[1];
+
+            var snippet = new UserSnippet(name, _snippetCode, description);
+            if (AppState.CurrentUser.Snippets.Any(x => x.Name == name))
+            {
+                snippet = AppState.CurrentUser.Snippets.FirstOrDefault(x => x.Name == name);
+                snippet.Code = _snippetCode;
+                snippet.Description = description;
+            }
+            else
+            {
+                AppState.CurrentUser.Snippets.Add(snippet);
+            }
+
+            _ = PublicClient.UpdateUser(AppState.CurrentUser);
+            _showSaveModal = false;
+            StateHasChanged();
+
+        }
         private void HandleAppStateStateChange(object _, PropertyChangedEventArgs args)
         {
             if (args.PropertyName != nameof(AppState.Content)) return;

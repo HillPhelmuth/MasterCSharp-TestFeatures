@@ -16,9 +16,20 @@ namespace MasterCsharpHosted.Shared
         private string _snippet;
         private ChallengeModel _activeChallenge;
         private string _title = "Practice";
+        private AppUser _currentUser;
 
         public event PropertyChangedEventHandler PropertyChanged;
-       
+
+        public AppUser CurrentUser
+        {
+            get => _currentUser;
+            set
+            {
+                if (value == _currentUser) return;
+                _currentUser = value;
+                OnPropertyChanged();
+            }
+        }
 
         public string Snippet
         {

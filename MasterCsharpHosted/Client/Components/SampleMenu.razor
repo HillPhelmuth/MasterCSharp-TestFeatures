@@ -103,4 +103,22 @@
             }
         </ul>
     </li>
+    <li class="top">
+        <AuthorizeView>
+            <Authorized>
+                <span>Your Snippets</span>
+                <ul class="inner-list">
+                    @foreach (var snippet in AppState.CurrentUser.Snippets)
+                    {
+                        <li class="inner" @key="snippet.Name">
+                            <Tooltip Text="@snippet.Description">
+                                <button @onclick="@(() => AppState.UpdateSnippet(snippet.Code))">@snippet.Name</button>
+                            </Tooltip>
+                        </li>
+                    }
+                </ul>
+            </Authorized>
+        </AuthorizeView>
+    </li>
+
 </ul>

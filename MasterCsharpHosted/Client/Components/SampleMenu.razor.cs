@@ -17,7 +17,6 @@ namespace MasterCsharpHosted.Client.Components
         private IPublicClient PublicClient { get; set; }
         [Parameter]
         public EventCallback<bool> OnCloseMenu { get; set; }
-        
         private void MouseOverContent(string content)
         {
             AppState.Content = content;
@@ -25,7 +24,7 @@ namespace MasterCsharpHosted.Client.Components
 
         private async Task GetCodeFromGithub(CodeSample snippet)
         {
-            var code = await PublicClient.GetFromGithubRepo(snippet.Code);
+            string code = await PublicClient.GetFromGithubRepo(snippet.Code);
             MouseOverContent(snippet.Description);
             AppState.UpdateSnippet(code);
         }
