@@ -27,7 +27,7 @@ function getcsharpCompletionProvider(monaco) {
                                 var withSymbol = {
                                     label: data.items[i].label,
                                     insertText: data.items[i].insertText,
-                                    kind: convertSymbolKindToMonacoEnum(data.items[i].kind),
+                                    kind: convertRoslynKindToMonacoKind(data.items[i].kind),
                                     detail: data.items[i].detail,
                                     documentation: data.items[i].documentation
                                 };
@@ -51,7 +51,7 @@ function getcsharpCompletionProvider(monaco) {
         }
     };
 }
-function convertSymbolKindToMonacoEnum(kind) {
+function convertRoslynKindToMonacoKind(kind) {
     switch (kind) {
         case "9": return monaco.languages.CompletionItemKind.Method;
         case "15": return monaco.languages.CompletionItemKind.Property;

@@ -4,7 +4,7 @@ namespace MasterCsharpHosted.Shared
 {
     public static class CodeSnippets
     {
-        
+
         #region Linq from Github
 
         public static readonly CodeSamples LinqFromGithubSamples = new()
@@ -147,22 +147,15 @@ namespace MasterCsharpHosted.Shared
         private const string LIST = "List<string> list = new List<string>();\nlist.Add(\"item 1\");\nlist.Add(\"item 2\");\nlist.Add(\"item 3\");\nreturn list;";
         private const string DICTIONARY = "Dictionary<int, string> dict = new Dictionary<int, string>();\ndict.Add(1, \"item 1\");\ndict.Add(2, \"item 2\");\ndict.Add(3, \"item 3\");\nreturn dict;";
         private const string CONCATENATION =
-            "string nowDateTime = \"Date: \" + DateTime.Now.ToString(\"D\");\n" +
-            "string firstName = \"Gob\";\nstring lastName = \"Bluth\";\nstring age = \"33\";\n" +
-            "string authorDetails = firstName + \" \" + lastName + \" is \" + age + \" years old.\";\nreturn authorDetails;";
-        private const string FORMAT = "string name = \"George Bluth\";\nint age = 33;\n" +
-                                      "string authorInfo = string.Format(\"{0} is {1} years old.\", name, age.ToString());\nreturn authorInfo;";
-        private const string INTERPOLATION = "string name = \"George Bluth\";\nint age = 33;\n" +
-                                             "string authorInfo = string.Format($\"{name} is {age} years old.\");\nreturn authorInfo;";
-        private const string SUBSTRING = "string authorInfo = \"Buster Bluth is 33 years old.\";\n" +
-                                         "int startPosition = authorInfo.IndexOf(\"is \") + 1;\n" +
-                                         "string age = authorInfo.Substring(startPosition +2, 2 );\nreturn age;";
+            "string nowDateTime = \"Date: \" + DateTime.Now.ToString(\"D\");\nstring firstName = \"Gob\";\nstring lastName = \"Bluth\";\nstring age = \"33\";\nstring authorDetails = firstName + \" \" + lastName + \" is \" + age + \" years old.\";\nreturn authorDetails;";
+        private const string FORMAT = "string name = \"George Bluth\";\nint age = 33;\nstring authorInfo = string.Format(\"{0} is {1} years old.\", name, age.ToString());\nreturn authorInfo;";
+        private const string INTERPOLATION = "string name = \"George Bluth\";\nint age = 33;\nstring authorInfo = string.Format($\"{name} is {age} years old.\");\nreturn authorInfo;";
+        private const string SUBSTRING = "string authorInfo = \"Buster Bluth is 33 years old.\";\nint startPosition = authorInfo.IndexOf(\"is \") + 1;\nstring age = authorInfo.Substring(startPosition +2, 2 );\nreturn age;";
 
         private const string ARRAYTOSTRING =
             "char[] chars = { 'C', 'S', 'h', 'a', 'r', 'p' };\nstring name = new string(chars);\nreturn name;";
 
-        private const string STRINGTOARRAY = "string sentence = \"Adam Holm is the author and founder of mastercsharp\";\n" +
-                                             "char[] charArr = sentence.ToCharArray();\nreturn charArr;";
+        private const string STRINGTOARRAY = "string sentence = \"Adam Holm is the author and founder of mastercsharp\";\nchar[] charArr = sentence.ToCharArray();\nreturn charArr;";
 
         private const string IFCONDITIONAL = "char[] chars = { 'C', 'S', 'h', 'a', 'r', 'p' };\nstring name = new string(chars);\nif (name.Length > 5)\n{\n\tname = $\"{name} is sometimes easy\";\n}\nreturn name;";
         private const string IFELSE = "char[] chars = { 'C', 'S', 'h', 'a', 'r', 'p' };\nstring name = new string(chars);\nif (name.Length > 6)\n{\n\tname = $\"{name} is sometimes easy\";\n}\nelse\n{\n\tname = $\"{name} is sometimes hard\";\n}\nreturn name;\n";

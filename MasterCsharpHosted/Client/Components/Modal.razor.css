@@ -40,6 +40,7 @@
     .modal-overlay .topright {
         top: 10%;
         right: 10%;
+        transform: translate(-10%, -10%);
     }
 
     .modal-overlay .right {

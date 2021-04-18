@@ -69,5 +69,30 @@ namespace MasterCsharpHosted.Client
             Console.WriteLine($"api/githubCode returned a value in {sw.ElapsedMilliseconds}ms\r\nResult: {result}");
             return result;
         }
+
+        public async Task<AppUser> GetOrAddUser(string userName)
+        {
+            var sw = new Stopwatch();
+            sw.Start();
+            var apiResult = await Client.GetFromJsonAsync<AppUser>($"api/appUser/getUser/{userName}");
+            if (apiResult != null && apiResult.UserName != "NONE")
+            {
+                sw.Stop();
+                Console.WriteLine($"api/appUser/getUser returned a value in {sw.ElapsedMilliseconds}ms\r\nResult: {apiResult}");
+                return apiResult;
+            }
+
+            var addResult = await Client.PostAsJsonAsync("api/appUser/addUser", new AppUser {UserName = userName, Snippets = new List<UserSnippet>{new("Default", CodeSnippets.DefaultCode, "Default sample snippet")}, CompletedChallenges = new List<CompletedChallenge>(), IsAuthenticated = true});
+            var result = await addResult.Content.ReadAsStringAsync();
+            sw.Stop();
+            Console.WriteLine($"api/appUser/addUser returned a value in {sw.ElapsedMilliseconds}ms\r\nResult: {result}");
+            return JsonSerializer.Deserialize<AppUser>(result);
+        }
+
+        public async Task<bool> UpdateUser(AppUser user)
+        {
+            var apiResult = await Client.PostAsJsonAsync("api/appUser/updateUser", user);
+            return apiResult.IsSuccessStatusCode;
+        }
     }
 }

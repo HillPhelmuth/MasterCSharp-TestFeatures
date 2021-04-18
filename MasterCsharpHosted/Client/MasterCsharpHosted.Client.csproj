@@ -5,11 +5,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Components\Overlay.razor.cs" />
     <Compile Remove="IPublicClient.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BlazorMonaco" Version="2.0.0" />
+    <Content Remove="Components\Overlay.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Components\Overlay.razor.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BlazorMonaco" Version="2.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="5.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="5.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="5.0.5" PrivateAssets="all" />
