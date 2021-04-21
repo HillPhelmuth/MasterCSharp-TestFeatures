@@ -9,7 +9,8 @@ using System.Threading.Tasks;
 using System.Web;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Scripting.Hosting; 
+using Microsoft.CodeAnalysis.CSharp.Scripting.Hosting;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace MasterCsharpHosted.Server.Services
 {
@@ -34,6 +35,15 @@ namespace MasterCsharpHosted.Server.Services
 
         public async Task<string> SubmitCode(string code, IEnumerable<MetadataReference> references)
         {
+            SyntaxTree tree = CSharpSyntaxTree.ParseText(code);
+            CompilationUnitSyntax root = tree.GetCompilationUnitRoot();
+            var members = root.Members;
+            if (members.Any(x => x.Kind() == SyntaxKind.NamespaceDeclaration))
+            {
+                CodeOutput = await RunConsole(code, references);
+                Console.WriteLine($"Code output: {CodeOutput}");
+                return CodeOutput;
+            }
             await RunSubmission(code, references);
             Console.WriteLine($"Code output: {CodeOutput}");
             return CodeOutput;
@@ -112,7 +122,9 @@ namespace MasterCsharpHosted.Server.Services
                     "System.Text",
                     "System.Net",
                     "System.Threading.Tasks",
-                    "System.Numerics"
+                    "System.Numerics",
+                    "Microsoft.CodeAnalysis",
+                    "Microsoft.CodeAnalysis.CSharp"
                 }),
                 runningCompilation
             );
