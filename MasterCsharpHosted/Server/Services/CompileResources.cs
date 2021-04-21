@@ -11,7 +11,7 @@ namespace MasterCsharpHosted.Server.Services
         public static List<PortableExecutableReference> PortableExecutableReferences =>
             AppDomain.CurrentDomain.GetAssemblies().Where(x =>
                 !x.IsDynamic && !string.IsNullOrWhiteSpace(x.Location) &&
-                (x.FullName.Contains("System"))).Select(assembly => MetadataReference.CreateFromFile(assembly.Location)).ToList();
+                (x.FullName.Contains("System")||x.FullName.Contains("Microsoft.CodeAnalysis"))).Select(assembly => MetadataReference.CreateFromFile(assembly.Location)).ToList();
         public static List<PortableExecutableReference> PortableExecutableCompletionReferences =>
            AppDomain.CurrentDomain.GetAssemblies().Where(x =>
                !x.IsDynamic && !string.IsNullOrWhiteSpace(x.Location)).Select(assembly => MetadataReference.CreateFromFile(assembly.Location, documentation:DocumentationProvider.Default)).ToList();
