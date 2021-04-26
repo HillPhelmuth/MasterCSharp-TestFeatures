@@ -14,7 +14,7 @@ namespace MasterCsharpHosted.Client.Components
     public partial class CodeEditor : IDisposable
     {
         [Inject]
-        private IPublicClient PublicClient { get; set; }
+        private ICodeClient PublicClient { get; set; }
         [Inject]
         private AppState AppState { get; set; }
         [Inject]
@@ -26,6 +26,8 @@ namespace MasterCsharpHosted.Client.Components
         public EventCallback<string> OnSubmit { get; set; }
         [Parameter]
         public EventCallback<string> OnSave { get; set; }
+        [Parameter]
+        public EventCallback<string> OnAnalyze { get; set; }
         private MonacoEditor _editor = new();
         private string[] _deltaDecorationIds;
         private bool _shouldRender;
@@ -63,7 +65,7 @@ namespace MasterCsharpHosted.Client.Components
                 Language = "csharp",
                 Theme = "vs-dark",
                 GlyphMargin = true,
-                Value = CodeSnippets.DefaultCode
+                Value = AppState.Snippet ?? CodeSnippets.DefaultCode
             };
         }
 
@@ -81,7 +83,14 @@ namespace MasterCsharpHosted.Client.Components
                     await SubmitCodeDefault();
                     Console.WriteLine("Code Executed from Editor Command");
                 });
-            await _editor.AddAction("Undo", "Undo", new[] {(int) KeyMode.CtrlCmd | (int) KeyCode.KEY_Z},
+            await _editor.AddAction("Analyze", "Analyze Code", new[] { (int)KeyMode.CtrlCmd | (int)KeyCode.KEY_A },
+                null, null, "navigation", 2.0,
+                async (e, codes) =>
+                {
+                    await SubmitForAnalysis();
+                    Console.WriteLine("Tried Analyze");
+                });
+            await _editor.AddAction("Undo", "Undo", new[] { (int)KeyMode.CtrlCmd | (int)KeyCode.KEY_Z },
                 null, null, "navigation", 2.5,
                 async (e, codes) =>
                 {
@@ -118,10 +127,11 @@ namespace MasterCsharpHosted.Client.Components
                     await Suggest();
                     Console.WriteLine("Tried Redo");
                 });
-            if (!string.IsNullOrEmpty(AppState.CurrentUser.UserName))
+
+            if (!string.IsNullOrEmpty(AppState.CurrentUser?.UserName))
             {
-                await _editor.AddAction("Save", "Save Code", new[] {(int) KeyMode.CtrlCmd | (int) KeyCode.KEY_S}, null,
-                    null, "navigation", 7.5,
+                await _editor.AddAction("Save", "Save Code", new[] { (int)KeyMode.CtrlCmd | (int)KeyCode.KEY_S }, null,
+                    null, "navigation", 8.5,
                     async (e, c) =>
                     {
                         string code = await _editor.GetValue();
@@ -143,7 +153,7 @@ namespace MasterCsharpHosted.Client.Components
             Console.WriteLine($"Word at current cursor: {word?.Word}");
             string[] deltas = _deltaDecorationIds;
             var listDelta = new List<ModelDeltaDecoration>();
-            
+
             foreach (var hoverContent in AppHoverContent.AllAppHoverItems)
             {
                 foreach ((string key, var messages) in hoverContent.KeyWordMessages.Where(x => lineContent.Contains(x.Key)))
@@ -173,16 +183,22 @@ namespace MasterCsharpHosted.Client.Components
                 await OnSubmit.InvokeAsync(code);
                 return;
             }
-            
+
             string returnedValue = await PublicClient.CompileCodeAsync(code);
             AppState.AddLineToOutput(returnedValue);
         }
 
-        private async Task Undo() => await Js.InvokeVoidAsync("blazorMonaco.editor.trigger", _editor.Id, "whatever...", "undo", "whatever...");
+        private async Task SubmitForAnalysis()
+        {
+            string code = await _editor.GetValue();
+            AppState.SyntaxTreeInfo = await PublicClient.GetAnalysis(code);
+            //AppState.Snippet = code;
+        }
+        private async Task Undo() => await _editor.Trigger("whatever...", "undo", "whatever...");
 
-        private async Task Redo() => await Js.InvokeVoidAsync("blazorMonaco.editor.trigger", _editor.Id, "whatever...", "redo", "whatever...");
+        private async Task Redo() => await _editor.Trigger("whatever...", "redo", "whatever...");
 
-        private async Task Suggest() => await Js.InvokeVoidAsync("blazorMonaco.editor.trigger", _editor.Id, "whatever...", "editor.action.triggerSuggest", "whatever...");
+        private async Task Suggest() => await _editor.Trigger("whatever...", "editor.action.triggerSuggest", "whatever...");
 
         protected void OnContextMenu(EditorMouseEvent eventArg)
         {
@@ -190,8 +206,13 @@ namespace MasterCsharpHosted.Client.Components
         }
         private async void HandleAppStateStateChange(object _, PropertyChangedEventArgs args)
         {
-            if (args.PropertyName != nameof(AppState.Snippet)) return;
+            if (args.PropertyName != nameof(AppState.Snippet) && args.PropertyName != nameof(AppState.SyntaxTreeInfo)) return;
             _shouldRender = true;
+            if (args.PropertyName == nameof(AppState.SyntaxTreeInfo))
+            {
+                StateHasChanged();
+                return;
+            }
             await _editor.SetValue(AppState.Snippet);
             StateHasChanged();
         }

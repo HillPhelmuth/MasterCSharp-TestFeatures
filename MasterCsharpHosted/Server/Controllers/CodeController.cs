@@ -52,5 +52,12 @@ namespace MasterCsharpHosted.Server.Controllers
         {
             return await _githubClient.CodeFromPublicRepo(org, repo, filePath);
         }
+
+        [HttpPost("syntax")]
+        public Task<SyntaxTreeInfo> GetSyntaxAnalysis([FromBody] string code)
+        {
+            var analysis = new CodeAnalysis();
+            return Task.FromResult(analysis.Analyze(code));
+        }
     }
 }

@@ -11,7 +11,7 @@ using MasterCsharpHosted.Shared;
 
 namespace MasterCsharpHosted.Client
 {
-    public class PublicClient : IPublicClient
+    public class PublicClient : ICodeClient, IUserClient, IChallengeClient
     {
         public HttpClient Client { get; }
         public PublicClient(HttpClient httpClient)
@@ -30,7 +30,7 @@ namespace MasterCsharpHosted.Client
                 Console.WriteLine($"api/code/compile returned an error in {sw.ElapsedMilliseconds}ms");
                 return $"Error on compile. {apiResult.ReasonPhrase}";
             }
-            var result = await apiResult.Content.ReadAsStringAsync();
+            string result = await apiResult.Content.ReadAsStringAsync();
             sw.Stop();
             Console.WriteLine($"api/code/compile returned an value in {sw.ElapsedMilliseconds}ms");
             return result;
@@ -40,7 +40,7 @@ namespace MasterCsharpHosted.Client
             var sw = new Stopwatch();
             sw.Start();
             var apiResult = await Client.PostAsJsonAsync($"api/challenge/submit", challenge);
-            var result = await apiResult.Content.ReadAsStringAsync();
+            string result = await apiResult.Content.ReadAsStringAsync();
             sw.Stop();
             Console.WriteLine($"challenge submit too {sw.ElapsedMilliseconds}ms");
             var output = JsonSerializer.Deserialize<CodeOutputModel>(result);
@@ -83,12 +83,29 @@ namespace MasterCsharpHosted.Client
             }
 
             var addResult = await Client.PostAsJsonAsync("api/appUser/addUser", new AppUser {UserName = userName, Snippets = new List<UserSnippet>{new("Default", CodeSnippets.DefaultCode, "Default sample snippet")}, CompletedChallenges = new List<CompletedChallenge>(), IsAuthenticated = true});
-            var result = await addResult.Content.ReadAsStringAsync();
+            string result = await addResult.Content.ReadAsStringAsync();
             sw.Stop();
             Console.WriteLine($"api/appUser/addUser returned a value in {sw.ElapsedMilliseconds}ms\r\nResult: {result}");
             return JsonSerializer.Deserialize<AppUser>(result);
         }
 
+        public async Task<SyntaxTreeInfo> GetAnalysis(string code)
+        {
+            var sw = new Stopwatch();
+            sw.Start();
+            var apiResult = await Client.PostAsJsonAsync("api/code/syntax", code);
+            if (!apiResult.IsSuccessStatusCode)
+            {
+                sw.Stop();
+                Console.WriteLine($"api/code/syntax returned an error in {sw.ElapsedMilliseconds}ms");
+                Console.WriteLine($"Error on Analyze. {apiResult.ReasonPhrase}");
+                return null;
+            }
+            string result = await apiResult.Content.ReadAsStringAsync();
+            sw.Stop();
+            Console.WriteLine($"api/code/syntax returned value in {sw.ElapsedMilliseconds}ms\r\nResult: {result} ");
+            return JsonSerializer.Deserialize<SyntaxTreeInfo>(result);
+        }
         public async Task<bool> UpdateUser(AppUser user)
         {
             var apiResult = await Client.PostAsJsonAsync("api/appUser/updateUser", user);

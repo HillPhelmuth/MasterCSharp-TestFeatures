@@ -1,0 +1,19 @@
+﻿@page "/analyze"
+@using CodeSyntaxModule
+
+@if (AppState.SyntaxTreeInfo != null)
+{
+    <div class="syntax-diagram">
+        <CodeDiagram SyntaxTreeInfo="AppState.SyntaxTreeInfo" SendCode="HandleSendCode"/>
+    </div>
+}
+else
+{
+    <p class="missing">No SyntaxTree to analyze. </p>
+}
+<div class="editor-container">
+    <MonacoEditor Id="small-editor" CssClass="editor" @ref="_editor" ConstructionOptions="EditorOptionsSmall" OnDidInit="EditorOnDidInit"></MonacoEditor>
+</div>
+@code {
+
+}

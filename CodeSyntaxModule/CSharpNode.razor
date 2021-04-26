@@ -1,0 +1,39 @@
+﻿@using Blazor.Diagrams.Components.Renderers;
+
+<div class="card @(Node.NodeKind.ToString().ToLower())">
+    <div class="card-body">
+        <h4 class="card-title text-center">@Node.Name</h4>
+        <h5 class="text-center"><code>@(Node.NodeKind == NodeKind.None ? "" : Node.NodeKind.ToString())</code></h5>
+        @if (Node.NodeKind != NodeKind.Namespace && Node.NodeKind != NodeKind.Class && Node.NodeKind != NodeKind.None)
+        {
+            <h6 class="text-center">Returns <code>@Node.Type</code></h6>
+        }
+        @if (Node.NodeKind == NodeKind.Method && Node.Parameters.Count > 0)
+        {
+            <h6>Parameters</h6>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ((string name, string type) in Node.Parameters)
+                    {
+                        <tr>
+                            <td>@name</td>
+                            <td><code>@type</code></td>
+                        </tr>
+                    }
+                </tbody>
+            </table><br />
+        }
+     
+    </div>
+    @foreach (var port in Node.Ports)
+    {
+        <!-- Default ports -->
+        <PortRenderer Port="port"/>
+    }
+</div>

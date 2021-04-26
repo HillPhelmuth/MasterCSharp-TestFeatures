@@ -4,7 +4,7 @@ namespace MasterCsharpHosted.Shared
 {
     public interface IPublicClient
     {
-        Task<string> CompileCodeAsync(string code);
-        Task<string> GetFromGithubRepo(string fileName);
+        public Task<string> CompileCodeAsync(string code);
+        public Task<string> GetFromGithubRepo(string fileName);
     }
 }

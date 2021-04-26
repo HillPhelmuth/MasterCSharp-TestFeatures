@@ -26,6 +26,9 @@ namespace MasterCsharpHosted.Client
             });
             builder.Services.AddHttpClient<PublicClient>(c => c.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
             builder.Services.AddScoped<IPublicClient, PublicClient>();
+            builder.Services.AddScoped<ICodeClient, PublicClient>();
+            builder.Services.AddScoped<IUserClient, PublicClient>();
+            builder.Services.AddScoped<IChallengeClient, PublicClient>();
             builder.Services.AddSingleton<AppState>();
             await builder.Build().RunAsync();
         }

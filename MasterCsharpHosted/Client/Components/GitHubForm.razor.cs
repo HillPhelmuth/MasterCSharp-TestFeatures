@@ -13,7 +13,7 @@ namespace MasterCsharpHosted.Client.Components
         [Inject]
         private AppState AppState { get; set; }
         [Inject]
-        private PublicClient PublicClient { get; set; }
+        private ICodeClient PublicClient { get; set; }
         class FormModel
         {
             [Required]

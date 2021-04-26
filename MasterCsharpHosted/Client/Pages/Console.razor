@@ -24,7 +24,7 @@
                     <GitHubForm />
                 </div>
             </Modal>
-            <CodeEditor OnSave="SaveSnippet" />
+            <CodeEditor OnSave="SaveSnippet" OnAnalyze="HandleAnalyze" />
         </div>
         <div>
             <Tooltip Text="Clear output window">
@@ -41,6 +41,7 @@
             {
                 <div class="text">@((MarkupString) AppState.Content)</div>
             }
+            
         </div>
        
 

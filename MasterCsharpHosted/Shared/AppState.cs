@@ -17,6 +17,7 @@ namespace MasterCsharpHosted.Shared
         private ChallengeModel _activeChallenge;
         private string _title = "Practice";
         private AppUser _currentUser;
+        private SyntaxTreeInfo _syntaxTreeInfo;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -27,6 +28,17 @@ namespace MasterCsharpHosted.Shared
             {
                 if (value == _currentUser) return;
                 _currentUser = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public SyntaxTreeInfo SyntaxTreeInfo
+        {
+            get => _syntaxTreeInfo;
+            set
+            {
+                if (value == _syntaxTreeInfo) return;
+                _syntaxTreeInfo = value;
                 OnPropertyChanged();
             }
         }

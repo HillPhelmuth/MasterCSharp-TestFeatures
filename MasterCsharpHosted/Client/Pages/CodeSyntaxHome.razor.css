@@ -1,0 +1,30 @@
+﻿.editor-container {
+    bottom:90%;
+    left:100%;
+    position: sticky;
+    width:20rem;
+    height:15rem;
+}
+::deep .editor {
+    width:100%;
+    height:100%;
+}
+.syntax-diagram {
+    width:100%;
+    min-height:20rem;
+}
+button {
+    background-color: darkviolet;
+    color: white;
+    border-radius: 8px;
+    padding: 1px 4px;
+}
+
+button:hover {
+    background-color: mediumvioletred;
+}
+.missing {
+    font-size:1.15rem;
+    color: darkred;
+    font-weight:bold
+}

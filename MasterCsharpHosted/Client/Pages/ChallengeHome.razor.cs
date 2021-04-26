@@ -12,7 +12,7 @@ namespace MasterCsharpHosted.Client.Pages
         [Inject]
         private AppState AppState { get; set; }
         [Inject]
-        private PublicClient PublicClient { get; set; }
+        private IChallengeClient PublicClient { get; set; }
 
         private CodeOutputModel results;
         private TestResult _testResult;

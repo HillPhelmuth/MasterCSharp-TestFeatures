@@ -30,9 +30,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\ChallengeModule\ChallengeModule.csproj" />
+    <ProjectReference Include="..\..\CodeSyntaxModule\CodeSyntaxModule.csproj" />
     <ProjectReference Include="..\Shared\MasterCsharpHosted.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
     <BlazorWebAssemblyLazyLoad Include="ChallengeModule.dll" />
+    <BlazorWebAssemblyLazyLoad Include="CodeSyntaxModule.dll" />
+    <BlazorWebAssemblyLazyLoad Include="Blazor.Diagrams.dll" />
+    <BlazorWebAssemblyLazyLoad Include="Blazor.Diagrams.Core.dll" />
+    <BlazorWebAssemblyLazyLoad Include="SvgPathProperties.dll"/>
   </ItemGroup>
 </Project>

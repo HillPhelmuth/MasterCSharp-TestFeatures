@@ -57,18 +57,18 @@ button {
     }
 
     .content .text {
-        margin-left: 5%;
-        margin-right: 5%;
-        width: 85%;
+        margin-left: 3%;
+        margin-right: 3%;
+        width: 90%;
         padding: 3px 6px;
-        box-shadow: -2px 2px 5px 2px gray,-5px 5px 10px 5px darkviolet;
+        box-shadow: -2px 2px 5px 2px gray,-4px 4px 8px 4px darkviolet;
     }
     .content .form {
         width: 92%;
         min-width:20rem;
         margin-left: 2%;
         margin-right: 2%;
-        box-shadow: -2px 2px 5px 2px gray,-5px 5px 10px 5px darkviolet;
+        box-shadow: -2px 2px 5px 2px gray,-4px 4px 8px 4px darkviolet;
         padding: 4px 8px;
     }
 @-webkit-keyframes slide {

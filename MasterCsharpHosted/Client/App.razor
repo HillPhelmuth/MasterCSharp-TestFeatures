@@ -57,6 +57,12 @@
         {
             AppState.Title = "Practice";
         }
+        else if (context.Path == "analyze")
+        {
+            var assemblies = await AssemblyLoader.LoadAssembliesAsync(new[] { "CodeSyntaxModule.dll", "Blazor.Diagrams.dll", "Blazor.Diagrams.Core.dll", "SvgPathProperties.dll" });
+            _lazyLoadedAssemblies.AddRange(assemblies);
+            AppState.Title = "Syntax Tree";
+        }
         else
         {
             AppState.Title = "Home";

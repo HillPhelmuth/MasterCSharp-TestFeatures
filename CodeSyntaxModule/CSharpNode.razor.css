@@ -1,0 +1,55 @@
+﻿.card {
+    border: 1px solid;
+    border-radius: 5%;
+    padding: 5px 10px;
+    width: auto;
+    min-width: 12rem;
+    max-width: 18rem;
+}
+
+    .card.namespace {
+        border-color: darkviolet;
+        box-shadow: 0px 0px 20px 0px darkviolet inset;
+        color: darkviolet;
+    }
+
+    .card.class {
+        border-color: #0000cc;
+        box-shadow: 0px 0px 20px 0px #0000cc inset;
+        color: #0000cc;
+    }
+
+    .card.method {
+        border-color: darkgreen;
+        box-shadow: 0px 0px 20px 0px darkgreen inset;
+        color: darkgreen;
+    }
+
+    .card.property {
+        border-color: #995400;
+        box-shadow: 0px 0px 20px 0px #995400 inset;
+        color: #995400;
+    }
+
+    .card.field {
+        border-color: #372f6a;
+        box-shadow: 0px 0px 20px 0px #372f6a inset;
+        color: #372f6a;
+    }
+
+    .card.global {
+        border-color: #800000;
+        box-shadow: 0px 0px 20px 0px #800000 inset;
+        color: #800000;
+    }
+
+    .card .card-title {
+        top: 0;
+        height: 20%;
+        border-bottom: 1px solid;
+    }
+
+td, th {
+    border: 1px solid black;
+    padding: 0 2px
+}

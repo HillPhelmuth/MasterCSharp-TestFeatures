@@ -18,6 +18,7 @@ namespace MasterCsharpHosted.Client.Pages
         private bool _isMenuOpen;
         private bool _showModal;
         private bool _showSaveModal;
+        private string _syntax;
 
         protected override Task OnInitializedAsync()
         {
@@ -74,6 +75,12 @@ namespace MasterCsharpHosted.Client.Pages
             _showSaveModal = false;
             StateHasChanged();
 
+        }
+
+        private void HandleAnalyze(string syntaxOjb)
+        {
+            _syntax = syntaxOjb;
+            StateHasChanged();
         }
         private void HandleAppStateStateChange(object _, PropertyChangedEventArgs args)
         {

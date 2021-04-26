@@ -15,7 +15,7 @@ namespace MasterCsharpHosted.Client.Shared
         [Inject]
         private AuthenticationStateProvider AuthState { get; set; }
         [Inject]
-        private PublicClient PublicClient { get; set; }
+        private IUserClient PublicClient { get; set; }
 
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
