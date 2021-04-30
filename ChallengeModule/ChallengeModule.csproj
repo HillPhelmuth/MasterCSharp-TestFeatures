@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MasterCsharpHosted\Shared\MasterCsharpHosted.Shared.csproj" />
+    <ProjectReference Include="..\SharedComponents\SharedComponents.csproj" />
   </ItemGroup>
 
 </Project>

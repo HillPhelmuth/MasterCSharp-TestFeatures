@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <Content Remove="Components\Overlay.razor" />
+    <Content Remove="wwwroot\index.html" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,6 +32,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\ChallengeModule\ChallengeModule.csproj" />
     <ProjectReference Include="..\..\CodeSyntaxModule\CodeSyntaxModule.csproj" />
+    <ProjectReference Include="..\..\SharedComponents\SharedComponents.csproj" />
     <ProjectReference Include="..\Shared\MasterCsharpHosted.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
@@ -38,6 +40,6 @@
     <BlazorWebAssemblyLazyLoad Include="CodeSyntaxModule.dll" />
     <BlazorWebAssemblyLazyLoad Include="Blazor.Diagrams.dll" />
     <BlazorWebAssemblyLazyLoad Include="Blazor.Diagrams.Core.dll" />
-    <BlazorWebAssemblyLazyLoad Include="SvgPathProperties.dll"/>
+    <BlazorWebAssemblyLazyLoad Include="SvgPathProperties.dll" />
   </ItemGroup>
 </Project>

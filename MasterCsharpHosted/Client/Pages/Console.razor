@@ -11,6 +11,9 @@
                 </span>
             </Tooltip>
             <button class="standard-btn" @onclick="@(() => _showModal = true)">Get code from Github</button>
+            <div style="margin-left: 75%; margin-top: -2rem">
+                <MySelect TItem="string" OptionsList="_themeOptions" OnSelectItem="HandleThemeChange" />
+            </div>
             <AuthorizeView>
                 <Authorized>
                    

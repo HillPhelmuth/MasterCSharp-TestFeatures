@@ -16,12 +16,6 @@ namespace MasterCsharpHosted.Client.Components
 
         protected override Task OnInitializedAsync()
         {
-            //AppState.OnOutputChange += output =>
-            //{
-            //    _currentCodeOutput = output;
-            //    _shouldRender = true;
-            //    StateHasChanged();
-            //};
             AppState.PropertyChanged += HandleAppStateStateChange;
             return base.OnInitializedAsync();
         }

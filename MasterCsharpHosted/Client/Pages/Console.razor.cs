@@ -19,7 +19,8 @@ namespace MasterCsharpHosted.Client.Pages
         private bool _showModal;
         private bool _showSaveModal;
         private string _syntax;
-
+        private readonly List<string> _themeOptions = new() {"vs", "vs-dark", "hc-black"};
+       
         protected override Task OnInitializedAsync()
         {
             AppState.PropertyChanged += HandleAppStateStateChange;
@@ -77,6 +78,11 @@ namespace MasterCsharpHosted.Client.Pages
 
         }
 
+        private void HandleThemeChange(string theme)
+        {
+            AppState.EditorTheme = theme;
+            StateHasChanged();
+        }
         private void HandleAnalyze(string syntaxOjb)
         {
             _syntax = syntaxOjb;

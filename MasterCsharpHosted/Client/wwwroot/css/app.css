@@ -113,52 +113,6 @@ a, .btn-link {
     box-shadow: 0px 0px 20px 0px #590080 inset;
 }
 
-.node.selected, .node.selected .port {
-    border: 1px solid #6e9fd4;
-}
-
-.node:hover .port {
-    visibility: visible;
-}
-
-.port {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background-color: #f5f5f5;
-    border: 1px solid #d4d4d4;
-    cursor: pointer;
-    visibility: hidden;
-}
-
-    .port:hover, .card .port.has-links {
-        visibility: visible;
-        background-color: black;
-    }
-
-    .port.bottom {
-        position: absolute;
-        bottom: -10px;
-        left: 49%;
-    }
-
-    .port.top {
-        position: absolute;
-        top: -10px;
-        left: 49%;
-    }
-
-    .port.right {
-        position: absolute;
-        bottom: 49%;
-        right: -10px;
-    }
-
-    .port.left {
-        position: absolute;
-        bottom: 49%;
-        left: -10px;
-    }
 
 .fail {
     background-color: red;

@@ -1,6 +1,6 @@
 ﻿@using Blazor.Diagrams.Components.Renderers;
 
-<div class="card @(Node.NodeKind.ToString().ToLower())">
+<div class="card @(Node.NodeKind.ToString().ToLower()) @(Node.Selected ? "selected" : "")">
     <div class="card-body">
         <h4 class="card-title text-center">@Node.Name</h4>
         <h5 class="text-center"><code>@(Node.NodeKind == NodeKind.None ? "" : Node.NodeKind.ToString())</code></h5>

@@ -24,6 +24,8 @@ namespace MasterCsharpHosted.Shared
 
         [JsonPropertyName("GlobalDeclarations")]
         public List<GlobalDeclarationInfo> GlobalDeclarations { get; set; } = new();
+        [JsonPropertyName("MaxLevel")]
+        public int MaxLevel { get; set; }
 
     }
     public class NameSpaceInfo : SyntaxInfoBase
@@ -64,6 +66,9 @@ namespace MasterCsharpHosted.Shared
         public string ReturnType { get; set; }
         [JsonPropertyName("Parameters")]
         public Dictionary<string, string> Parameters { get; set; }
+
+        [JsonPropertyName("BodySyntax")]
+        public List<GlobalDeclarationInfo> BodySyntax { get; set; } = new();
     }
 
     public class GlobalDeclarationInfo : SyntaxInfoBase

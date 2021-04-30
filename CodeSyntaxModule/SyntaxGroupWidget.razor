@@ -1,0 +1,17 @@
+﻿@using Blazor.Diagrams.Components.Renderers;
+@using Blazor.Diagrams.Components.Groups;
+
+
+<GroupContainer Group="Group" Class="@GroupCss">
+    <div class="group-title text-center">
+        <span class="top">@Group.Title </span><br />
+        @*<span class="bottom">@Group.Kind.ToString()</span>*@
+    </div>
+    <GroupLinks></GroupLinks>
+    <GroupNodes></GroupNodes>
+
+    @foreach (var port in Group.Ports)
+    {
+        <PortRenderer Port="port" Class="port"></PortRenderer>
+    }
+</GroupContainer>

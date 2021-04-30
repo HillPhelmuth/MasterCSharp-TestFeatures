@@ -40,6 +40,7 @@ namespace CodeSyntaxModule
             if (left) node.AddPort(PortAlignment.Left);
             if (right) node.AddPort(PortAlignment.Right);
         }
+        
     }
    
 }

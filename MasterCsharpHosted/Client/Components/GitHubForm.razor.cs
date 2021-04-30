@@ -38,7 +38,6 @@ namespace MasterCsharpHosted.Client.Components
         {
             if (folderCount > 3) return;
             folderCount += 1;
-            //ghFrm.Folders.Add(string.Empty);
             StateHasChanged();
         }
 
@@ -46,7 +45,6 @@ namespace MasterCsharpHosted.Client.Components
         {
             if (folderCount == 0) return;
             folderCount -= 1;
-            //ghFrm.Folders.RemoveAt(ghFrm.Folders.Count - 1);
             StateHasChanged();
         }
         private FormModel ghFrm = new();

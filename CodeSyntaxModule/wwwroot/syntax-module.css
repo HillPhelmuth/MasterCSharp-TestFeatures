@@ -1,0 +1,68 @@
+﻿.custom-group {
+   /* border: 1px dashed #590080 !important;*/
+    background: transparent !important;
+    outline: none !important;
+    border-radius: 5%;
+    
+    
+}
+    .custom-group.class {
+        box-shadow: 0px 0px 20px 0px #590080 inset;
+    }
+    .custom-group.method {
+        box-shadow: 0px 0px 20px 0px darkgreen inset;
+    }
+    .custom-group .layer {
+        display: grid;
+        grid-template-columns: 17rem;
+        grid-column-gap: .5rem;
+    }
+    .custom-group.selected {
+        border: 5px solid darkviolet;
+    }
+.node.selected, .node.selected .port {
+    border: 1px solid #6e9fd4;
+}
+
+.node:hover .port {
+    visibility: visible;
+}
+
+.port {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #f5f5f5;
+    border: 1px solid #d4d4d4;
+    cursor: pointer;
+    visibility: hidden;
+}
+
+    .port:hover, .card .port.has-links {
+        visibility: visible;
+        background-color: #6b0099;
+    }
+
+.port.bottom {
+    position: absolute;
+    bottom: -10px;
+    left: 49%;
+}
+
+.port.top {
+    position: absolute;
+    top: -10px;
+    left: 49%;
+}
+
+.port.right {
+    position: absolute;
+    bottom: 49%;
+    right: -10px;
+}
+
+.port.left {
+    position: absolute;
+    bottom: 49%;
+    left: -10px;
+}

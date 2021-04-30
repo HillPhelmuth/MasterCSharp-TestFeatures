@@ -18,6 +18,7 @@ namespace MasterCsharpHosted.Shared
         private string _title = "Practice";
         private AppUser _currentUser;
         private SyntaxTreeInfo _syntaxTreeInfo;
+        private string _editorTheme = "vs-dark";
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -39,6 +40,17 @@ namespace MasterCsharpHosted.Shared
             {
                 if (value == _syntaxTreeInfo) return;
                 _syntaxTreeInfo = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string EditorTheme
+        {
+            get => _editorTheme;
+            set
+            {
+                if (value == _editorTheme) return;
+                _editorTheme = value;
                 OnPropertyChanged();
             }
         }

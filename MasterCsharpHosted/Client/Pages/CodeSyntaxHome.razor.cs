@@ -17,7 +17,7 @@ namespace MasterCsharpHosted.Client.Pages
         private ICodeClient PublicClient { get; set; }
 
         private bool _shouldRender;
-        
+        private bool _selfTrigger;
         protected override Task OnInitializedAsync()
         {
             AppState.PropertyChanged += AppStateChanged;
@@ -60,14 +60,14 @@ namespace MasterCsharpHosted.Client.Pages
                 GlyphMargin = false,
                 FontSize = 12,
                 LineNumbers = "off",
-                Value = AppState.SyntaxTreeInfo.SourceCode ?? AppState.Snippet ?? CodeSnippets.DefaultCode
+                Value = AppState.SyntaxTreeInfo?.SourceCode ?? AppState.Snippet ?? CodeSnippets.DefaultCode
 
             };
         }
 
         protected async Task EditorOnDidInit(MonacoEditorBase editorBase)
         {
-            await _editor.SetValue(AppState.SyntaxTreeInfo.SourceCode ?? AppState.Snippet);
+            await _editor.SetValue(AppState.SyntaxTreeInfo?.SourceCode ?? AppState.Snippet);
             await _editor.AddAction("Analyze", "Analyze Code", new[] { (int)KeyMode.CtrlCmd | (int)KeyCode.Enter },
                 null, null, "navigation", 1.5,
                 async (e, codes) =>
@@ -80,6 +80,7 @@ namespace MasterCsharpHosted.Client.Pages
 
         private async Task SubmitForAnalysis()
         {
+            _selfTrigger = true;
             string code = await _editor.GetValue();
             AppState.SyntaxTreeInfo = await PublicClient.GetAnalysis(code);
             AppState.Snippet = code;
@@ -87,8 +88,10 @@ namespace MasterCsharpHosted.Client.Pages
         private async void AppStateChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName != nameof(AppState.SyntaxTreeInfo) && e.PropertyName != nameof(AppState.Snippet)) return;
-            _shouldRender = true;
-            await InvokeAsync(StateHasChanged);
+            _shouldRender = !_selfTrigger;
+            _selfTrigger = false;
+            if (_shouldRender)
+                await InvokeAsync(StateHasChanged);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using MasterCsharpHosted.Shared;
@@ -12,39 +13,43 @@ namespace MasterCsharpHosted.Server.Services
 {
     public class CodeAnalysis
     {
+        private int maxLevel = 2;
         public SyntaxTreeInfo Analyze(string programText)
         {
 
             var tree = CSharpSyntaxTree.ParseText(programText);
             var root = tree.GetCompilationUnitRoot();
-           
-            return new SyntaxTreeInfo
+
+            var treeInfo = new SyntaxTreeInfo
             {
                 SourceCode = programText,
                 Usings = root.Usings.Select(x => x.Name.ToString()).ToList(),
                 NameSpaces = root.Members.OfType<NamespaceDeclarationSyntax>().Select(syntax =>
                     WriteNamespaceInfo(syntax)).ToList(),
-                Classes = root.Members.OfType<ClassDeclarationSyntax>().Select(syntax => WriteClassInfo(syntax)).ToList(),
-                Methods = root.Members.OfType<MethodDeclarationSyntax>().Select(syntax => WriteMethodInfo(syntax)).ToList(),
-                GlobalDeclarations = root.Members.OfType<GlobalStatementSyntax>().Select(WriteGlobalDeclarationInfo).ToList()
+                Classes = root.Members.OfType<ClassDeclarationSyntax>().Select(syntax => WriteClassInfo(syntax))
+                    .ToList(),
+                Methods = root.Members.OfType<MethodDeclarationSyntax>().Select(syntax => WriteMethodInfo(syntax))
+                    .ToList(),
+                GlobalDeclarations = root.Members.OfType<GlobalStatementSyntax>()
+                    .Select(syntax => WriteStatementInfo(syntax.Statement, maxLevel)).ToList()
             };
-
+            return treeInfo;
         }
 
-        private static GlobalDeclarationInfo WriteGlobalDeclarationInfo(GlobalStatementSyntax globalStatement)
+        private GlobalDeclarationInfo WriteGlobalInfo(GlobalStatementSyntax globalStatement, int rootLevel = 1)
         {
-            
             return new()
             {
                 Name = "Declaration",
-                RootLevel = 2,
+                RootLevel = rootLevel,
                 Type = globalStatement.Statement.Kind().ToString(),
                 RawCode = globalStatement.ToFullString()
             };
         }
-        private static NameSpaceInfo WriteNamespaceInfo(NamespaceDeclarationSyntax nameSpace, int rootLevel = 1)
+        private NameSpaceInfo WriteNamespaceInfo(NamespaceDeclarationSyntax nameSpace, int rootLevel = 1)
         {
-            return new()
+            maxLevel = rootLevel > maxLevel ? rootLevel : maxLevel;
+            return new NameSpaceInfo()
             {
                 Name = nameSpace.Name.ToFullString(),
                 RawCode = nameSpace.ToFullString(),
@@ -52,10 +57,11 @@ namespace MasterCsharpHosted.Server.Services
             };
         }
 
-        private static ClassInfo WriteClassInfo(ClassDeclarationSyntax cls, int rootLevel = 1)
+        private ClassInfo WriteClassInfo(ClassDeclarationSyntax cls, int rootLevel = 1)
         {
             int root = rootLevel + 1;
-            return new()
+            maxLevel = rootLevel > maxLevel ? rootLevel : maxLevel;
+            return new ClassInfo()
             {
                 Name = cls.Identifier.ToString(),
                 ParentName = cls.Parent?.GetText().Lines[0].ToString().TrimStart() ?? "No ParentName",
@@ -68,9 +74,12 @@ namespace MasterCsharpHosted.Server.Services
             };
         }
 
-        private static MethodInfo WriteMethodInfo(MethodDeclarationSyntax method, int rootLevel = 1)
+        private MethodInfo WriteMethodInfo(MethodDeclarationSyntax method, int rootLevel = 1)
         {
-            return new()
+            maxLevel = rootLevel > maxLevel ? rootLevel : maxLevel;
+            
+            
+            return new MethodInfo()
             {
                 ParentName = method.Parent?.GetText().Lines[0].ToString().TrimStart() ?? "No ParentName",
                 Name = method.Identifier.Text,
@@ -78,13 +87,31 @@ namespace MasterCsharpHosted.Server.Services
                 RawCode = method.ToFullString(),
                 Parameters = method.ParameterList.Parameters.ToDictionary(x => x.Identifier.Text, x => x.Type?.ToString()),
                 Body = method.Body?.ToFullString(),
+                BodySyntax = method.Body?.Statements.Select(s => WriteStatementInfo(s, rootLevel + 1)).ToList(),
                 RootLevel = rootLevel
             };
         }
-
-        private static PropertyInfo WritePropertyInfo(PropertyDeclarationSyntax property, int rootLevel)
+       private GlobalDeclarationInfo WriteStatementInfo(StatementSyntax statement, int rootLevel = 1)
         {
-            return new()
+            var kind = statement.Kind();
+            string type = statement switch
+            {
+                LocalDeclarationStatementSyntax variable => variable.Declaration.Type.ToFullString(),
+                LocalFunctionStatementSyntax func => func.ReturnType.ToFullString(),
+                _ => ""
+            };
+            return new GlobalDeclarationInfo()
+            {
+                Name = kind == SyntaxKind.LocalDeclarationStatement ? "Variable" : kind.ToSplitCamelCase(),
+                RawCode = statement.ToFullString(),
+                Type = type,
+                RootLevel = rootLevel + 1
+            };
+        }
+        private PropertyInfo WritePropertyInfo(PropertyDeclarationSyntax property, int rootLevel)
+        {
+            maxLevel = rootLevel > maxLevel ? rootLevel : maxLevel;
+            return new PropertyInfo()
             {
                 Name = property.Identifier.Text,
                 ParentName = property.Parent?.GetText().Lines[0].ToString().TrimStart(),
@@ -94,9 +121,10 @@ namespace MasterCsharpHosted.Server.Services
             };
         }
 
-        private static PropertyInfo WriteFieldInfo(FieldDeclarationSyntax field, int rootLevel = 1)
+        private PropertyInfo WriteFieldInfo(FieldDeclarationSyntax field, int rootLevel = 1)
         {
-            return new()
+            maxLevel = rootLevel > maxLevel ? rootLevel : maxLevel;
+            return new PropertyInfo()
             {
                 Name = field.Declaration.Variables[0].Identifier.Text,
                 ParentName = field.Parent?.GetText().Lines[0].ToString().TrimStart(),
@@ -104,6 +132,16 @@ namespace MasterCsharpHosted.Server.Services
                 RawCode = field.ToFullString(),
                 RootLevel = rootLevel
             };
+        }
+    }
+
+    public static class SytaxExtensions
+    {
+        public static string ToSplitCamelCase(this Enum kind)
+        {
+            string input = kind.ToString();
+            return Regex.Replace(input, "(?<=[a-z])([A-Z])", " $1", RegexOptions.Compiled).Trim();
+
         }
     }
 }
