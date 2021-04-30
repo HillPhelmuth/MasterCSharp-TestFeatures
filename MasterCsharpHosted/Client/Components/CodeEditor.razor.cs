@@ -63,7 +63,7 @@ namespace MasterCsharpHosted.Client.Components
                 Lightbulb = new EditorLightbulbOptions { Enabled = true },
                 SuggestOnTriggerCharacters = true,
                 Language = "csharp",
-                Theme = "vs-dark",
+                //Theme = "vs-dark",
                 GlyphMargin = true,
                 Value = AppState.Snippet ?? CodeSnippets.DefaultCode
             };
@@ -72,6 +72,7 @@ namespace MasterCsharpHosted.Client.Components
         protected async Task EditorOnDidInit(MonacoEditorBase editorBase)
         {
             await _editor.SetValue(AppState.Snippet);
+            await MonacoEditorBase.SetTheme("vs-dark");
             await _editor.AddCommand((int)KeyMode.CtrlCmd | (int)KeyCode.KEY_H, (editor, keyCode) =>
             {
                 Console.WriteLine("Ctrl+H : Initial editor command is triggered.");
@@ -132,7 +133,7 @@ namespace MasterCsharpHosted.Client.Components
             {
                 await _editor.AddAction("Save", "Save Code", new[] { (int)KeyMode.CtrlCmd | (int)KeyCode.KEY_S }, null,
                     null, "navigation", 8.5,
-                    async (e, c) =>
+                    async (_, _) =>
                     {
                         string code = await _editor.GetValue();
                         await OnSave.InvokeAsync(code);
@@ -206,15 +207,27 @@ namespace MasterCsharpHosted.Client.Components
         }
         private async void HandleAppStateStateChange(object _, PropertyChangedEventArgs args)
         {
-            if (args.PropertyName != nameof(AppState.Snippet) && args.PropertyName != nameof(AppState.SyntaxTreeInfo)) return;
+            //if (args.PropertyName != nameof(AppState.Snippet) && args.PropertyName != nameof(AppState.SyntaxTreeInfo) && args.PropertyName != nameof(AppState.EditorTheme)) return;
+            Console.WriteLine($"Editor Handles AppState change of {args.PropertyName} property");
             _shouldRender = true;
-            if (args.PropertyName == nameof(AppState.SyntaxTreeInfo))
+            switch (args.PropertyName)
             {
-                StateHasChanged();
-                return;
+                case nameof(AppState.SyntaxTreeInfo):
+                    StateHasChanged();
+                    return;
+                case nameof(AppState.EditorTheme):
+                    await MonacoEditorBase.SetTheme(AppState.EditorTheme);
+                    StateHasChanged();
+                    Console.WriteLine("Theme set to " + AppState.EditorTheme);
+                    return;
+                case nameof(AppState.Snippet):
+                    await _editor.SetValue(AppState.Snippet);
+                    StateHasChanged();
+                    break;
+                default:
+                    _shouldRender = false;
+                    return;
             }
-            await _editor.SetValue(AppState.Snippet);
-            StateHasChanged();
         }
 
         public void Dispose()

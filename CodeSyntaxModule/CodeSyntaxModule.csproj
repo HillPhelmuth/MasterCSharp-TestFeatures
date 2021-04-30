@@ -4,6 +4,18 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="CSharpGroup.razor.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="CSharpGroup.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="CSharpGroup.razor.css" />
+  </ItemGroup>
+
   
   <ItemGroup>
     <SupportedPlatform Include="browser" />
@@ -16,6 +28,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MasterCsharpHosted\Shared\MasterCsharpHosted.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="CSharpGroup.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="CSharpGroup.razor" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,10 +10,11 @@ using Blazor.Diagrams.Core;
 using Blazor.Diagrams.Core.Models;
 using Blazor.Diagrams.Components;
 using Blazor.Diagrams.Core.Geometry;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace CodeSyntaxModule
 {
-    public partial class CodeDiagram
+    public partial class CodeDiagram : IDisposable
     {
         [Inject]
         public AppState AppState { get; set; }
@@ -22,20 +24,19 @@ namespace CodeSyntaxModule
         public EventCallback<string> SendCode { get; set; }
 
         public CSharpDiagramState DiagramState { get; set; } = new();
-
+        
         private List<SyntaxNode> _namespaceNodes = new();
         private List<SyntaxNode> _classNodes = new();
         private List<SyntaxNode> _methodNodes = new();
         private List<SyntaxNode> _propNodes = new();
         private List<SyntaxNode> _fieldNodes = new();
         private List<SyntaxNode> _globalNodes = new();
+        private Dictionary<string, List<SyntaxNode>> _methodMemberNodes = new();
         private List<LinkModel> _nodeLinks = new();
+        
         private static DiagramOptions _options = new()
         {
-
-            DeleteKey = "Delete",
-            DefaultNodeComponent = null,
-            //GridSize = 400,
+            DeleteKey = "None",
             AllowMultiSelection = true,
             AllowPanning = true,
             Zoom = new DiagramZoomOptions
@@ -44,25 +45,27 @@ namespace CodeSyntaxModule
             },
             Links = new DiagramLinkOptions
             {
-                DefaultLinkComponent = null,
                 DefaultColor = "blue",
                 DefaultSelectedColor = "red"
             }
         };
-        private List<GroupModel> _groups = new();
+        private List<SyntaxGroup> _groups = new();
         private Diagram _diagram = new(_options);
         private Dictionary<int, int> _rowColumns = new();
+        private bool _isExpandMethods;
         protected override Task OnInitializedAsync()
         {
-            for (int i = 1; i < 100; i++) _rowColumns[i] = 0;
+            AppState.PropertyChanged += AppStateChanged;
+            for (int i = 0; i < 100; i++) _rowColumns[i] = 0;
 
-            DiagramState.OnSendRawCode += s => SendCode.InvokeAsync(s);
+            
             RegisterEvents();
             _diagram.RegisterModelComponent<SyntaxNode, CSharpNode>();
+            _diagram.RegisterModelComponent<SyntaxGroup, SyntaxGroupWidget>();
             int nsIndex = 1;
             foreach (var nameSpace in SyntaxTreeInfo.NameSpaces)
             {
-                var node = new SyntaxNode(new Point(10 * nameSpace.RootLevel, 0))
+                var node = new SyntaxNode(new Point((150 * _rowColumns[nameSpace.RootLevel]) + 175, 0))
                 {
                     Name = nameSpace.Name,
                     RawCode = nameSpace.RawCode,
@@ -71,19 +74,29 @@ namespace CodeSyntaxModule
                 _rowColumns[nameSpace.RootLevel]++;
                 node.AddPort();
                 _namespaceNodes.Add(node);
-                foreach (var classMembers in nameSpace.Classes.Select(cls => CreateClassMemberNodes(cls, node)))
+                foreach (var cls in nameSpace.Classes)
                 {
-                    _groups.Add(new GroupModel(classMembers, 20));
+                    var classNode = GetClassSyntaxNode(cls, node);
+                    var classMembers = CreateClassMemberNodes(cls, classNode);
+                    var syntaxGroup = new SyntaxGroup(classMembers, cls.Name, NodeKind.Class, 50);
+                    syntaxGroup.AddNodePorts();
+                    _groups.Add(syntaxGroup);
+                    _nodeLinks.Add(new LinkModel(classNode.GetPort(PortAlignment.Bottom), syntaxGroup.GetPort(PortAlignment.Top)));
                 }
 
                 nsIndex++;
             }
 
-            foreach (var classGroup in SyntaxTreeInfo.Classes.Select(c => CreateClassMemberNodes(c)))
+            foreach (var cls in SyntaxTreeInfo.Classes)
             {
-                _groups.Add(new GroupModel(classGroup, 20));
+                var classNode = GetClassSyntaxNode(cls);
+                var classGroup = CreateClassMemberNodes(cls, classNode);
+                var syntaxGroup = new SyntaxGroup(classGroup, cls.Name, NodeKind.Class, 50);
+                syntaxGroup.AddNodePorts();
+                _groups.Add(syntaxGroup);
+                _nodeLinks.Add(new LinkModel(classNode.GetPort(PortAlignment.Bottom), syntaxGroup.GetPort(PortAlignment.Top)));
             }
-            
+
             if (SyntaxTreeInfo.GlobalDeclarations.Count > 0)
             {
                 SyntaxNode previousNode = null;
@@ -94,7 +107,8 @@ namespace CodeSyntaxModule
                     NodeKind = NodeKind.None
                 };
                 globalNode.AddNodePorts();
-                foreach (var global in SyntaxTreeInfo.GlobalDeclarations.Select(CreateGlobalNode))
+                
+                foreach (var global in SyntaxTreeInfo.GlobalDeclarations.Select(g => CreateGlobalNode(g)))
                 {
                     _globalNodes.Add(global);
                     if (previousNode != null)
@@ -116,81 +130,101 @@ namespace CodeSyntaxModule
             _diagram.Nodes.Add(_methodNodes.Union(_propNodes).Union(_fieldNodes).Union(_globalNodes));
             _diagram.Links.Add(_nodeLinks);
             _groups.ForEach(g => _diagram.AddGroup(g));
-            
+
             return base.OnInitializedAsync();
         }
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
+        private void ZoomToFit(MouseEventArgs args)
         {
-            if (firstRender)
-            {
-                await Task.Delay(1000);
-                _diagram.ZoomToFit(50);
-            }
-                
-            await base.OnAfterRenderAsync(firstRender);
+            _diagram.ZoomToFit(50);
         }
-
         private void RegisterEvents()
         {
             _diagram.SelectionChanged += (m) =>
             {
                 Console.WriteLine($"SelectionChanged, Id={m.Id}, Type={m.GetType().Name}, Selected={m.Selected}");
-                if (m is SyntaxNode node)
+                switch (m)
                 {
-                    SendCode.InvokeAsync(node.RawCode);
+                    case SyntaxNode node:
+                    {
+                        SendCode.InvokeAsync(node.RawCode);
+                        //if (node.NodeKind == NodeKind.Method && _isExpandMethods)
+                        //{
+                        //    CreateMethodGroupNode(node);
+                        //}
+
+                        break;
+                    }
+                    case SyntaxGroup grp:
+                    {
+                        var n = grp.Ports.Select(p => p.Parent).FirstOrDefault();
+                        string code = (n as SyntaxNode)?.RawCode;
+                        if (!string.IsNullOrWhiteSpace(code))
+                            SendCode.InvokeAsync(code);
+                        break;
+                    }
                 }
+
                 StateHasChanged();
             };
-            _diagram.MouseClick += (model, args) =>
-            {
-                Console.WriteLine($"MouseClick, Type={model?.GetType().Name}, ModelId={model?.Id}");
-                if (model is SyntaxNode node)
-                {
-                    SendCode.InvokeAsync(node.RawCode);
-                }
-            };
+           
         }
-        private List<SyntaxNode> CreateClassMemberNodes(ClassInfo cls, NodeModel node = null)
+        private List<SyntaxNode> CreateClassMemberNodes(ClassInfo cls, SyntaxNode classNode = null)
         {
+            var classMembers = new List<SyntaxNode>();
+            foreach (var method in cls.Methods)
+            {
+                var methodNode = CreateMethodNode(method);
+                var methodGroup = CreateMethodMembersNodes(method);
+                var syntaxGroup = new SyntaxGroup(methodGroup, methodNode.Name, NodeKind.Class, 50);
+                syntaxGroup.AddNodePorts();
+                _groups.Add(syntaxGroup);
+                _nodeLinks.Add(new LinkModel(methodNode.GetPort(PortAlignment.Bottom), syntaxGroup.GetPort(PortAlignment.Top)));
+                _methodMemberNodes[methodNode.Id] = methodGroup;
+               
+                classMembers.Add(methodNode);
+            }
+
+            cls.NestedClasses.ForEach(x => CreateClassMemberNodes(x, classNode));
+
+            classMembers.AddRange(cls.Properties.Select(CreatePropNode));
+            classMembers.AddRange(cls.Fields.Select(CreateFieldNode));
+
+            return classMembers;
+        }
+
+        private void CreateMethodGroupNode(SyntaxNode methodNode)
+        {
+            var syntaxGroup = new SyntaxGroup(_methodMemberNodes[methodNode.Id], methodNode.Name, NodeKind.Method, 40);
+            syntaxGroup.AddNodePorts();
             
-            var classNode = new SyntaxNode(new Point(200 * _rowColumns[cls.RootLevel], 220 * cls.RootLevel))
+            //_diagram.Nodes.Add(syntaxGroup);
+            //_diagram.Links.Add(new LinkModel(methodNode.GetPort(PortAlignment.Bottom), syntaxGroup.GetPort(PortAlignment.Top)));
+            //_diagram.AddGroup(syntaxGroup);
+            
+        }
+
+        private SyntaxNode GetClassSyntaxNode(ClassInfo cls, NodeModel node = null)
+        {
+            var classNode = new SyntaxNode(new Point(220 * _rowColumns[cls.RootLevel], 220 * cls.RootLevel))
             {
                 Name = cls.Name,
                 RawCode = cls.RawCode,
                 NodeKind = NodeKind.Class
             };
+
             _rowColumns[cls.RootLevel]++;
             classNode.AddNodePorts();
 
             _classNodes.Add(classNode);
             if (node != null)
                 _nodeLinks.Add(new LinkModel(node.GetPort(PortAlignment.Bottom), classNode.GetPort(PortAlignment.Top)));
-            var classMembers = new List<SyntaxNode>();
-            foreach (var methodNode in cls.Methods.Select(CreateMethodNode))
-            {
-                _nodeLinks.Add(new LinkModel(classNode.GetPort(PortAlignment.Bottom), methodNode.GetPort(PortAlignment.Top)));
-                classMembers.Add(methodNode);
-            }
-            cls.NestedClasses.ForEach(x => CreateClassMemberNodes(x, classNode));
-
-            foreach (var propNode in cls.Properties.Select(CreatePropNode))
-            {
-                _nodeLinks.Add(new LinkModel(classNode.GetPort(PortAlignment.Bottom), propNode.GetPort(PortAlignment.Top)));
-                classMembers.Add(propNode);
-            }
-            foreach (var fieldNode in cls.Fields.Select(CreateFieldNode))
-            {
-                _nodeLinks.Add(new LinkModel(classNode.GetPort(PortAlignment.Bottom), fieldNode.GetPort(PortAlignment.Top)));
-                classMembers.Add(fieldNode);
-            }
-
-            return classMembers;
+            return classNode;
         }
 
         private SyntaxNode CreateFieldNode(PropertyInfo field)
         {
-            var fieldNode = new SyntaxNode(new Point(220 * _rowColumns[field.RootLevel + 1], 220 * field.RootLevel + 1))
+            var fieldNode = new SyntaxNode(new Point(240 * _rowColumns[field.RootLevel + 1], 220 * field.RootLevel + 1))
             {
                 Name = field.Name,
                 RawCode = field.RawCode,
@@ -205,7 +239,7 @@ namespace CodeSyntaxModule
 
         private SyntaxNode CreatePropNode(PropertyInfo prop)
         {
-            var propNode = new SyntaxNode(new Point(220 * _rowColumns[prop.RootLevel + 1], 220 * prop.RootLevel + 1))
+            var propNode = new SyntaxNode(new Point(240 * _rowColumns[prop.RootLevel + 1], 220 * prop.RootLevel + 1))
             {
                 Name = prop.Name,
                 RawCode = prop.RawCode,
@@ -220,7 +254,7 @@ namespace CodeSyntaxModule
 
         private SyntaxNode CreateMethodNode(MethodInfo method)
         {
-            var methodNode = new SyntaxNode(new Point(220 * _rowColumns[method.RootLevel], 220 * method.RootLevel))
+            var methodNode = new SyntaxNode(new Point(240 * _rowColumns[method.RootLevel], 220 * method.RootLevel))
             {
                 Name = method.Name,
                 RawCode = method.RawCode,
@@ -234,19 +268,36 @@ namespace CodeSyntaxModule
             return methodNode;
         }
 
-        private SyntaxNode CreateGlobalNode(GlobalDeclarationInfo global)
+        private List<SyntaxNode> CreateMethodMembersNodes(MethodInfo method)
         {
-            var node = new SyntaxNode(new Point(280 * _rowColumns[global.RootLevel], 220 * global.RootLevel))
+            //return method.BodySyntax.Select(info => CreateGlobalNode(info, true)).ToList();
+            return method.BodySyntax.Select(info => CreateGlobalNode(info)).ToList();
+        }
+        private SyntaxNode CreateGlobalNode(GlobalDeclarationInfo global, bool isMethodBody = false)
+        {
+            var node = new SyntaxNode(new Point(240 * _rowColumns[global.RootLevel], 220 * global.RootLevel))
             {
                 Name = global.Name,
                 RawCode = global.RawCode,
                 Type = global.Type,
                 NodeKind = NodeKind.Global
             };
+            if (isMethodBody) return node;
             _rowColumns[global.RootLevel]++;
             node.AddNodePorts();
             _globalNodes.Add(node);
             return node;
+        }
+
+        private void AppStateChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName != nameof(AppState.SyntaxTreeInfo)) return;
+            StateHasChanged();
+        }
+
+        public void Dispose()
+        {
+            AppState.PropertyChanged -= AppStateChanged;
         }
     }
 }

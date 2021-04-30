@@ -19,29 +19,5 @@
 
 
 @code {
-    [Parameter]
-    public EventCallback<string> OnSave { get; set; }
-
-    private string _description;
-    private string _name;
-    private string _errorText;
-
-    private void SaveSnippet()
-    {
-        if (string.IsNullOrWhiteSpace(_name))
-        {
-            _errorText = "Name field is required";
-            StateHasChanged();
-            return;
-        }
-        var combinedValues = $"{_name}|{_description}";
-        OnSave.InvokeAsync(combinedValues);
-    }
-
-    private void InputHandler(ChangeEventArgs args)
-    {
-        if (string.IsNullOrWhiteSpace(_errorText)) return;
-        if (!string.IsNullOrWhiteSpace(_name))
-            _errorText = string.Empty;
-    }
+   
 }

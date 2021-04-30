@@ -1,11 +1,13 @@
-﻿<h3>Code Diagram</h3>
+﻿
+<div class="zoom-to-fit">
+    <button class="fit-btn" @onclick="ZoomToFit">Zoom to fit</button><br />
+    @*<input type="checkbox" @bind="_isExpandMethods" /> Expand Methods On Select*@
+</div>
 <div class="diagram-container">
     <CascadingValue Value="DiagramState">
         <CascadingValue Value="_diagram">
             <DiagramCanvas>
-                @*<Widgets>
-                    <NavigatorWidget Width="225" Height="150" DefaultStyle="true" FillColor="darkviolet"></NavigatorWidget>
-                </Widgets>*@
+                
             </DiagramCanvas>
         </CascadingValue>
     </CascadingValue>

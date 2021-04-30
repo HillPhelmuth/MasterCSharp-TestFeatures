@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MasterCsharpHosted.Shared",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChallengeModule", "ChallengeModule\ChallengeModule.csproj", "{7AB29B62-3F6A-4A38-86C3-FF07B4937D69}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeSyntaxModule", "CodeSyntaxModule\CodeSyntaxModule.csproj", "{8BCB30D4-B1BE-4211-9E42-071561C3FEFE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeSyntaxModule", "CodeSyntaxModule\CodeSyntaxModule.csproj", "{8BCB30D4-B1BE-4211-9E42-071561C3FEFE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharedComponents", "SharedComponents\SharedComponents.csproj", "{380FD933-46AD-4E4D-BF18-E1E5646A5910}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{8BCB30D4-B1BE-4211-9E42-071561C3FEFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8BCB30D4-B1BE-4211-9E42-071561C3FEFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8BCB30D4-B1BE-4211-9E42-071561C3FEFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{380FD933-46AD-4E4D-BF18-E1E5646A5910}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{380FD933-46AD-4E4D-BF18-E1E5646A5910}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{380FD933-46AD-4E4D-BF18-E1E5646A5910}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{380FD933-46AD-4E4D-BF18-E1E5646A5910}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
