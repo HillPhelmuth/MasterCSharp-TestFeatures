@@ -4,7 +4,7 @@
     <div class="card-body">
         <h4 class="card-title text-center">@Node.Name</h4>
         <h5 class="text-center"><code>@(Node.NodeKind == NodeKind.None ? "" : Node.NodeKind.ToString())</code></h5>
-        @if (Node.NodeKind != NodeKind.Namespace && Node.NodeKind != NodeKind.Class && Node.NodeKind != NodeKind.None)
+        @if (Node.NodeKind != NodeKind.Namespace && Node.NodeKind != NodeKind.Class && Node.NodeKind != NodeKind.None && !string.IsNullOrWhiteSpace(Node.Type))
         {
             <h6 class="text-center">Returns <code>@Node.Type</code></h6>
         }

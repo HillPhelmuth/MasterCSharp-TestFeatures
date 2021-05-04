@@ -84,5 +84,7 @@ namespace MasterCsharpHosted.Shared
         public string Name { get; set; }
         [JsonPropertyName("RootLevel")]
         public int RootLevel { get; set; }
+        [JsonPropertyName("Column")]
+        public int Column { get; set; }
     }
 }

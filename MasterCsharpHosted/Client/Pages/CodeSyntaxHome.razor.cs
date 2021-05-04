@@ -58,7 +58,7 @@ namespace MasterCsharpHosted.Client.Pages
                 Language = "csharp",
                 Theme = "vs-dark",
                 GlyphMargin = false,
-                FontSize = 12,
+                FontSize = 13,
                 LineNumbers = "off",
                 Value = AppState.SyntaxTreeInfo?.SourceCode ?? AppState.Snippet ?? CodeSnippets.DefaultCode
 

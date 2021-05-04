@@ -18,6 +18,7 @@ namespace CodeSyntaxModule
         {
             string baseCls = "custom-group";
             if (Group.Selected) baseCls += " selected";
+            baseCls += $" {Group.Kind.ToString().ToLower()}";
             return baseCls += $" {Group.Kind.ToString().ToLower()}";
         }
         protected override Task OnInitializedAsync()

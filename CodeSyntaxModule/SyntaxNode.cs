@@ -16,6 +16,9 @@ namespace CodeSyntaxModule
         public string Type { get; set; }
         public Dictionary<string, string> Parameters { get; set; }
         public NodeKind NodeKind { get; set; }
+        public int Row { get; set; }
+        public int Column { get; set; }
+        public bool IsAdjusted { get; set; }
         
     }
 
@@ -39,6 +42,46 @@ namespace CodeSyntaxModule
             if (bottom) node.AddPort();
             if (left) node.AddPort(PortAlignment.Left);
             if (right) node.AddPort(PortAlignment.Right);
+        }
+
+        public static List<SyntaxNode> AdjustRowColumns(this IEnumerable<SyntaxNode> nodes)
+        {
+            var newNodes = nodes.ToList();
+            var rows = newNodes.Max(x => x.Row);
+            var listRows = new List<int>();
+            for (int i = 1; i <= rows; i++)
+            {
+                if (newNodes.Count(n => n.Row == i) <= 8) continue;
+
+                int adjustedColumn = 1;
+                int adjustedRow = 1;
+                foreach (var node in newNodes.Where(n => n.Row == i))
+                {
+                    if (node.Column <= 8) continue;
+                    node.Column = adjustedColumn;
+                    node.Row += adjustedRow;
+                    node.IsAdjusted = true;
+                    listRows.Add(i + adjustedRow);
+                    if (adjustedColumn == 8)
+                    {
+                        adjustedColumn = 1;
+                        adjustedRow++;
+                    }
+                    else
+                    {
+                        adjustedColumn++;
+                    }
+
+                }
+
+            }
+            var rowsToAdjust = listRows.Distinct();
+            newNodes.Where(x => rowsToAdjust.Contains(x.Row) && !x.IsAdjusted).ToList().ForEach(x => x.Row++);
+            foreach (var node in newNodes)
+            {
+                node.Position = new Point(node.Column * 240, node.Row * 240);
+            }
+            return newNodes;
         }
         
     }

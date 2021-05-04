@@ -14,9 +14,14 @@ namespace MasterCsharpHosted.Server.Services
     public class CodeAnalysis
     {
         private int maxLevel = 2;
+        private int _currentColumn;
+        private Dictionary<int, int> _rowColumns = new();
         public SyntaxTreeInfo Analyze(string programText)
         {
-
+            for (int i = 0; i < 100; i++)
+            {
+                _rowColumns[i] = 0;
+            }
             var tree = CSharpSyntaxTree.ParseText(programText);
             var root = tree.GetCompilationUnitRoot();
 
@@ -38,53 +43,73 @@ namespace MasterCsharpHosted.Server.Services
 
         private GlobalDeclarationInfo WriteGlobalInfo(GlobalStatementSyntax globalStatement, int rootLevel = 1)
         {
-            return new()
+            int modifier = _rowColumns[rootLevel] >= 5 ? 1 : 0;
+            rootLevel += modifier;
+            int column = _rowColumns[rootLevel];
+            _rowColumns[rootLevel] = _rowColumns[rootLevel] >= 5 ? 0 : _rowColumns[rootLevel] + 1;
+            return new GlobalDeclarationInfo
             {
                 Name = "Declaration",
                 RootLevel = rootLevel,
+                Column = column,
                 Type = globalStatement.Statement.Kind().ToString(),
                 RawCode = globalStatement.ToFullString()
             };
         }
         private NameSpaceInfo WriteNamespaceInfo(NamespaceDeclarationSyntax nameSpace, int rootLevel = 1)
         {
+            int modifier = _rowColumns[rootLevel] >= 5 ? 1 : 0;
+            rootLevel += modifier;
             maxLevel = rootLevel > maxLevel ? rootLevel : maxLevel;
-            return new NameSpaceInfo()
+            int column = _rowColumns[rootLevel];
+            _rowColumns[rootLevel] = _rowColumns[rootLevel] >= 5 ? 0 : _rowColumns[rootLevel] + 1;
+           
+            return new NameSpaceInfo
             {
                 Name = nameSpace.Name.ToFullString(),
                 RawCode = nameSpace.ToFullString(),
-                Classes = nameSpace.Members.OfType<ClassDeclarationSyntax>().Select(syntax => WriteClassInfo(syntax, rootLevel + 1)).ToList()
+                Classes = nameSpace.Members.OfType<ClassDeclarationSyntax>().Select(syntax => WriteClassInfo(syntax, rootLevel + 1)).ToList(),
+                Column = column
             };
         }
 
         private ClassInfo WriteClassInfo(ClassDeclarationSyntax cls, int rootLevel = 1)
         {
+            int modifier = _rowColumns[rootLevel] >= 5 ? 1 : 0;
+            rootLevel += modifier;
             int root = rootLevel + 1;
             maxLevel = rootLevel > maxLevel ? rootLevel : maxLevel;
-            return new ClassInfo()
+            int column = _rowColumns[rootLevel];
+            _rowColumns[rootLevel] = _rowColumns[rootLevel] >= 5 ? 0 : _rowColumns[rootLevel] + 1;
+           
+            return new ClassInfo
             {
                 Name = cls.Identifier.ToString(),
                 ParentName = cls.Parent?.GetText().Lines[0].ToString().TrimStart() ?? "No ParentName",
                 RawCode = cls.ToFullString(),
                 RootLevel = rootLevel,
-                Methods = cls.Members.OfType<MethodDeclarationSyntax>().Select(syntax => WriteMethodInfo(syntax, root)).ToList(),
-                NestedClasses = cls.Members.OfType<ClassDeclarationSyntax>().Select(syntax => WriteClassInfo(syntax, root)).ToList(),
-                Properties = cls.Members.OfType<PropertyDeclarationSyntax>().Select(syntax => WritePropertyInfo(syntax, root + 1)).ToList(),
-                Fields = cls.Members.OfType<FieldDeclarationSyntax>().Select(syntax => WriteFieldInfo(syntax, root + 1)).ToList()
+                Column = column,
+                Methods = cls.Members.OfType<MethodDeclarationSyntax>().Select(syntax => WriteMethodInfo(syntax, root+1)).ToList(),
+                NestedClasses = cls.Members.OfType<ClassDeclarationSyntax>().Select(syntax => WriteClassInfo(syntax, root+1)).ToList(),
+                Properties = cls.Members.OfType<PropertyDeclarationSyntax>().Select(syntax => WritePropertyInfo(syntax, root)).ToList(),
+                Fields = cls.Members.OfType<FieldDeclarationSyntax>().Select(syntax => WriteFieldInfo(syntax, root)).ToList()
             };
         }
 
         private MethodInfo WriteMethodInfo(MethodDeclarationSyntax method, int rootLevel = 1)
         {
+            int modifier = _rowColumns[rootLevel] >= 5 ? 1 : 0;
+            rootLevel += modifier;
             maxLevel = rootLevel > maxLevel ? rootLevel : maxLevel;
-            
-            
-            return new MethodInfo()
+            int column = _rowColumns[rootLevel];
+            _rowColumns[rootLevel] = _rowColumns[rootLevel] >= 5 ? 0 : _rowColumns[rootLevel] + 1;
+            return new MethodInfo
             {
                 ParentName = method.Parent?.GetText().Lines[0].ToString().TrimStart() ?? "No ParentName",
                 Name = method.Identifier.Text,
                 ReturnType = method.ReturnType.ToString(),
                 RawCode = method.ToFullString(),
+                Column = column,
                 Parameters = method.ParameterList.Parameters.ToDictionary(x => x.Identifier.Text, x => x.Type?.ToString()),
                 Body = method.Body?.ToFullString(),
                 BodySyntax = method.Body?.Statements.Select(s => WriteStatementInfo(s, rootLevel + 1)).ToList(),
@@ -93,43 +118,61 @@ namespace MasterCsharpHosted.Server.Services
         }
        private GlobalDeclarationInfo WriteStatementInfo(StatementSyntax statement, int rootLevel = 1)
         {
+            int modifier = _rowColumns[rootLevel] >= 5 ? 1 : 0;
+            rootLevel += modifier;
             var kind = statement.Kind();
+            int column = _rowColumns[rootLevel];
+            _rowColumns[rootLevel] = _rowColumns[rootLevel] >= 5 ? 0 : _rowColumns[rootLevel] + 1;
+            
             string type = statement switch
             {
                 LocalDeclarationStatementSyntax variable => variable.Declaration.Type.ToFullString(),
                 LocalFunctionStatementSyntax func => func.ReturnType.ToFullString(),
                 _ => ""
             };
-            return new GlobalDeclarationInfo()
+            return new GlobalDeclarationInfo
             {
                 Name = kind == SyntaxKind.LocalDeclarationStatement ? "Variable" : kind.ToSplitCamelCase(),
                 RawCode = statement.ToFullString(),
                 Type = type,
-                RootLevel = rootLevel + 1
+                RootLevel = rootLevel,
+                Column = column
             };
         }
         private PropertyInfo WritePropertyInfo(PropertyDeclarationSyntax property, int rootLevel)
         {
+            int modifier = _rowColumns[rootLevel] >= 5 ? 1 : 0;
+            rootLevel += modifier;
             maxLevel = rootLevel > maxLevel ? rootLevel : maxLevel;
-            return new PropertyInfo()
+            int column = _rowColumns[rootLevel];
+            _rowColumns[rootLevel] = _rowColumns[rootLevel] >= 5 ? 0 : _rowColumns[rootLevel] + 1;
+           
+            return new PropertyInfo
             {
                 Name = property.Identifier.Text,
                 ParentName = property.Parent?.GetText().Lines[0].ToString().TrimStart(),
                 Type = property.Type.ToString(),
                 RawCode = property.ToFullString(),
+                Column = column,
                 RootLevel = rootLevel
             };
         }
 
         private PropertyInfo WriteFieldInfo(FieldDeclarationSyntax field, int rootLevel = 1)
         {
+            int modifier = _rowColumns[rootLevel] >= 5 ? 1 : 0;
+            rootLevel += modifier;
             maxLevel = rootLevel > maxLevel ? rootLevel : maxLevel;
-            return new PropertyInfo()
+            int column = _rowColumns[rootLevel];
+            _rowColumns[rootLevel] = _rowColumns[rootLevel] >= 5 ? 0 : _rowColumns[rootLevel] + 1;
+            
+            return new PropertyInfo
             {
                 Name = field.Declaration.Variables[0].Identifier.Text,
                 ParentName = field.Parent?.GetText().Lines[0].ToString().TrimStart(),
                 Type = field.Declaration.Type.ToString(),
                 RawCode = field.ToFullString(),
+                Column = column,
                 RootLevel = rootLevel
             };
         }
