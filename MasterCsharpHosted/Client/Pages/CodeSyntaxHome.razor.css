@@ -19,7 +19,19 @@ button {
     border-radius: 8px;
     padding: 1px 4px;
 }
-
+.hide {
+    display:none;
+}
+.float-button {
+    font-size: 70%;
+    bottom: 94%;
+    left: 100%;
+    position: sticky;
+    cursor:pointer;
+}
+.float-button:hover{
+    color:blue;
+}
 button:hover {
     background-color: mediumvioletred;
 }

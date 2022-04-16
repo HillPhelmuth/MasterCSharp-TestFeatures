@@ -20,6 +20,7 @@ namespace MasterCsharpHosted.Client.Pages
         private bool _selfTrigger;
         protected override Task OnInitializedAsync()
         {
+            AppState.OnShowCode += HandleCodeWindow;
             AppState.PropertyChanged += AppStateChanged;
             return base.OnInitializedAsync();
         }
@@ -48,6 +49,7 @@ namespace MasterCsharpHosted.Client.Pages
             _shouldRender = true;
             StateHasChanged();
         }
+        private bool showEdit = true;
         #region Editor
         private MonacoEditor _editor = new();
         protected StandaloneEditorConstructionOptions EditorOptionsSmall(MonacoEditor editor)
@@ -74,6 +76,7 @@ namespace MasterCsharpHosted.Client.Pages
                 {
                     await SubmitForAnalysis();
                 });
+            
         }
 
         #endregion
@@ -92,6 +95,12 @@ namespace MasterCsharpHosted.Client.Pages
             _selfTrigger = false;
             if (_shouldRender)
                 await InvokeAsync(StateHasChanged);
+        }
+        private void HandleCodeWindow(bool isShow)
+        {
+            _shouldRender = true;
+            showEdit = !showEdit;
+            StateHasChanged();
         }
     }
 }

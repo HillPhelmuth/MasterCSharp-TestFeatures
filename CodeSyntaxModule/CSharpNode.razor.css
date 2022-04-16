@@ -3,63 +3,72 @@
     border-radius: 5%;
     padding: 5px 10px;
     width: auto;
-    min-width: 12rem;
-    max-width: 16rem;
+    min-width: 14rem;
+    max-width: 18rem;
     font-family: Consolas, "Courier New", ui-monospace;
 }
+
     .card.selected {
-        
-        border:5px solid darkviolet;
+        border: 5px solid darkviolet;
     }
+
 .card-body {
     font-size: 90%;
 }
 
-    .card.class {
-        border-color: darkviolet;
-        box-shadow: 0px 0px 20px 0px darkviolet inset;
-        color: darkviolet;
-    }
+.card.class {
+    border-color: darkviolet;
+    box-shadow: 0px 0px 20px 0px darkviolet inset;
+    color: darkviolet;
+}
 
-    .card.namespace {
-        border-color: #0000cc;
-        box-shadow: 0px 0px 20px 0px #0000cc inset;
-        color: #0000cc;
-    }
+.card.namespace {
+    border-color: #0000cc;
+    box-shadow: 0px 0px 20px 0px #0000cc inset;
+    color: #0000cc;
+}
 
-    .card.method {
-        border-color: darkgreen;
-        box-shadow: 0px 0px 20px 0px darkgreen inset;
-        color: darkgreen;
-    }
+.card.method {
+    border-color: darkgreen;
+    box-shadow: 0px 0px 20px 0px darkgreen inset;
+    color: darkgreen;
+}
 
-    .card.property {
-        border-color: #995400;
-        box-shadow: 0px 0px 20px 0px #995400 inset;
-        color: #995400;
-    }
+.card.property {
+    border-color: #995400;
+    box-shadow: 0px 0px 20px 0px #995400 inset;
+    color: #995400;
+}
 
-    .card.field {
-        border-color: #372f6a;
-        box-shadow: 0px 0px 20px 0px #372f6a inset;
-        color: #372f6a;
-    }
+.card.field {
+    border-color: #372f6a;
+    box-shadow: 0px 0px 20px 0px #372f6a inset;
+    color: #372f6a;
+}
 
-    .card.global {
-        border-color: #800000;
-        box-shadow: 0px 0px 20px 0px #800000 inset;
-        color: #800000;
-    }
-    .card.none {
-        border-color: darkslategrey;
-        box-shadow: 0px 0px 20px 0px darkslategrey inset;
-        color: darkslategrey;
-    }
-    .card .card-title {
-        top: 0;
-        height: 20%;
-        border-bottom: 1px solid;
-    }
+.card.constructor {
+    border-color: #b40bb7;
+    box-shadow: 0px 0px 20px 0px #b40bb7 inset;
+    color: #b40bb7
+}
+
+.card.global {
+    border-color: #800000;
+    box-shadow: 0px 0px 20px 0px #800000 inset;
+    color: #800000;
+}
+
+.card.none {
+    border-color: darkslategrey;
+    box-shadow: 0px 0px 20px 0px darkslategrey inset;
+    color: darkslategrey;
+}
+
+.card .card-title {
+    top: 0;
+    height: 20%;
+    border-bottom: 1px solid;
+}
 
 td, th {
     border: 1px solid black;

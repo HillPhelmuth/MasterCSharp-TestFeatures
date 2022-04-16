@@ -121,7 +121,8 @@ namespace MasterCsharpHosted.Shared
             Snippet = challenge.Snippet;
             ActiveChallenge = challenge;
         }
-
+        public event Action<bool> OnShowCode;
+        public void ShowCode(bool show) => OnShowCode?.Invoke(show);
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

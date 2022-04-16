@@ -103,8 +103,11 @@ namespace MasterCsharpHosted.Client
             }
             string result = await apiResult.Content.ReadAsStringAsync();
             sw.Stop();
-            Console.WriteLine($"api/code/syntax returned value in {sw.ElapsedMilliseconds}ms\r\nResult: {result} ");
-            return JsonSerializer.Deserialize<SyntaxTreeInfo>(result);
+            Console.WriteLine($"api/code/syntax returned value in {sw.ElapsedMilliseconds}ms");
+            var syntaxResult = Newtonsoft.Json.JsonConvert.DeserializeObject<SyntaxTreeInfo>(result);
+            Console.WriteLine($"Namespaces:\r\n{string.Join("\r\n\t", syntaxResult.NameSpaces?.Select(x => x.Name))}");
+            Console.WriteLine($"Classes:\r\n{string.Join("\r\n\t", syntaxResult.NameSpaces.SelectMany(x => x?.Classes?.Select(c => x.Name)))}");
+            return syntaxResult;
         }
         public async Task<bool> UpdateUser(AppUser user)
         {

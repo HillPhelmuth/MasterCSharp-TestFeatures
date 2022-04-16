@@ -8,7 +8,7 @@
         {
             <h6 class="text-center">Returns <code>@Node.Type</code></h6>
         }
-        @if (Node.NodeKind == NodeKind.Method && Node.Parameters.Count > 0)
+        @if ((Node.NodeKind == NodeKind.Method || Node.NodeKind == NodeKind.Constructor) && Node.Parameters.Count > 0)
         {
             <h6>Parameters</h6>
             <table>

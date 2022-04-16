@@ -7,26 +7,46 @@
     box-shadow: 0px 0px 20px 0px #590080 inset;
 }
 
-    .group.custom-group > div.group-title {
-        padding: 25px;
-        position: absolute;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: #eee;
-        border: 2px solid darkviolet;
-        border-radius: 10%;
-        background-color: white;
-        
-        font-family: Consolas, "Courier New", ui-monospace;
-        z-index:999;
-        /*text-transform: uppercase;*/
-    }
+.group.custom-group.selected > div.group-title {
+    padding: 25px !important;
+    position: absolute !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    background: #eee !important;
+    border: 2px solid darkviolet !important;
+    border-radius: 10% !important;
+    background-color: white !important;
+    font-family: Consolas, "Courier New", ui-monospace !important;
+    z-index: 999 !important;
+    display:block !important;
+    /*text-transform: uppercase;*/
+}
+.group.custom-group > div.group-title {
+    /*padding: 25px;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #eee;
+    border: 2px solid darkviolet;
+    border-radius: 10%;
+    background-color: white;
+    font-family: Consolas, "Courier New", ui-monospace;
+    z-index: 999;*/
+    /*text-transform: uppercase;*/
+    display:none;
+}
+.namespace {
+    /*box-shadow: 0px 0px 20px 0px green inset;*/
+}
+
 .class {
     box-shadow: 0px 0px 20px 0px mediumvioletred inset;
 }
+
 .method {
-    box-shadow: 0px 0px 20px 0px #00cc00 inset;
+    /*box-shadow: 0px 0px 20px 0px #00cc00 inset;*/
 }
+
 .top {
     font-size: 1.25rem;
     font-weight: bold;
