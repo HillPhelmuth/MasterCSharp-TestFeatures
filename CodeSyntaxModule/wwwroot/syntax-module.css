@@ -7,10 +7,12 @@
     
 }
     .custom-group.class {
-        box-shadow: 0px 0px 20px 0px #590080 inset;
+        /*box-shadow: 0px 0px 20px 0px #590080 inset;*/
+        border: 1px solid #590080;
     }
     .custom-group.method {
-        box-shadow: 0px 0px 20px 0px darkgreen inset;
+        /*box-shadow: 0px 0px 20px 0px darkgreen inset;*/
+        border: 1px solid darkgreen;
     }
     .custom-group .layer {
         display: grid;

@@ -10,7 +10,11 @@ namespace CodeSyntaxModule
 {
     public class SyntaxNode : NodeModel
     {
-        public SyntaxNode(Point position = null) : base(position) { }
+        public SyntaxNode(string nodeId, string groupId, Point position = null) : base(position) 
+        {
+            GroupId = groupId;
+            NodeId = nodeId;
+        }
         public string Name { get; set; }
         public string RawCode { get; set; }
         public string Type { get; set; }
@@ -19,6 +23,8 @@ namespace CodeSyntaxModule
         public int Row { get; set; }
         public int Column { get; set; }
         public bool IsAdjusted { get; set; }
+        public string GroupId { get; }
+        public string NodeId { get; }
         
     }
 
@@ -30,7 +36,9 @@ namespace CodeSyntaxModule
         Method,
         Property,
         Field,
-        Global
+        Global,
+        NestedClass,
+        Constructor
     }
 
     public static class Extensions

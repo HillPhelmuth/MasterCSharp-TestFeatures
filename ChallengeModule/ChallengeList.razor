@@ -1,15 +1,15 @@
 ﻿<div>
     <ul class="expando">
-        @foreach (var section in _challengeViews)
+        @foreach (var challengeSection in _challengeViews)
         {
             <li>
-                <div class="header" @onclick="@(() => Open(section))">
-                    Difficulty: @section.Header
-                    <img height="32" width="32" alt="up down ind" src="_content/ChallengeModule/images/@(section.IsActive ? "up":"down").png" />
+                <div class="header" @onclick="@(() => Open(challengeSection))">
+                    Difficulty: @challengeSection.Header
+                    <img height="32" width="32" alt="up down ind" src="_content/ChallengeModule/images/@(challengeSection.IsActive ? "up":"down").png" />
                 </div>
-                <div class="item @(section.IsActive ? "active" : "")">
+                <div class="item @(challengeSection.IsActive ? "active" : "")">
                     <ul class="item-list">
-                        @foreach (var challenge in section.Challenges)
+                        @foreach (var challenge in challengeSection.Challenges)
                         {
                             <li>
                                 <hr />
