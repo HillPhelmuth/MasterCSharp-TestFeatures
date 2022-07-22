@@ -108,7 +108,7 @@
             <Authorized>
                 <span>Your Snippets</span>
                 <ul class="inner-list">
-                    @foreach (var snippet in AppState.CurrentUser.Snippets)
+                    @foreach (var snippet in AppState.CurrentUser?.Snippets ?? new List<UserSnippet>())
                     {
                         <li class="inner" @key="snippet.Name">
                             <Tooltip Text="@snippet.Description">

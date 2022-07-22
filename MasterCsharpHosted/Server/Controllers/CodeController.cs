@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using MasterCsharpHosted.Server.Services;
 using MasterCsharpHosted.Shared;
+using Newtonsoft.Json;
 
 namespace MasterCsharpHosted.Server.Controllers
 {
@@ -58,6 +59,12 @@ namespace MasterCsharpHosted.Server.Controllers
         {
             var analysis = new CodeAnalysis();
             return Task.FromResult(analysis.Analyze(code));
+        }
+        [HttpPost("simpleSyntax")]
+        public Task<string> GetSimpleSyntax([FromBody] string code)
+        {
+            var analysis = CodeAnalysis.AnalyzeSimpleTree(code);
+            return Task.FromResult(JsonConvert.SerializeObject(analysis, settings:new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore} ));
         }
     }
 }

@@ -47,25 +47,35 @@
 
     private async Task OnNavigateAsync(NavigationContext context)
     {
-        if (context.Path == "challenges")
+        switch (context.Path)
         {
-            var assemblies = await AssemblyLoader.LoadAssembliesAsync(new[] { "ChallengeModule.dll" });
-            _lazyLoadedAssemblies.AddRange(assemblies);
-            AppState.Title = "Challenges";
-        }
-        else if (context.Path == "practice")
-        {
-            AppState.Title = "Practice";
-        }
-        else if (context.Path == "analyze")
-        {
-            var assemblies = await AssemblyLoader.LoadAssembliesAsync(new[] { "CodeSyntaxModule.dll", "Blazor.Diagrams.dll", "Blazor.Diagrams.Core.dll", "SvgPathProperties.dll" });
-            _lazyLoadedAssemblies.AddRange(assemblies);
-            AppState.Title = "Syntax Tree";
-        }
-        else
-        {
-            AppState.Title = "Home";
+            case "challenges":
+            {
+                var assemblies = await AssemblyLoader.LoadAssembliesAsync(new[] { "ChallengeModule.dll" });
+                _lazyLoadedAssemblies.AddRange(assemblies);
+                AppState.Title = "Challenges";
+                break;
+            }
+            case "practice":
+                AppState.Title = "Practice";
+                break;
+            case "analyze":
+            {
+                var assemblies = await AssemblyLoader.LoadAssembliesAsync(new[] { "CodeSyntaxModule.dll", "Blazor.Diagrams.dll", "Blazor.Diagrams.Core.dll", "SvgPathProperties.dll" });
+                _lazyLoadedAssemblies.AddRange(assemblies);
+                AppState.Title = "Syntax Tree";
+                break;
+            }
+            //case "codeTree":
+            //{
+            //    var assemblies = await AssemblyLoader.LoadAssembliesAsync(new[] {"CodeSyntaxModuleSimple.dll", "Radzen.Blazor.dll"});
+            //    _lazyLoadedAssemblies.AddRange(assemblies);
+            //    AppState.Title = "Code Tree";
+            //    break;
+            //}
+            default:
+                AppState.Title = "Home";
+                break;
         }
     }
 }

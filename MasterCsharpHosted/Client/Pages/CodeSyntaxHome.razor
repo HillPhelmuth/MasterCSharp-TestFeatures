@@ -1,16 +1,24 @@
 ﻿@page "/analyze"
 @using CodeSyntaxModule
 
-@if (AppState.SyntaxTreeInfo != null)
+@if (AppState.SyntaxTreeInfo != null && !_isSimple)
 {
     <div class="syntax-diagram">
         <CodeDiagram SyntaxTreeInfo="AppState.SyntaxTreeInfo" SendCode="HandleSendCode" />
+    </div>
+}
+@if (AppState.SimpleSyntaxTrees != null && AppState.SimpleSyntaxTrees.Any() && _isSimple){
+    <div class="syntax-diagram">
+        <SimpleDiagram SendCode="HandleSendCode"/>
     </div>
 }
 else
 {
     <p class="missing">No SyntaxTree to analyze. </p>
 }
+<div style="position:absolute; top:60px; right:45vw; ">
+    <button @onclick=ToggleSimple>@(_isSimple ? "Show Syntax Tree Details" : "Show Full Syntax Tree")</button>
+</div>
 @if (showEdit)
 {
     <div class="editor-container">

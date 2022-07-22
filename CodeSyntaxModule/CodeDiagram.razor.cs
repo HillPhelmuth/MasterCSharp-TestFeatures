@@ -16,7 +16,7 @@ using QG = QuikGraph;
 
 namespace CodeSyntaxModule
 {
-    public partial class CodeDiagram : IDisposable
+    public partial class CodeDiagram : ComponentBase, IDisposable
     {
         [Inject]
         public AppState AppState { get; set; }
@@ -25,23 +25,23 @@ namespace CodeSyntaxModule
         [Parameter]
         public EventCallback<string> SendCode { get; set; }
         private List<string> Graphlist => new StandardLayoutAlgorithmFactory<string, QG.IEdge<string>, QG.IBidirectionalGraph<string, QG.IEdge<string>>>().AlgorithmTypes.ToList();
-        private string _selectedGraph = "Tree";
+        private readonly string _selectedGraph = "Tree";
         public CSharpDiagramState DiagramState { get; set; } = new();
 
-        private List<SyntaxNode> _namespaceNodes = new();
-        private List<SyntaxNode> _classNodes = new();
-        private List<SyntaxNode> _methodNodes = new();
-        private List<SyntaxNode> _propNodes = new();
-        private List<SyntaxNode> _fieldNodes = new();
-        private List<SyntaxNode> _globalNodes = new();
-        private Dictionary<SyntaxNode, List<SyntaxNode>> _methodGroups = new();
-        private Dictionary<SyntaxNode, List<SyntaxNode>> _classGroups = new();
-        private Dictionary<SyntaxNode, List<SyntaxNode>> _namespaceGroups = new();
-        private List<LinkModel> _nodeLinks = new();
+        private readonly List<SyntaxNode> _namespaceNodes = new();
+        private readonly List<SyntaxNode> _classNodes = new();
+        private readonly List<SyntaxNode> _methodNodes = new();
+        private readonly List<SyntaxNode> _propNodes = new();
+        private readonly List<SyntaxNode> _fieldNodes = new();
+        private readonly List<SyntaxNode> _globalNodes = new();
+        private readonly Dictionary<SyntaxNode, List<SyntaxNode>> _methodGroups = new();
+        private readonly Dictionary<SyntaxNode, List<SyntaxNode>> _classGroups = new();
+        private readonly Dictionary<SyntaxNode, List<SyntaxNode>> _namespaceGroups = new();
+        private readonly List<LinkModel> _nodeLinks = new();
 
-        private List<SyntaxNode> _allNodes = new();
+        private readonly List<SyntaxNode> _allNodes = new();
 
-        private static DiagramOptions _options = new()
+        private static readonly DiagramOptions _options = new()
         {
             DeleteKey = "None",
             AllowMultiSelection = true,
@@ -55,13 +55,15 @@ namespace CodeSyntaxModule
                 DefaultColor = "blue",
                 DefaultSelectedColor = "red",
 
-            }
+            },
+            EnableVirtualization = false,
+            GridSize = 50,
 
         };
-        private List<SyntaxGroup> _groups = new();
-        private Diagram _diagram = new(_options);
-        private Dictionary<int, int> _rowColumns = new();
-        private bool _isExpandMethods;
+        private readonly List<SyntaxGroup> _groups = new();
+        private readonly Diagram _diagram = new(_options);
+        private readonly Dictionary<int, int> _rowColumns = new();
+        private readonly bool _isExpandMethods;
         protected override Task OnInitializedAsync()
         {
             AppState.PropertyChanged += AppStateChanged;
@@ -202,8 +204,24 @@ namespace CodeSyntaxModule
                 Console.WriteLine($"Source: {lnk.SourceNode?.GetType().ToString() ?? "none"}\r\nTarget: {lnk.TargetNode?.GetType().ToString() ?? "none"}");
             }
         }
-        private void TryLayout()
+        private class LayoutOptions
         {
+            public string Name { get; set; }
+            public string Value { get; set; }
+        }
+        private static readonly List<LayoutOptions> layoutOptions = GetLayoutOptions();
+        private static List<LayoutOptions> GetLayoutOptions()
+        {
+            var algoFact = new StandardLayoutAlgorithmFactory<SyntaxNode, QG.Edge<SyntaxNode>, QG.BidirectionalGraph<SyntaxNode, QG.Edge<SyntaxNode>>>();
+            return algoFact.AlgorithmTypes.Select(x => new LayoutOptions { Name = x, Value = x }).ToList();
+        }
+        private void TryLayout(LayoutOptions layout)
+        {
+            TryLayout(layout.Value);
+        }
+        private void TryLayout(string layout = "Tree")
+        {
+            Console.WriteLine($"Layout updated to {layout}");
             var graph = new QG.BidirectionalGraph<SyntaxNode, QG.Edge<SyntaxNode>>();
             var nodes = _diagram.Nodes.OfType<SyntaxNode>().ToList();
             var groups = _diagram.Groups.OfType<SyntaxGroup>().ToList();
@@ -213,14 +231,15 @@ namespace CodeSyntaxModule
                 var target = nodes.FirstOrDefault(dn => dn.Id == lm?.TargetNode?.Id);
                 return new QG.Edge<SyntaxNode>(source, target);
             }).ToList();
+            
             graph.AddVertexRange(nodes);
             graph.AddEdgeRange(edges);
 
             var positions = nodes.ToDictionary(nm => nm, dn => new GraphShape.Point(dn.Position.X, dn.Position.Y));
-            var sizes = nodes.ToDictionary(nm => nm, dn => new GraphShape.Size(dn.Size?.Width ?? 100, dn.Size?.Height ?? 100));
+            var sizes = nodes.ToDictionary(nm => nm, dn => new GraphShape.Size(dn.Size?.Width + 25 ?? 100, dn.Size?.Height + 25 ?? 100));
             var layoutCtx = new LayoutContext<SyntaxNode, QG.Edge<SyntaxNode>, QG.BidirectionalGraph<SyntaxNode, QG.Edge<SyntaxNode>>>(graph, positions, sizes, LayoutMode.Simple);
             var algoFact = new StandardLayoutAlgorithmFactory<SyntaxNode, QG.Edge<SyntaxNode>, QG.BidirectionalGraph<SyntaxNode, QG.Edge<SyntaxNode>>>();
-            var algo = algoFact.CreateAlgorithm("Tree", layoutCtx, null);
+            var algo = algoFact.CreateAlgorithm(layout, layoutCtx, null);
             try
             {
                 algo.Compute();
@@ -285,7 +304,7 @@ namespace CodeSyntaxModule
         }
         private SyntaxNode AddClassAndMemeberNodes(ClassInfo cls, SyntaxNode parent = null)
         {
-            var classNode = GetClassSyntaxNode(cls);
+            var classNode = CreateClassNode(cls);
             _classNodes.Add(classNode);
             _classGroups[classNode] = CreateClassMemberNodes(cls, classNode);
             return classNode;
@@ -315,8 +334,8 @@ namespace CodeSyntaxModule
 
             cls.NestedClasses.ForEach(x => CreateClassMemberNodes(x, classNode));
 
-            classMembers.AddRange(cls.Properties.Select(x => CreatePropNode(x)));
-            classMembers.AddRange(cls.Fields.Select(x => CreateFieldNode(x)));
+            classMembers.AddRange(cls.Properties.Select(CreatePropNode));
+            classMembers.AddRange(cls.Fields.Select(CreateFieldNode));
 
             return classMembers;
         }
@@ -333,7 +352,7 @@ namespace CodeSyntaxModule
             return methods;
         }
 
-        private SyntaxNode GetClassSyntaxNode(ClassInfo cls)
+        private SyntaxNode CreateClassNode(ClassInfo cls)
         {
             var classNode = new SyntaxNode(cls.Id, cls.GroupId, new Point(220 * _rowColumns[cls.RootLevel], 220 * cls.RootLevel))
             {
@@ -436,6 +455,7 @@ namespace CodeSyntaxModule
 
         public void Dispose()
         {
+            GC.SuppressFinalize(this);
             AppState.PropertyChanged -= AppStateChanged;
         }
     }
