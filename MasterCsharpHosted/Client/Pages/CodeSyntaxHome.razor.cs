@@ -46,7 +46,7 @@ namespace MasterCsharpHosted.Client.Pages
         private async void HandleSendCode(string code)
         {
             await _editor.SetValue(code);
-            System.Console.WriteLine($"Received code from Diagram:\n{code.Substring(0, Math.Min(150, code.Length))}...");
+            //System.Console.WriteLine($"Received code from Diagram");
             _shouldRender = true;
             StateHasChanged();
         }

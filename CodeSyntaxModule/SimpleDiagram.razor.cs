@@ -36,7 +36,7 @@ namespace CodeSyntaxModule
 
             },
             EnableVirtualization = false,
-            GridSize = 50,
+            GridSize = 20,
 
         };
         
@@ -60,13 +60,25 @@ namespace CodeSyntaxModule
             await base.OnAfterRenderAsync(firstRender);
             
         }
+        private List<string> expandedNodes = new();
         private void RegisterEvents()
         {
-            _diagram.SelectionChanged += (selected) =>
+            _diagram.SelectionChanged += async (selected) =>
             {
                 if (selected is SimpleNodeModel model)
                 {
-                    SendCode.InvokeAsync(model.SimpleSyntaxTree?.RawCode ?? "No Code");
+                    if (model.SimpleSyntaxTree.Members.Any() && !expandedNodes.Any(x => x == model.Id))
+                    {
+                        expandedNodes.Add(model.Id);
+                        AddChildNodes(model.SimpleSyntaxTree, model);
+                        TryLayout();
+                        await InvokeAsync(StateHasChanged);
+                    }
+                    
+                    await SendCode.InvokeAsync(model.SimpleSyntaxTree?.RawCode ?? "No Code");
+                    Console.WriteLine($"POSITION: {model.Position?.X}, {model.Position?.Y}");
+                    
+
                 }
             };
         }
@@ -78,7 +90,7 @@ namespace CodeSyntaxModule
                 var node = new SimpleNodeModel() { SimpleSyntaxTree = treeItem };
                 node.AddNodePorts();
                 _diagram.Nodes.Add(node);
-                AddChildNodes(treeItem, node);
+                //AddChildNodes(treeItem, node);
             }
         }
 
@@ -93,7 +105,7 @@ namespace CodeSyntaxModule
                 _diagram.Links.Add(link);
                 if (subItem.Members.Any())
                 {
-                    AddChildNodes(subItem, subNode);
+                    //AddChildNodes(subItem, subNode);
                 }
             }
         }
@@ -125,29 +137,42 @@ namespace CodeSyntaxModule
 
             graph.AddVertexRange(nodes);
             graph.AddEdgeRange(edges);
-
+#if DEBUG
+            var nodeSizeDic = nodes?.Select(x => $"Title: {x?.Title}, Size: X-{x?.Position?.X ?? .999} Y-{x?.Position?.Y ?? .999}");
+            Console.WriteLine($"Node Positions BEFORE: {string.Join("| ", nodeSizeDic.Take(30))}");
+#endif
             var positions = nodes.ToDictionary(nm => nm, dn => new GraphShape.Point(dn.Position.X, dn.Position.Y));
-            var sizes = nodes.ToDictionary(nm => nm, dn => new GraphShape.Size(dn.Size?.Width + 25 ?? 100, dn.Size?.Height + 25 ?? 100));
+            var sizes = nodes.ToDictionary(nm => nm, dn => new GraphShape.Size(dn.Size?.Width + 5 ?? 160, dn.Size?.Height + 15 ?? 60));
             var layoutCtx = new LayoutContext<SimpleNodeModel, QG.Edge<SimpleNodeModel>, QG.BidirectionalGraph<SimpleNodeModel, QG.Edge<SimpleNodeModel>>>(graph, positions, sizes, LayoutMode.Simple);
             var algoFact = new StandardLayoutAlgorithmFactory<SimpleNodeModel, QG.Edge<SimpleNodeModel>, QG.BidirectionalGraph<SimpleNodeModel, QG.Edge<SimpleNodeModel>>>();
             var algo = algoFact.CreateAlgorithm(layout, layoutCtx, null);
+
             try
             {
                 algo.Compute();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"EXCEPTION\r\n{ex.Message}");
+                Console.WriteLine($"EXCEPTION\r\n{ex.Message}\r\n{ex.StackTrace}");
             }
 
             try
             {
                 _diagram.SuspendRefresh = true;
+//#if DEBUG
+//                var nodeSizeDicAfter = nodes?.Select(x => $"Title: {x?.Title}, Size: X-{x?.Position?.X ?? .999} Y-{x?.Position?.Y ?? .999}");
+//                Console.WriteLine($"Node Positions BEFORE: \r\n{string.Join("| ", nodeSizeDicAfter)}");
+//                var graphVertPos = algo.VerticesPositions?.Select(x => $"{x.Key.Title} -- Position: X-{x.Value.X} Y-{x.Value.Y}");
+//                Console.WriteLine($"EXPECTED POSITIONS: \r\n{string.Join("| ", graphVertPos)}");
+//#endif
                 foreach (var vertPos in algo.VerticesPositions)
                 {
                     // NOTE;  have to use SetPosition which takes care of updating everything
                     vertPos.Key.SetPosition(vertPos.Value.X, vertPos.Value.Y);
                 }
+                //nodeSizeDicAfter = nodes?.Select(x => $"Title: {x?.Title}, Size: X-{x?.Position?.X ?? .999} Y-{x?.Position?.Y ?? .999}");
+                //Console.WriteLine($"Node Positions AFTER: \r\n{string.Join("| ", nodeSizeDicAfter)}");
+                
             }
             finally
             {

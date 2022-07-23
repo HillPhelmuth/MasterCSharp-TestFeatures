@@ -20,4 +20,20 @@ public partial class SimpleNode
     public SimpleNodeModel Node { get; set; }
     [CascadingParameter]
     public Diagram Diagram { get; set; }
+    
+    private void HandleExpandMembers()
+    {
+
+    }
+}
+public static class NodeExtensions
+{
+    public static string HasMembersCss(this SimpleNodeModel model)
+    {
+        return model.SimpleSyntaxTree.Members.Any() ? "expand" : "";
+        if (model.SimpleSyntaxTree.Members.Any())
+        {
+
+        }
+    }
 }

@@ -1,9 +1,13 @@
 ﻿@using Blazor.Diagrams.Components.Renderers;
-<div class="card @(Node.Selected ? "selected" : "")">
+<div class="card @(Node.Selected ? "selected" : "") @Node.HasMembersCss()">
     <h6 class="text-center">@Node.SimpleSyntaxTree.Kind</h6>
     @if (!string.IsNullOrEmpty(Node.SimpleSyntaxTree.Name))
     {
-        <div class="text-center">Name: @Node.SimpleSyntaxTree.Name</div>
+        <code class="text-center">@Node.SimpleSyntaxTree.Name</code>
+    }
+    @if (Node.SimpleSyntaxTree.Members.Any())
+    {
+        <button></button>
     }
     @foreach (var port in Node.Ports)
     {

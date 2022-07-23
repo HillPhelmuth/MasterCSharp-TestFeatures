@@ -93,13 +93,6 @@ namespace MasterCsharpHosted.Client.Components
                     await SubmitForAnalysis();
                     Console.WriteLine("Tried Analyze");
                 });
-            await _editor.AddAction("AnalyzeSimple", "Analyze Code - Tree", new[] { (int)KeyMode.CtrlCmd | (int)KeyCode.KEY_1 },
-               null, null, "navigation", 2.5,
-               async (e, codes) =>
-               {
-                   await SubmitForSimpleAnalysis();
-                   Console.WriteLine("Tried Analyze");
-               });
             await _editor.AddAction("Undo", "Undo", new[] { (int)KeyMode.CtrlCmd | (int)KeyCode.KEY_Z },
                 null, null, "navigation", 3.5,
                 async (e, codes) =>
@@ -202,18 +195,16 @@ namespace MasterCsharpHosted.Client.Components
         {
             var code = await _editor.GetValue();
             AppState.SyntaxTreeInfo = await PublicClient.GetAnalysis(code);
-            await SubmitForSimpleAnalysis();
-            //AppState.Snippet = code;
+            await SubmitForSimpleAnalysis(code);
+            AppState.Snippet = code;
         }
         
-        public async Task SubmitForSimpleAnalysis()
+        private async Task SubmitForSimpleAnalysis(string code)
         {
-            var code = await _editor.GetValue();
-            //AppState.SyntaxInfoList = LocalAnalyze.AnalyzeSimple(code);
             AppState.SimpleSyntaxTrees = await PublicClient.GetSimpleAnalysis(code);
             var settings = new JsonSerializerSettings() {ReferenceLoopHandling = ReferenceLoopHandling.Ignore, PreserveReferencesHandling = PreserveReferencesHandling.All};
             AppState.TreeContent = JsonConvert.SerializeObject(AppState.SimpleSyntaxTrees, Formatting.Indented, settings);
-            Console.WriteLine(AppState.TreeContent[..1000]);
+            Console.WriteLine(AppState.TreeContent[..100]);
         }
         private async Task Undo()
         {
@@ -236,6 +227,9 @@ namespace MasterCsharpHosted.Client.Components
             switch (args.PropertyName)
             {
                 case nameof(AppState.SyntaxTreeInfo):
+                    StateHasChanged();
+                    return;
+                case nameof(AppState.SimpleSyntaxTrees):
                     StateHasChanged();
                     return;
                 case nameof(AppState.EditorTheme):

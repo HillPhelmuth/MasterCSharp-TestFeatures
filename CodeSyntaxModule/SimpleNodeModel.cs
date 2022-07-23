@@ -10,6 +10,16 @@ namespace CodeSyntaxModule
 {
     public class SimpleNodeModel : NodeModel
     {
-        public SimpleSyntaxTree SimpleSyntaxTree { get; set; }
+        private SimpleSyntaxTree simpleSyntaxTree;
+
+        public SimpleSyntaxTree SimpleSyntaxTree
+        {
+            get => simpleSyntaxTree; 
+            set
+            {
+                simpleSyntaxTree = value;
+                this.Title = simpleSyntaxTree.Kind;
+            }
+        }
     }
 }

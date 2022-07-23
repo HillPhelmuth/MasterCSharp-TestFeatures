@@ -106,6 +106,7 @@ namespace MasterCsharpHosted.Server.Services
                 Column = column
             };
             namespaceInfo.AddClasses(nameSpace.Members.OfType<ClassDeclarationSyntax>().Select(syntax => WriteClassInfo(syntax, rootLevel++)).ToList());
+            namespaceInfo.AddClasses(nameSpace.Members.OfType<EnumDeclarationSyntax>().Select(x => WriteEnumInfo(x, rootLevel + 1)).ToList());
             return namespaceInfo;
         }
 
@@ -133,15 +134,35 @@ namespace MasterCsharpHosted.Server.Services
             classinfo.AddMethods(methods);
             var nested = cls.Members.ConvertToInfo<ClassInfo, ClassDeclarationSyntax>(syntax => WriteClassInfo(syntax, root + 1));
             classinfo.AddNestedClasses(nested);
-            classinfo.AddProperties(cls.Members.ConvertToInfo<PropertyInfo, PropertyDeclarationSyntax>(syntax => WritePropertyInfo(syntax, root)));
-            classinfo.AddFields(cls.Members.OfType<FieldDeclarationSyntax>().Select(syntax => WriteFieldInfo(syntax, root)).ToList());
+            classinfo.AddProperties(cls.Members.ConvertToInfo<PropertyInfo, PropertyDeclarationSyntax>(syntax => WritePropTypeInfo(syntax, root)));
+            classinfo.AddFields(cls.Members.OfType<FieldDeclarationSyntax>().Select(syntax => WritePropTypeInfo(syntax, root)).ToList());
             var events = cls.Members.ConvertToInfo<PropertyInfo, EventDeclarationSyntax>(s => WritePropTypeInfo(s, root));
             classinfo.AddProperties(events);
             var eventFields = cls.Members.ConvertToInfo<PropertyInfo, EventFieldDeclarationSyntax>(s => WritePropTypeInfo(s, root));
             classinfo.AddProperties(eventFields);
+            var enums = cls.Members.OfType<EnumDeclarationSyntax>().Select(x => WriteEnumInfo(x, root + 1)).ToList();
+            classinfo.AddNestedClasses(enums);
             return classinfo;
         }
-
+        private ClassInfo WriteEnumInfo(EnumDeclarationSyntax cls, int rootLevel = 1)
+        {
+            int modifier = _rowColumns[rootLevel] >= 5 ? 1 : 0;
+            rootLevel += modifier;
+            int root = rootLevel + 1;
+            maxLevel = rootLevel > maxLevel ? rootLevel : maxLevel;
+            int column = _rowColumns[rootLevel];
+            _rowColumns[rootLevel] = _rowColumns[rootLevel] >= 5 ? 0 : _rowColumns[rootLevel] + 1;
+            var classinfo = new ClassInfo
+            {
+                Name = cls.Identifier.ToString(),
+                ParentName = cls.Parent?.GetText().Lines[0].ToString().TrimStart() ?? "No ParentName",
+                RawCode = cls.ToFullString(),
+                RootLevel = rootLevel,
+                Column = column,
+            };
+            classinfo.AddProperties(cls.Members.OfType<EnumMemberDeclarationSyntax>().Select(syntax => WritePropTypeInfo(syntax, root)).ToList());
+            return classinfo;
+        }
         private MethodInfo WriteConstructorSyntax(ConstructorDeclarationSyntax constructor, int rootLevel = 1)
         {
             (int column, int row) = SetColumnRow(rootLevel);
@@ -244,39 +265,20 @@ namespace MasterCsharpHosted.Server.Services
                     Column = column,
                     RootLevel = row
                 },
+                EnumMemberDeclarationSyntax enumMember => new PropertyInfo
+                {
+                    Name = enumMember.Identifier.Text,
+                    ParentName = enumMember.Parent?.GetText().Lines[0].ToString().TrimStart(),
+                    Type = "enum value",
+                    RawCode = enumMember.ToFullString(),
+                    Column = column,
+                    RootLevel = row
+                },
                 _ => new PropertyInfo()
             };
 
         }
-        private PropertyInfo WritePropertyInfo(PropertyDeclarationSyntax property, int rootLevel)
-        {
-            (int column, int row) = SetColumnRow(rootLevel);
-
-            return new PropertyInfo
-            {
-                Name = property.Identifier.Text,
-                ParentName = property.Parent?.GetText().Lines[0].ToString().TrimStart(),
-                Type = property.Type.ToString(),
-                RawCode = property.ToFullString(),
-                Column = column,
-                RootLevel = row
-            };
-        }
-
-        private PropertyInfo WriteFieldInfo(FieldDeclarationSyntax field, int rootLevel = 1)
-        {
-            (int column, int row) = SetColumnRow(rootLevel);
-
-            return new PropertyInfo
-            {
-                Name = field.Declaration.Variables[0].Identifier.Text,
-                ParentName = field.Parent?.GetText().Lines[0].ToString().TrimStart(),
-                Type = field.Declaration.Type.ToString(),
-                RawCode = field.ToFullString(),
-                Column = column,
-                RootLevel = row
-            };
-        }
+        
         #endregion
 
         private (int column, int row) SetColumnRow(int rootLevel)
@@ -293,13 +295,12 @@ namespace MasterCsharpHosted.Server.Services
 
     public static class SytaxExtensions
     {
-        
         public static List<TValue> ConvertToInfo<TValue, TItem>(this SyntaxList<MemberDeclarationSyntax> items, Func<TItem, TValue> convertDelegate) where TItem : MemberDeclarationSyntax
                                                                                                                                                        where TValue : SyntaxInfoBase
         {
             return items.OfType<TItem>().Select(convertDelegate).ToList();
         }
-        public static string ToDeclarationIdentifier<T>(this T declaration) where T : MemberDeclarationSyntax
+        public static string ToDeclarationIdentifier<T>(this T declaration) where T : CSharpSyntaxNode
         {
             return declaration switch
             {
@@ -314,13 +315,23 @@ namespace MasterCsharpHosted.Server.Services
                 NamespaceDeclarationSyntax name => name.Name.ToFullString(),
                 VariableDeclaratorSyntax variable => variable.Identifier.Text,
                 VariableDeclarationSyntax varDec => varDec.Variables[0].Identifier.Text,
+                LocalDeclarationStatementSyntax local => local.Declaration.Variables[0].Identifier.Text,
+                LocalFunctionStatementSyntax localFunc => localFunc.Identifier.Text,
                 _ => ""
             };
         }
         public static string ToIdentifier<T>(this T node) where T : SyntaxNode
         {
-            if (node is MemberDeclarationSyntax memberDeclaration) return memberDeclaration.ToDeclarationIdentifier();
-            return "";
+            var result = "";
+            if (node is CSharpSyntaxNode memberDeclaration) 
+                result = memberDeclaration.ToDeclarationIdentifier();
+            else
+            {
+
+                Console.WriteLine($"Type of Child Member is not {nameof(CSharpSyntaxNode)}/r/n It is of Type -- {node.GetType()}");
+            }
+            
+            return result;
         }
     }
 }

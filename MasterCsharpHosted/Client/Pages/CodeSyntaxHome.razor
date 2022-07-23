@@ -7,7 +7,7 @@
         <CodeDiagram SyntaxTreeInfo="AppState.SyntaxTreeInfo" SendCode="HandleSendCode" />
     </div>
 }
-@if (AppState.SimpleSyntaxTrees != null && AppState.SimpleSyntaxTrees.Any() && _isSimple){
+else if (AppState.SimpleSyntaxTrees != null && AppState.SimpleSyntaxTrees.Any() && _isSimple){
     <div class="syntax-diagram">
         <SimpleDiagram SendCode="HandleSendCode"/>
     </div>
