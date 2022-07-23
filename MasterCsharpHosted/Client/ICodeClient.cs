@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using MasterCsharpHosted.Shared;
 
 namespace MasterCsharpHosted.Client
@@ -7,6 +8,7 @@ namespace MasterCsharpHosted.Client
     {
         Task<string> GetFromPublicRepo(string org, string repo, string filePath);
         Task<SyntaxTreeInfo> GetAnalysis(string code);
+        Task<List<SimpleSyntaxTree>> GetSimpleAnalysis(string code);
     }
     public interface IUserClient
     {

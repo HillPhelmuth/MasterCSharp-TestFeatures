@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using BlazorMonaco;
 using MasterCsharpHosted.Shared;
+using MasterCsharpHosted.Shared.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using Newtonsoft.Json;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace MasterCsharpHosted.Client.Components
 {
@@ -92,21 +94,21 @@ namespace MasterCsharpHosted.Client.Components
                     Console.WriteLine("Tried Analyze");
                 });
             await _editor.AddAction("Undo", "Undo", new[] { (int)KeyMode.CtrlCmd | (int)KeyCode.KEY_Z },
-                null, null, "navigation", 2.5,
+                null, null, "navigation", 3.5,
                 async (e, codes) =>
                 {
                     await Undo();
                     Console.WriteLine("Tried Undo");
                 });
             await _editor.AddAction("Redo", "Redo", new[] { (int)KeyMode.CtrlCmd | (int)KeyCode.KEY_Y },
-                null, null, "navigation", 3.5,
+                null, null, "navigation", 4.5,
                 async (e, codes) =>
                 {
                     await Redo();
                     Console.WriteLine("Tried Redo");
                 });
             await _editor.AddAction("ZoomIn", "Zoom in", new[] { (int)KeyMode.CtrlCmd | (int)KeyCode.US_DOT },
-                null, null, "navigation", 4.5,
+                null, null, "navigation", 5.5,
                 async (e, codes) =>
                 {
                     var editorOptions = new GlobalEditorOptions { FontSize = ++_fontSize };
@@ -114,7 +116,7 @@ namespace MasterCsharpHosted.Client.Components
                     Console.WriteLine("Tried Redo");
                 });
             await _editor.AddAction("ZoomOut", "Zoom out", new[] { (int)KeyMode.CtrlCmd | (int)KeyCode.US_COMMA },
-                null, null, "navigation", 5.5,
+                null, null, "navigation", 6.5,
                 async (e, codes) =>
                 {
                     var editorOptions = new GlobalEditorOptions { FontSize = --_fontSize };
@@ -122,7 +124,7 @@ namespace MasterCsharpHosted.Client.Components
                     Console.WriteLine("Tried Redo");
                 });
             await _editor.AddAction("Suggest", "Request Suggestion", new[] { (int)KeyMode.CtrlCmd | (int)KeyCode.KEY_J },
-                null, null, "navigation", 6.5,
+                null, null, "navigation", 7.5,
                 async (e, codes) =>
                 {
                     await Suggest();
@@ -135,7 +137,7 @@ namespace MasterCsharpHosted.Client.Components
                     null, "navigation", 8.5,
                     async (_, _) =>
                     {
-                        string code = await _editor.GetValue();
+                        var code = await _editor.GetValue();
                         await OnSave.InvokeAsync(code);
                         Console.WriteLine("Trigger OnSave");
                     });
@@ -149,15 +151,15 @@ namespace MasterCsharpHosted.Client.Components
             var word = await model?.GetWordAtPosition(eventArgs.Position);
 
             var pos = eventArgs.Position;
-            int lineEndCol = await model.GetLineLastNonWhitespaceColumn(pos.LineNumber);
-            string lineContent = await model.GetLineContent(pos.LineNumber);
+            var lineEndCol = await model.GetLineLastNonWhitespaceColumn(pos.LineNumber);
+            var lineContent = await model.GetLineContent(pos.LineNumber);
             Console.WriteLine($"Word at current cursor: {word?.Word}");
-            string[] deltas = _deltaDecorationIds;
+            var deltas = _deltaDecorationIds;
             var listDelta = new List<ModelDeltaDecoration>();
 
             foreach (var hoverContent in AppHoverContent.AllAppHoverItems)
             {
-                foreach ((string key, var messages) in hoverContent.KeyWordMessages.Where(x => lineContent.Contains(x.Key)))
+                foreach (var (key, messages) in hoverContent.KeyWordMessages.Where(x => lineContent.Contains(x.Key)))
                 {
                     var decoration = new ModelDeltaDecoration
                     {
@@ -178,24 +180,36 @@ namespace MasterCsharpHosted.Client.Components
 
         private async Task SubmitCodeDefault()
         {
-            string code = await _editor.GetValue();
+            var code = await _editor.GetValue();
             if (OnSubmit.HasDelegate)
             {
                 await OnSubmit.InvokeAsync(code);
                 return;
             }
 
-            string returnedValue = await PublicClient.CompileCodeAsync(code);
+            var returnedValue = await PublicClient.CompileCodeAsync(code);
             AppState.AddLineToOutput(returnedValue);
         }
 
         private async Task SubmitForAnalysis()
         {
-            string code = await _editor.GetValue();
+            var code = await _editor.GetValue();
             AppState.SyntaxTreeInfo = await PublicClient.GetAnalysis(code);
-            //AppState.Snippet = code;
+            await SubmitForSimpleAnalysis(code);
+            AppState.Snippet = code;
         }
-        private async Task Undo() => await _editor.Trigger("whatever...", "undo", "whatever...");
+        
+        private async Task SubmitForSimpleAnalysis(string code)
+        {
+            AppState.SimpleSyntaxTrees = await PublicClient.GetSimpleAnalysis(code);
+            var settings = new JsonSerializerSettings() {ReferenceLoopHandling = ReferenceLoopHandling.Ignore, PreserveReferencesHandling = PreserveReferencesHandling.All};
+            AppState.TreeContent = JsonConvert.SerializeObject(AppState.SimpleSyntaxTrees, Formatting.Indented, settings);
+            Console.WriteLine(AppState.TreeContent[..100]);
+        }
+        private async Task Undo()
+        {
+            await _editor.Trigger("whatever...", "undo", "whatever...");
+        }
 
         private async Task Redo() => await _editor.Trigger("whatever...", "redo", "whatever...");
 
@@ -215,6 +229,9 @@ namespace MasterCsharpHosted.Client.Components
                 case nameof(AppState.SyntaxTreeInfo):
                     StateHasChanged();
                     return;
+                case nameof(AppState.SimpleSyntaxTrees):
+                    StateHasChanged();
+                    return;
                 case nameof(AppState.EditorTheme):
                     await MonacoEditorBase.SetTheme(AppState.EditorTheme);
                     StateHasChanged();
@@ -222,6 +239,9 @@ namespace MasterCsharpHosted.Client.Components
                     return;
                 case nameof(AppState.Snippet):
                     await _editor.SetValue(AppState.Snippet);
+                    StateHasChanged();
+                    break;
+                case nameof(AppState.TreeContent):
                     StateHasChanged();
                     break;
                 default:

@@ -46,7 +46,7 @@ namespace MasterCsharpHosted.Server
             services.AddScoped<SignOutSessionStateManager>();
             services.AddScoped<LazyAssemblyLoader>();
             services.AddDbContextFactory<AppUserContext>(opts =>
-                opts.UseCosmos(Configuration["Cosmos:Endpoint"], Configuration["Cosmos:Key"], "AppUserDb"));
+                opts.UseCosmos(Configuration["Cosmos:ConnectionString"], "AppUserDb"));
             services.AddControllersWithViews();
             services.AddRazorPages();
         }

@@ -24,7 +24,7 @@ namespace MasterCsharpHosted.Server.Controllers
         [HttpGet("getUser/{userName}")]
         public async Task<IActionResult> GetUserData(string userName)
         {
-            await using var context = _userContext.CreateDbContext();
+            await using var context = await _userContext.CreateDbContextAsync();
             var user = await context.AppUsers.FirstOrDefaultAsync(x => x.UserName == userName);
             return user == null
                 ? new OkObjectResult(new AppUser {UserName = "NONE"})

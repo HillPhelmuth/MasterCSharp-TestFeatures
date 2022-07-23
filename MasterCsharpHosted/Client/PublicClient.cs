@@ -4,10 +4,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using MasterCsharpHosted.Shared;
+using Newtonsoft.Json;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace MasterCsharpHosted.Client
 {
@@ -109,6 +110,22 @@ namespace MasterCsharpHosted.Client
             Console.WriteLine($"Classes:\r\n{string.Join("\r\n\t", syntaxResult.NameSpaces.SelectMany(x => x?.Classes?.Select(c => x.Name)))}");
             return syntaxResult;
         }
+        public async Task<List<SimpleSyntaxTree>> GetSimpleAnalysis(string code)
+        {
+            List<SimpleSyntaxTree> result = new();
+            try
+            {
+                var apiResult = await Client.PostAsJsonAsync("api/code/simpleSyntax", code);
+                var asString = await apiResult.Content.ReadAsStringAsync();
+                result = JsonConvert.DeserializeObject<List<SimpleSyntaxTree>>(asString);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Boooooo!!!!\r\nSee Exception:\r\n{ex}");
+            }
+            return result;
+        }
+
         public async Task<bool> UpdateUser(AppUser user)
         {
             var apiResult = await Client.PostAsJsonAsync("api/appUser/updateUser", user);

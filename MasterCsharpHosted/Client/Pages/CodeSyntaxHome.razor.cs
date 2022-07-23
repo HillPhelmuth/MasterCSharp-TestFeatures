@@ -18,6 +18,7 @@ namespace MasterCsharpHosted.Client.Pages
 
         private bool _shouldRender;
         private bool _selfTrigger;
+        private bool _isSimple;
         protected override Task OnInitializedAsync()
         {
             AppState.OnShowCode += HandleCodeWindow;
@@ -45,7 +46,7 @@ namespace MasterCsharpHosted.Client.Pages
         private async void HandleSendCode(string code)
         {
             await _editor.SetValue(code);
-            System.Console.WriteLine($"Received code from Diagram:\n{code.Substring(0, Math.Min(150, code.Length))}...");
+            //System.Console.WriteLine($"Received code from Diagram");
             _shouldRender = true;
             StateHasChanged();
         }
@@ -95,6 +96,12 @@ namespace MasterCsharpHosted.Client.Pages
             _selfTrigger = false;
             if (_shouldRender)
                 await InvokeAsync(StateHasChanged);
+        }
+        private void ToggleSimple()
+        {
+            _shouldRender = true;
+            _isSimple = !_isSimple;
+            StateHasChanged();
         }
         private void HandleCodeWindow(bool isShow)
         {

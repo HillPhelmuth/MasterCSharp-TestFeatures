@@ -19,6 +19,8 @@ namespace MasterCsharpHosted.Shared
         private AppUser _currentUser;
         private SyntaxTreeInfo _syntaxTreeInfo;
         private string _editorTheme = "vs-dark";
+        private string treeContent;
+        private List<SimpleSyntaxTree> simpleSyntaxTrees = new();
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -109,8 +111,27 @@ namespace MasterCsharpHosted.Shared
                 OnPropertyChanged();
             }
         }
+        public string TreeContent
+        {
+            get => treeContent;
+            set
+            {
+                treeContent = value;
+                OnPropertyChanged();
+            }
+        }
 
-        public void AddLineToOutput(string output) => CurrentOutput += Environment.NewLine + output;
+        
+        public List<SimpleSyntaxTree> SimpleSyntaxTrees
+        {
+            get => simpleSyntaxTrees; 
+            set
+            {
+                simpleSyntaxTrees = value;
+                OnPropertyChanged();
+            }
+        }
+        public void AddLineToOutput(string output) => CurrentOutput += $"{Environment.NewLine}{output}";
 
         public void ClearOutput() => CurrentOutput = "";
 

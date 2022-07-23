@@ -37,19 +37,6 @@ namespace MasterCsharpHosted.Shared
                 throw;
             }
         }
-
-        private static string GetJsonContentFromFile(string fileName)
-        {
-            var assembly = Assembly.GetExecutingAssembly();
-            string fileResource = assembly.GetManifestResourceNames()
-                .SingleOrDefault(s => s.EndsWith(fileName));
-            string contentJson = "";
-            using var fileStream = assembly.GetManifestResourceStream(fileResource);
-            using var reader = new StreamReader(fileStream);
-            contentJson = reader.ReadToEnd();
-
-            return contentJson;
-        }
     }
 
     public class AppHoverModel
