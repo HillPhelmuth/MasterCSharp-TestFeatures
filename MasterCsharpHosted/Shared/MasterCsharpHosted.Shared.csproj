@@ -1,13 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="CustomCompletionList.cs" />
-    <Compile Remove="Services\LocalAnalyze.cs" />
-    <Compile Remove="SyntaxInfo.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,7 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.JSInterop" Version="7.0.0-preview.6.22330.3" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 

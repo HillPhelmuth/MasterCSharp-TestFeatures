@@ -1,18 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="Components\Overlay.razor.cs" />
     <Compile Remove="IPublicClient.cs" />
-    <Compile Remove="Pages\CodeTreePage.razor.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Remove="Components\Overlay.razor" />
-    <Content Remove="Pages\CodeTreePage.razor" />
     <Content Remove="wwwroot\index.html" />
   </ItemGroup>
 
@@ -22,13 +20,13 @@
 
   <ItemGroup>
     <PackageReference Include="BlazorMonaco" Version="2.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.0-preview.6.22330.3" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="7.0.0-preview.6.22330.3" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.0-preview.6.22330.3" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0-preview.6.22324.4" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0-preview.6.22324.4" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0-preview.6.22324.4" />
-    <PackageReference Include="System.Net.Http.Json" Version="7.0.0-preview.6.22324.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="6.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.4" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
+    <PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -40,8 +38,6 @@
   <ItemGroup>
     <BlazorWebAssemblyLazyLoad Include="ChallengeModule.dll" />
     <BlazorWebAssemblyLazyLoad Include="CodeSyntaxModule.dll" />
-    <!--<BlazorWebAssemblyLazyLoad Include="CodeSyntaxModuleSimple.dll" />
-    <BlazorWebAssemblyLazyLoad Include="Radzen.Blazor.dll" />-->
     <BlazorWebAssemblyLazyLoad Include="Blazor.Diagrams.dll" />
     <BlazorWebAssemblyLazyLoad Include="Blazor.Diagrams.Core.dll" />
     <BlazorWebAssemblyLazyLoad Include="SvgPathProperties.dll" />
