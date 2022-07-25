@@ -21,5 +21,7 @@ namespace CodeSyntaxModule
                 this.Title = simpleSyntaxTree.Kind;
             }
         }
+        public bool IsExpanded { get; set; }
+        public List<string> ChildrenIds { get; set; } = new();
     }
 }

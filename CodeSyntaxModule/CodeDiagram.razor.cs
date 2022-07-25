@@ -26,7 +26,7 @@ namespace CodeSyntaxModule
         public EventCallback<string> SendCode { get; set; }
         private List<string> Graphlist => new StandardLayoutAlgorithmFactory<string, QG.IEdge<string>, QG.IBidirectionalGraph<string, QG.IEdge<string>>>().AlgorithmTypes.ToList();
         private readonly string _selectedGraph = "Tree";
-        public CSharpDiagramState DiagramState { get; set; } = new();
+        public DiagramState DiagramState { get; set; }
 
         private readonly List<SyntaxNode> _namespaceNodes = new();
         private readonly List<SyntaxNode> _classNodes = new();
@@ -66,6 +66,7 @@ namespace CodeSyntaxModule
         private readonly bool _isExpandMethods;
         protected override Task OnInitializedAsync()
         {
+            DiagramState = new DiagramState(_diagram);
             AppState.PropertyChanged += AppStateChanged;
             for (int i = 0; i < 100; i++) _rowColumns[i] = 0;
 

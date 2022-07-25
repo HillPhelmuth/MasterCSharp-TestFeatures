@@ -13,6 +13,38 @@
     }
 
 .expand {
-    cursor: pointer;
+    
     border: 3px solid green;
+}
+.expand-collapse-icon {
+    font-size: 32px;
+    width: 1em;
+    height: 1em;
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+    .expand-collapse-icon::before, .expand-collapse-icon::after {
+        content: "";
+        position: absolute;
+        width: 1em;
+        height: .16em;
+        top: calc( (1em / 2 ) - .08em );
+        background-color: black;
+        transition: 0.3s ease-in-out all;
+        border-radius: 0.03em;
+    }
+
+    .expand-collapse-icon::after {
+        transform: rotate(90deg);
+    }
+
+.collapsed.expand-collapse-icon::after {
+    transform: rotate(180deg);
+}
+
+
+.collapsed.expand-collapse-icon::before {
+    transform: rotate(90deg) scale(0);
 }

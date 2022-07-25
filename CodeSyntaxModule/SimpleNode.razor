@@ -7,7 +7,7 @@
     }
     @if (Node.SimpleSyntaxTree.Members.Any())
     {
-        <button></button>
+        <div style="margin-left:40%" class="@expandCollapseCss" @onclick=HandleExpandMembers></div>
     }
     @foreach (var port in Node.Ports)
     {

@@ -20,6 +20,7 @@ namespace CodeSyntaxModule
         public AppState AppState { get; set; }
         [Parameter]
         public EventCallback<string> SendCode { get; set; }
+        public DiagramState DiagramState { get; set; }
         private static readonly DiagramOptions _options = new()
         {
             DeleteKey = "None",
@@ -44,6 +45,7 @@ namespace CodeSyntaxModule
         private readonly List<LinkModel> _nodeLinks = new();
         protected override Task OnInitializedAsync()
         {
+            DiagramState = new DiagramState(_diagram);
             RegisterEvents();
             InitDiagram();
             return base.OnInitializedAsync();
@@ -63,17 +65,31 @@ namespace CodeSyntaxModule
         private List<string> expandedNodes = new();
         private void RegisterEvents()
         {
+            DiagramState.UpdateLayout += async () =>
+            {
+                TryLayout();
+                await InvokeAsync(StateHasChanged);
+            };
             _diagram.SelectionChanged += async (selected) =>
             {
                 if (selected is SimpleNodeModel model)
                 {
-                    if (model.SimpleSyntaxTree.Members.Any() && !expandedNodes.Any(x => x == model.Id))
-                    {
-                        expandedNodes.Add(model.Id);
-                        AddChildNodes(model.SimpleSyntaxTree, model);
-                        TryLayout();
-                        await InvokeAsync(StateHasChanged);
-                    }
+                    //if (!model.Selected) return;
+                    //if (model.IsExpanded)
+                    //{
+                    //    RemoveChildNodes(model);
+                    //    model.IsExpanded = false;
+                    //    TryLayout();
+                    //    await InvokeAsync(StateHasChanged);
+                    //}
+                    //else if (model.SimpleSyntaxTree.Members.Any())
+                    //{
+                    //    //expandedNodes.Add(model.Id);
+                    //    model.IsExpanded = true;
+                    //    AddChildNodes(model.SimpleSyntaxTree, model);
+                    //    TryLayout();
+                    //    await InvokeAsync(StateHasChanged);
+                    //}
                     
                     await SendCode.InvokeAsync(model.SimpleSyntaxTree?.RawCode ?? "No Code");
                     Console.WriteLine($"POSITION: {model.Position?.X}, {model.Position?.Y}");
@@ -93,7 +109,28 @@ namespace CodeSyntaxModule
                 //AddChildNodes(treeItem, node);
             }
         }
-
+        private void ExpandAll()
+        {
+            _diagram.Nodes.Clear();
+            foreach (var treeItem in AppState.SimpleSyntaxTrees)
+            {
+                var node = new SimpleNodeModel() { SimpleSyntaxTree = treeItem };
+                node.AddNodePorts();
+                _diagram.Nodes.Add(node);
+                AddChildNodes(treeItem, node);
+            }
+        }
+        private void CollapseAll()
+        {
+            _diagram.Nodes.Clear();
+            foreach (var treeItem in AppState.SimpleSyntaxTrees)
+            {
+                var node = new SimpleNodeModel() { SimpleSyntaxTree = treeItem };
+                node.AddNodePorts();
+                _diagram.Nodes.Add(node);
+                //AddChildNodes(treeItem, node);
+            }
+        }
         private void AddChildNodes(SimpleSyntaxTree treeItem, SimpleNodeModel node)
         {
             foreach (var subItem in treeItem.Members)
@@ -103,10 +140,20 @@ namespace CodeSyntaxModule
                 var link = new LinkModel(node.GetPort(PortAlignment.Bottom), subNode.GetPort(PortAlignment.Top));
                 _diagram.Nodes.Add(subNode);
                 _diagram.Links.Add(link);
+                node.ChildrenIds.Add(subNode.Id);
                 if (subItem.Members.Any())
                 {
-                    //AddChildNodes(subItem, subNode);
+                    AddChildNodes(subItem, subNode);
                 }
+            }
+        }
+        private void RemoveChildNodes(SimpleNodeModel nodeModel)
+        {
+            if (!nodeModel.SimpleSyntaxTree.Members.Any()) return;
+            var childNodes = _diagram.Nodes.Where(x => nodeModel.ChildrenIds.Contains(x.Id)).ToList();
+            foreach (var node in childNodes)
+            {
+                _diagram.Nodes.Remove(node);
             }
         }
 

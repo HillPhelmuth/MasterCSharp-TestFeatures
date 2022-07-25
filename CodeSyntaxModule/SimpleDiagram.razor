@@ -3,15 +3,19 @@
    
     <button class="fit-btn" @onclick=@(() => TryLayout())>Tree Layout</button>
     <button class="fit-btn" style="font-size:.9rem; margin-left:30px" @onclick=ToggleCodeWindow>Toggle Code Window</button>
+    <button class="fit-btn" style="font-size:.9rem;" @onclick=ExpandAll>Expand All</button>
+    <button class="fit-btn" style="font-size:.9rem;" @onclick=CollapseAll>Collapse All</button>
     <br />
     @*<input type="checkbox" @bind="_isExpandMethods" /> Expand Methods On Select*@
 </div>
 <div class="diagram-container">
 
-    <CascadingValue Value="_diagram">
-        <DiagramCanvas>
+    <CascadingValue Value="DiagramState">
+        <CascadingValue Value="_diagram">
+            <DiagramCanvas>
 
-        </DiagramCanvas>
+            </DiagramCanvas>
+        </CascadingValue>
     </CascadingValue>
 
 </div>
