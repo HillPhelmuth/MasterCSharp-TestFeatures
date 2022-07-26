@@ -34,8 +34,10 @@ namespace CodeSyntaxModule
         private readonly List<SyntaxNode> _propNodes = new();
         private readonly List<SyntaxNode> _fieldNodes = new();
         private readonly List<SyntaxNode> _globalNodes = new();
+        private readonly List<SyntaxNode> _enumNodes = new();
         private readonly Dictionary<SyntaxNode, List<SyntaxNode>> _methodGroups = new();
         private readonly Dictionary<SyntaxNode, List<SyntaxNode>> _classGroups = new();
+        private readonly Dictionary<SyntaxNode, List<SyntaxNode>> _enumGroups = new();
         private readonly Dictionary<SyntaxNode, List<SyntaxNode>> _namespaceGroups = new();
         private readonly List<LinkModel> _nodeLinks = new();
 
@@ -57,7 +59,7 @@ namespace CodeSyntaxModule
 
             },
             EnableVirtualization = false,
-            GridSize = 50,
+            GridSize = 40,
 
         };
         private readonly List<SyntaxGroup> _groups = new();
@@ -110,7 +112,10 @@ namespace CodeSyntaxModule
                 {
                     _namespaceGroups[node].Add(AddClassAndMemeberNodes(cls, node));
                 }
-
+                foreach (var enm in nameSpace.Enums)
+                {
+                    _namespaceGroups[node].Add(AddEnumAndMemberNodes(enm));
+                }
                 nsIndex++;
             }
 
@@ -155,40 +160,19 @@ namespace CodeSyntaxModule
             }
 
             var allNodes = _namespaceNodes.Union(_classNodes).Union(_methodNodes).Union(_propNodes).Union(_fieldNodes)
-                .Union(_globalNodes).ToList();
-            foreach ((var parent, var nodeGroup) in _namespaceGroups)
-            {
-                SyntaxGroup groupItem = new(nodeGroup, parent.Name, NodeKind.Namespace, 25);
-                groupItem.AddNodePorts();
-                _groups.Add(groupItem);
-                _nodeLinks.AddRange(nodeGroup.Select(x => new LinkModel(parent, x)));
-                //_nodeLinks.Add(new LinkModel(parent.GetPort(PortAlignment.Bottom), groupItem.GetPort(PortAlignment.Top)));
-            }
+                .Union(_globalNodes).Union(_enumNodes).ToList();
+            
+            AddGroupNodes(_namespaceGroups, NodeKind.Namespace);
             Console.WriteLine($"Class Groups: {_classGroups.Count}");
-            foreach ((var parent, var nodeGroup) in _classGroups)
-            {
-                if (!nodeGroup.Any()) continue;
-                SyntaxGroup groupItem = new(nodeGroup, parent.Name, NodeKind.Class, 40);
-                groupItem.AddNodePorts();
-                _groups.Add(groupItem);
-                _nodeLinks.AddRange(nodeGroup.Select(x => new LinkModel(parent, x)));
-                //_nodeLinks.Add(new LinkModel(parent.GetPort(PortAlignment.Bottom), groupItem.GetPort(PortAlignment.Top)));
-            }
-            foreach ((var parent, var nodeGroup) in _methodGroups)
-            {
-                SyntaxGroup groupItem = new(nodeGroup, parent.Name, NodeKind.Method, 50);
-                groupItem.AddNodePorts();
-                _groups.Add(groupItem);
-                _nodeLinks.AddRange(nodeGroup.Select(x => new LinkModel(parent, x)));
-                //_nodeLinks.Add(new LinkModel(parent.GetPort(PortAlignment.Bottom), groupItem.GetPort(PortAlignment.Top)));
-            }
+            AddGroupNodes(_classGroups, NodeKind.Class, 40);
+            AddGroupNodes(_enumGroups, NodeKind.Enum);
+            AddGroupNodes(_methodGroups, NodeKind.Method, 50);
 
             allNodes.ForEach(node =>
             {
                 if (node.Row > 0) node.Row--;
                 node.SetPosition(node.Column * 240, node.Row * 220);
             });
-            //IEnumerable<IGrouping<string, SyntaxNode>> nodeGroups = allNodes.GroupBy(node => node.GroupId, node => node);
 
             var adjustedNodes = allNodes.AdjustRowColumns();
             _diagram.Nodes.Add(allNodes);
@@ -205,6 +189,18 @@ namespace CodeSyntaxModule
                 Console.WriteLine($"Source: {lnk.SourceNode?.GetType().ToString() ?? "none"}\r\nTarget: {lnk.TargetNode?.GetType().ToString() ?? "none"}");
             }
         }
+
+        private void AddGroupNodes(Dictionary<SyntaxNode, List<SyntaxNode>> nameSpGroup, NodeKind kind, int padding = 25)
+        {
+            foreach ((var parent, var nodeGroup) in nameSpGroup)
+            {
+                SyntaxGroup groupItem = new(nodeGroup, parent.Name, NodeKind.Namespace, 25);
+                groupItem.AddNodePorts();
+                _groups.Add(groupItem);
+                _nodeLinks.AddRange(nodeGroup.Select(x => new LinkModel(parent, x)));
+            }
+        }
+
         private class LayoutOptions
         {
             public string Name { get; set; }
@@ -311,7 +307,13 @@ namespace CodeSyntaxModule
             return classNode;
 
         }
-
+        private SyntaxNode AddEnumAndMemberNodes(EnumInfo enm)
+        {
+            var enumNode = CreateEnumNode(enm);
+            _enumNodes.Add(enumNode);
+            _enumGroups[enumNode] = CreateEnumMemberNodes(enm);
+            return enumNode;
+        }
         private List<SyntaxNode> CreateClassMemberNodes(ClassInfo cls, SyntaxNode classNode = null)
         {
             var classMembers = new List<SyntaxNode>();
@@ -332,8 +334,21 @@ namespace CodeSyntaxModule
                 _methodGroups[ctorNode] = ctorGroup;
                 classMembers.Add(ctorNode);
             }
-
-            cls.NestedClasses.ForEach(x => CreateClassMemberNodes(x, classNode));
+            foreach (var nested in cls.NestedClasses)
+            {
+                var nestedClass = CreateClassNode(nested);
+                _classNodes.Add(nestedClass);
+                _classGroups[nestedClass] = CreateClassMemberNodes(nested, nestedClass);
+                classMembers.Add(nestedClass);
+            }
+            foreach (var enm in cls.Enums)
+            {
+                var enumNode = CreateEnumNode(enm);
+                _enumNodes.Add(enumNode);
+                _enumGroups[enumNode] = CreateEnumMemberNodes(enm);
+                classMembers.Add(enumNode);
+            }
+            //cls.NestedClasses.ForEach(x => CreateClassMemberNodes(x, classNode));
 
             classMembers.AddRange(cls.Properties.Select(CreatePropNode));
             classMembers.AddRange(cls.Fields.Select(CreateFieldNode));
@@ -372,33 +387,65 @@ namespace CodeSyntaxModule
             
             return classNode;
         }
+        private SyntaxNode CreateEnumNode(EnumInfo enm)
+        {
+            var enumNode = new SyntaxNode(enm.Id, enm.GroupId, new Point(220 * _rowColumns[enm.RootLevel], 220 * enm.RootLevel))
+            {
+                Name = enm.Name,
+                RawCode = enm.RawCode,
+                NodeKind = NodeKind.Enum,
+                Row = enm.RootLevel,
+                Column = enm.Column
+            };
 
+            _rowColumns[enm.RootLevel]++;
+            enumNode.AddNodePorts();
+
+            _enumNodes.Add(enumNode);
+            Console.WriteLine("Class Node added");
+
+            return enumNode;
+        }
+        private List<SyntaxNode> CreateEnumMemberNodes(EnumInfo enm)
+        {
+            var result = new List<SyntaxNode>();
+            List<SyntaxNode> syntaxNodes = enm.Fields.Select(CreateFieldNode).ToList();
+            
+            return syntaxNodes;
+            //foreach (var field in enm.Fields)
+            //{
+            //    SyntaxNode node = new SyntaxNode(field.Id, field.GroupId, new Point(240 * _rowColumns[field.RootLevel + 1], 220 * field.RootLevel + 1))
+            //    {
+            //        Name = field.Name,
+            //        RawCode = field.RawCode,
+            //        Type = field.Type,
+            //        NodeKind = NodeKind.Field,
+            //        Row = field.RootLevel,
+            //        Column = field.Column
+            //    };
+            //    node.AddNodePorts();
+            //    result.Add(node);
+            //}
+            //return result;
+        }
         private SyntaxNode CreateFieldNode(PropertyInfo field)
         {
-            var fieldNode = new SyntaxNode(field.Id, field.GroupId, new Point(240 * _rowColumns[field.RootLevel + 1], 220 * field.RootLevel + 1))
-            {
-                Name = field.Name,
-                RawCode = field.RawCode,
-                Type = field.Type,
-                NodeKind = NodeKind.Field,
-                Row = field.RootLevel,
-                Column = field.Column
-            };
-            _rowColumns[field.RootLevel + 1]++;
-            fieldNode.AddNodePorts();
-            _fieldNodes.Add(fieldNode);
-            Console.WriteLine("Field Node added");
-            return fieldNode;
+            return CreatePropOrFieldNode(field, NodeKind.Field);
         }
 
         private SyntaxNode CreatePropNode(PropertyInfo prop)
+        {
+            return CreatePropOrFieldNode(prop, NodeKind.Property);
+        }
+
+        private SyntaxNode CreatePropOrFieldNode(PropertyInfo prop, NodeKind kind)
         {
             var propNode = new SyntaxNode(prop.Id, prop.GroupId, new Point(240 * _rowColumns[prop.RootLevel + 1], 220 * prop.RootLevel + 1))
             {
                 Name = prop.Name,
                 RawCode = prop.RawCode,
                 Type = prop.Type,
-                NodeKind = NodeKind.Property,
+                NodeKind = kind,
                 Row = prop.RootLevel,
                 Column = prop.Column
             };

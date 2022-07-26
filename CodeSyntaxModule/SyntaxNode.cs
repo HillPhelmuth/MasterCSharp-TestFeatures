@@ -38,7 +38,8 @@ namespace CodeSyntaxModule
         Field,
         Global,
         NestedClass,
-        Constructor
+        Constructor,
+        Enum
     }
 
     public static class Extensions

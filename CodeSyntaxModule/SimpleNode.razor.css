@@ -16,27 +16,36 @@
     
     border: 3px solid green;
 }
-.expand-collapse-icon {
-    font-size: 32px;
-    width: 1em;
+.expand-icon, .collapsed-icon {
+    /*font-size: 32px;*/
+    width: 2em;
     height: 1em;
     position: relative;
     display: inline-block;
     cursor: pointer;
 }
 
-    .expand-collapse-icon::before, .expand-collapse-icon::after {
-        content: "";
+    .expand-icon::after {
+        content: url(icons/expand-arrow.png);
         position: absolute;
-        width: 1em;
-        height: .16em;
-        top: calc( (1em / 2 ) - .08em );
-        background-color: black;
+        /*width: 1em;*/
+        /*height: .16em;*/
+        top: -5px;
+        background-color: transparent;
         transition: 0.3s ease-in-out all;
         border-radius: 0.03em;
     }
-
-    .expand-collapse-icon::after {
+    .collapsed-icon::after {
+        content: url(icons/collapse-arrow.png);
+        position: absolute;
+        /*width: 1em;*/
+        /*height: .16em;*/
+        top: -5px;
+        background-color: transparent;
+        transition: 0.3s ease-in-out all;
+        border-radius: 0.03em;
+    }
+    /*.expand-collapse-icon::after {
         transform: rotate(90deg);
     }
 
@@ -47,4 +56,4 @@
 
 .collapsed.expand-collapse-icon::before {
     transform: rotate(90deg) scale(0);
-}
+}*/

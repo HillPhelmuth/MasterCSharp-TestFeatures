@@ -13,7 +13,7 @@ namespace CodeSyntaxModule
         [Parameter]
         public SyntaxNode Node { get; set; }
         [CascadingParameter(Name = "DiagramState")]
-        public CSharpDiagramState DiagramState { get; set; }
+        public DiagramState DiagramState { get; set; }
         [CascadingParameter]
         public Diagram Diagram { get; set; }
 

@@ -24,6 +24,8 @@ namespace MasterCsharpHosted.Shared
 
         [JsonPropertyName("GlobalDeclarations")]
         public List<GlobalDeclarationInfo> GlobalDeclarations { get; set; } = new();
+        [JsonPropertyName("Enums")]
+        public List<EnumInfo> Enums { get; set; } = new();
         [JsonPropertyName("MaxLevel")]
         public int MaxLevel { get; set; }
 
@@ -37,8 +39,24 @@ namespace MasterCsharpHosted.Shared
             classes.ForEach(c => c.GroupId = this.Id);
             Classes.AddRange(classes);
         }
+        [JsonPropertyName("Enums")]
+        public List<EnumInfo> Enums { get; private set; } = new();
+        public void AddEnums(List<EnumInfo> enums)
+        {
+            enums.ForEach(c => c.GroupId = this.Id);
+            Enums.AddRange(enums);
+        }
     }
-
+    public class EnumInfo : SyntaxInfoBase
+    {
+        [JsonPropertyName("Fields")]
+        public List<PropertyInfo> Fields { get; private set; } = new();
+        public void AddFields(List<PropertyInfo> fields)
+        {
+            fields.ForEach(c => c.GroupId = this.Id);
+            Fields.AddRange(fields);
+        }
+    }
     public class ClassInfo : SyntaxInfoBase
     {
         [JsonPropertyName("ParentName")]
@@ -80,6 +98,13 @@ namespace MasterCsharpHosted.Shared
         {
             fields.ForEach(m => m.GroupId = this.Id);
             Fields.AddRange(fields);
+        }
+        [JsonPropertyName("Enums")]
+        public List<EnumInfo> Enums { get; private set; } = new();
+        public void AddEnums(List<EnumInfo> enums)
+        {
+            enums.ForEach(c => c.GroupId = this.Id);
+            Enums.AddRange(enums);
         }
     }
 

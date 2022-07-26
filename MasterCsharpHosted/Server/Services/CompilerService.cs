@@ -44,6 +44,15 @@ namespace MasterCsharpHosted.Server.Services
                 Console.WriteLine($"Code output: {CodeOutput}");
                 return CodeOutput;
             }
+            if (!members.OfType<GlobalStatementSyntax>().Any())
+            {
+                if (members.OfType<ClassDeclarationSyntax>().IsClassWithMainMethod())
+                {
+                    CodeOutput = await RunConsole(code, references);
+                    Console.WriteLine($"Code output: {CodeOutput}");
+                    return CodeOutput;
+                }
+            }
             await RunSubmission(code, references);
             Console.WriteLine($"Code output: {CodeOutput}");
             return CodeOutput;
@@ -144,6 +153,13 @@ namespace MasterCsharpHosted.Server.Services
             assembly = Assembly.Load(peStream.ToArray());
             return true;
 
+        }
+    }
+    public static class CompileExtensions
+    {
+        public static bool IsClassWithMainMethod(this IEnumerable<ClassDeclarationSyntax> memberClasses)
+        {
+            return memberClasses.Any(cls => cls.Members.OfType<MethodDeclarationSyntax>().Any(mthd => mthd.Identifier.Text == "Main"));
         }
     }
 }

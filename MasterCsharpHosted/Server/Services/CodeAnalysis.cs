@@ -106,7 +106,7 @@ namespace MasterCsharpHosted.Server.Services
                 Column = column
             };
             namespaceInfo.AddClasses(nameSpace.Members.OfType<ClassDeclarationSyntax>().Select(syntax => WriteClassInfo(syntax, rootLevel++)).ToList());
-            namespaceInfo.AddClasses(nameSpace.Members.OfType<EnumDeclarationSyntax>().Select(x => WriteEnumInfo(x, rootLevel + 1)).ToList());
+            namespaceInfo.AddEnums(nameSpace.Members.OfType<EnumDeclarationSyntax>().Select(x => WriteEnumInfo(x, rootLevel + 1)).ToList());
             return namespaceInfo;
         }
 
@@ -141,10 +141,10 @@ namespace MasterCsharpHosted.Server.Services
             var eventFields = cls.Members.ConvertToInfo<PropertyInfo, EventFieldDeclarationSyntax>(s => WritePropTypeInfo(s, root));
             classinfo.AddProperties(eventFields);
             var enums = cls.Members.OfType<EnumDeclarationSyntax>().Select(x => WriteEnumInfo(x, root + 1)).ToList();
-            classinfo.AddNestedClasses(enums);
+            classinfo.AddEnums(enums);
             return classinfo;
         }
-        private ClassInfo WriteEnumInfo(EnumDeclarationSyntax cls, int rootLevel = 1)
+        private EnumInfo WriteEnumInfo(EnumDeclarationSyntax enm, int rootLevel = 1)
         {
             int modifier = _rowColumns[rootLevel] >= 5 ? 1 : 0;
             rootLevel += modifier;
@@ -152,16 +152,16 @@ namespace MasterCsharpHosted.Server.Services
             maxLevel = rootLevel > maxLevel ? rootLevel : maxLevel;
             int column = _rowColumns[rootLevel];
             _rowColumns[rootLevel] = _rowColumns[rootLevel] >= 5 ? 0 : _rowColumns[rootLevel] + 1;
-            var classinfo = new ClassInfo
+            var enumInfo = new EnumInfo
             {
-                Name = cls.Identifier.ToString(),
-                ParentName = cls.Parent?.GetText().Lines[0].ToString().TrimStart() ?? "No ParentName",
-                RawCode = cls.ToFullString(),
+                Name = enm.Identifier.ToString(),
+                //ParentName = cls.Parent?.GetText().Lines[0].ToString().TrimStart() ?? "No ParentName",
+                RawCode = enm.ToFullString(),
                 RootLevel = rootLevel,
                 Column = column,
             };
-            classinfo.AddProperties(cls.Members.OfType<EnumMemberDeclarationSyntax>().Select(syntax => WritePropTypeInfo(syntax, root)).ToList());
-            return classinfo;
+            enumInfo.AddFields(enm.Members.OfType<EnumMemberDeclarationSyntax>().Select(syntax => WritePropTypeInfo(syntax, root)).ToList());
+            return enumInfo;
         }
         private MethodInfo WriteConstructorSyntax(ConstructorDeclarationSyntax constructor, int rootLevel = 1)
         {

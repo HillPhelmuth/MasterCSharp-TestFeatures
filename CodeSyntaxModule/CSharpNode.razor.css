@@ -57,7 +57,11 @@
     box-shadow: 0px 0px 20px 0px #800000 inset;
     color: #800000;
 }
-
+.card.enum {
+    border-color: deeppink;
+    box-shadow: 0px 0px 20px 0px deeppink inset;
+    color: deeppink;
+}
 .card.none {
     border-color: darkslategrey;
     box-shadow: 0px 0px 20px 0px darkslategrey inset;

@@ -44,23 +44,23 @@
       "Name": "Collections",
       "ZIndex": 1,
       "KeyWordMessages": {
-        "List<": [ "##### *List<T>* #####", "A typed list of items. By far, the most common collection class used.", "###### **Useful Methods** ######", "*.Add(T)* - adds a new instance to list", ".Contains(T) - Determines whether the list contains a specific value.", "*.Remove(T)* - Removes the first occurrence of a specific object from the list", "*.Clear()* - Removes all items from the list" ],
-        "Dictionary<": [ "##### *Dictionary<TKey, TValue>* #####", "A collection of unique Key-Value pairs", "###### **Useful Methods** ######", ".Add(TKey, TValue) - Adds the specified key and value to the dictionary.", "*.ContainsKey(TKey)* - checks whether the dictionary contains a specified key", "*.ContainsValue(TValue)* - checks whether the dictionary contains a specified value", "*[TKey]* - returns the value of TValue associated with TKey", ".Remove(TKey) - Removes the value with the specified key from the dictionary" ],
-        "Stack<": [ "##### *Stack<T>* #####", "A last in, first out (LIFO) list of items. Great for storing program process stuff.", "###### **Useful Methods** ######", "*.Push(T)* - Adds a value to the top of the Stack<T>", "*.Pop()* - returns the value of last item added to the Stack<T> and removes that value from the Stack<T>", "*.Peek()* - returns the value of last item added to the Stack<T> without removing it" ],
-        "Queue<": [ "##### *Queue<T>* #####", "A first in, first out (FIFO) list of items. Great for storing program process stuff.", "###### **Useful Methods** ######", ".Enqueue(T) - Adds an object to the end of the Queue<T>.", "*.Dequeue()* - Removes and returns the object at the beginning of the Queue<T>.", "*.Peek()* - Returns the object at the beginning of the Queue<T> without removing it." ]
+        "List<": [ "##### *List\\<T\\>* #####", "A typed list of items. By far, the most common collection class used.", "###### **Useful Methods** ######", "*.Add(T)* - adds a new instance to list", ".Contains(T) - Determines whether the list contains a specific value.", "*.Remove(T)* - Removes the first occurrence of a specific object from the list", "*.Clear()* - Removes all items from the list" ],
+        "Dictionary<": [ "##### *Dictionary\\<TKey, TValue\\>* #####", "A collection of unique Key-Value pairs", "###### **Useful Methods** ######", ".Add(TKey, TValue) - Adds the specified key and value to the dictionary.", "*.ContainsKey(TKey)* - checks whether the dictionary contains a specified key", "*.ContainsValue(TValue)* - checks whether the dictionary contains a specified value", "*[TKey]* - returns the value of TValue associated with TKey", ".Remove(TKey) - Removes the value with the specified key from the dictionary" ],
+        "Stack<": [ "##### *Stack\\<T\\>* #####", "A last in, first out (LIFO) list of items. Great for storing program process stuff.", "###### **Useful Methods** ######", "*.Push(T)* - Adds a value to the top of the Stack\\<T\\>", "*.Pop()* - returns the value of last item added to the Stack\\<T\\> and removes that value from the Stack\\<T\\>", "*.Peek()* - returns the value of last item added to the Stack\\<T\\> without removing it" ],
+        "Queue<": [ "##### *Queue\\<T\\>* #####", "A first in, first out (FIFO) list of items. Great for storing program process stuff.", "###### **Useful Methods** ######", ".Enqueue(T) - Adds an object to the end of the Queue\\<T\\>.", "*.Dequeue()* - Removes and returns the object at the beginning of the Queue\\<T\\>.", "*.Peek()* - Returns the object at the beginning of the Queue\\<T\\> without removing it." ]
       }
     },
     {
       "Name": "Linq",
       "ZIndex": 1,
       "KeyWordMessages": {
-        ".Where(": [ "##### *Where(Func<TSource,bool> predicate)* #####", "Filters a collection based on the predicate function. Returns a collection **IEnumerable<TSource>**" ],
-        ".Select(": [ "##### *Select(Func<TSource,int,TResult> selector)* #####", "Returns a new collections of type **TResult**" ],
-        ".OrderBy(": [ "##### *OrderBy(Func<TSource,TKey> keySelector)* #####", "Returns the same collection now in ascending order of **TKey**" ],
-        ".First(": [ "##### *First(Func<TSource,bool> predicate)* #####", "Returns the first instance of **TSource** in the colleciton found by the predicate function" ],
-        ".FirstOrDefault(": [ "##### *FirstOrDefault(Func<TSource,bool> predicate)* #####", "Returns the first instance of **TSource** in the colleciton found by the predicate function" ],
-        ".Average(": [ "##### *Average(Func<TSource, number> selector)* #####", "Computes the average of a sequence of numeric values that are obtained by invoking a transform function on each element of the input sequence." ],
-        ".OrderByDescending(": [ "##### *OrderByDescending(Func<TSource,TKey> keySelector)* #####", "Returns the same collection now in descending order of **TKey**" ]
+        ".Where(": [ "##### *Where(Func\\<TSource,bool\\> predicate)* #####", "Filters a collection based on the predicate function. Returns a collection **IEnumerable\\\\<TSource\\\\>**" ],
+        ".Select(": [ "##### *Select(Func\\<TSource,int,TResult\\> selector)* #####", "Returns a new collections of type **TResult**" ],
+        ".OrderBy(": [ "##### *OrderBy(Func\\<TSource,TKey\\> keySelector)* #####", "Returns the same collection now in ascending order of **TKey**" ],
+        ".First(": [ "##### *First(Func\\<TSource,bool\\> predicate)* #####", "Returns the first instance of **TSource** in the colleciton found by the predicate function" ],
+        ".FirstOrDefault(": [ "##### *FirstOrDefault(Func\\<TSource,bool\\> predicate)* #####", "Returns the first instance of **TSource** in the colleciton found by the predicate function" ],
+        ".Average(": [ "##### *Average(Func\\<TSource, number\\> selector)* #####", "Computes the average of a sequence of numeric values that are obtained by invoking a transform function on each element of the input sequence." ],
+        ".OrderByDescending(": [ "##### *OrderByDescending(Func\\<TSource,TKey\\> keySelector)* #####", "Returns the same collection now in descending order of **TKey**" ]
       }
     }
   ]

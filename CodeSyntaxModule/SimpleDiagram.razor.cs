@@ -114,28 +114,28 @@ namespace CodeSyntaxModule
             _diagram.Nodes.Clear();
             foreach (var treeItem in AppState.SimpleSyntaxTrees)
             {
-                var node = new SimpleNodeModel() { SimpleSyntaxTree = treeItem };
+                var node = new SimpleNodeModel() { SimpleSyntaxTree = treeItem, IsExpanded = true };
                 node.AddNodePorts();
                 _diagram.Nodes.Add(node);
                 AddChildNodes(treeItem, node);
             }
+            TryLayout();
         }
         private void CollapseAll()
         {
             _diagram.Nodes.Clear();
             foreach (var treeItem in AppState.SimpleSyntaxTrees)
             {
-                var node = new SimpleNodeModel() { SimpleSyntaxTree = treeItem };
+                var node = new SimpleNodeModel() { SimpleSyntaxTree = treeItem, IsExpanded = false };
                 node.AddNodePorts();
                 _diagram.Nodes.Add(node);
-                //AddChildNodes(treeItem, node);
             }
         }
         private void AddChildNodes(SimpleSyntaxTree treeItem, SimpleNodeModel node)
         {
             foreach (var subItem in treeItem.Members)
             {
-                var subNode = new SimpleNodeModel() { SimpleSyntaxTree = subItem };
+                var subNode = new SimpleNodeModel() { SimpleSyntaxTree = subItem, IsExpanded = true };
                 subNode.AddNodePorts();
                 var link = new LinkModel(node.GetPort(PortAlignment.Bottom), subNode.GetPort(PortAlignment.Top));
                 _diagram.Nodes.Add(subNode);

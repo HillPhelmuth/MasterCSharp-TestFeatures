@@ -24,7 +24,7 @@ public partial class SimpleNode
     [CascadingParameter]
     public DiagramState DiagramState { get; set; }
 
-    private string expandCollapseCss => Node.IsExpanded ? "expand-collapse-icon" : "expand-collapse-icon collapsed";
+    private string expandCollapseCss => Node.IsExpanded ? "collapsed-icon" : "expand-icon";
     private void HandleExpandMembers()
     {
         if (Node.IsExpanded)
