@@ -72,10 +72,10 @@ namespace MasterCsharpHosted.Server.Services
 
                     var submission = (Func<object[], Task>)entryPointMethod.CreateDelegate(typeof(Func<object[], Task>));
 
-                    //if (submissionIndex >= submissionStates.Length)
-                    //{
-                    //    Array.Resize(ref submissionStates, Math.Max(submissionIndex, submissionStates.Length * 2));
-                    //}
+                    if (submissionIndex >= submissionStates.Length)
+                    {
+                        Array.Resize(ref submissionStates, Math.Max(submissionIndex, submissionStates.Length * 2));
+                    }
 
                     var returnValue = await (Task<object>)submission(submissionStates);
                     if (returnValue != null)
