@@ -38,20 +38,15 @@ namespace MasterCsharpHosted.Server.Services
             SyntaxTree tree = CSharpSyntaxTree.ParseText(code);
             CompilationUnitSyntax root = tree.GetCompilationUnitRoot();
             var members = root.Members;
-            if (members.Any(x => x.Kind() == SyntaxKind.NamespaceDeclaration))
+            
+            bool hasGlobalStatement = members.OfType<GlobalStatementSyntax>().Any();
+            bool hasEntryPoint = members.OfType<ClassDeclarationSyntax>().HasEntryMethod();
+            bool hasNamespace = members.Any(x => x.Kind() == SyntaxKind.NamespaceDeclaration);
+            if (hasNamespace || !hasGlobalStatement && hasEntryPoint)
             {
                 CodeOutput = await RunConsole(code, references);
                 Console.WriteLine($"Code output: {CodeOutput}");
                 return CodeOutput;
-            }
-            if (!members.OfType<GlobalStatementSyntax>().Any())
-            {
-                if (members.OfType<ClassDeclarationSyntax>().IsClassWithMainMethod())
-                {
-                    CodeOutput = await RunConsole(code, references);
-                    Console.WriteLine($"Code output: {CodeOutput}");
-                    return CodeOutput;
-                }
             }
             await RunSubmission(code, references);
             Console.WriteLine($"Code output: {CodeOutput}");
@@ -65,7 +60,8 @@ namespace MasterCsharpHosted.Server.Services
             var previousOut = Console.Out;
             try
             {
-                if (TryCompile(code, out var script, out var errorDiagnostics))
+                (bool success, var script) = TryCompileScript(code, out var errorDiagnostics);
+                if (success)
                 {
                     var writer = new StringWriter();
                     Console.SetOut(writer);
@@ -76,10 +72,10 @@ namespace MasterCsharpHosted.Server.Services
 
                     var submission = (Func<object[], Task>)entryPointMethod.CreateDelegate(typeof(Func<object[], Task>));
 
-                    if (submissionIndex >= submissionStates.Length)
-                    {
-                        Array.Resize(ref submissionStates, Math.Max(submissionIndex, submissionStates.Length * 2));
-                    }
+                    //if (submissionIndex >= submissionStates.Length)
+                    //{
+                    //    Array.Resize(ref submissionStates, Math.Max(submissionIndex, submissionStates.Length * 2));
+                    //}
 
                     var returnValue = await (Task<object>)submission(submissionStates);
                     if (returnValue != null)
@@ -109,9 +105,8 @@ namespace MasterCsharpHosted.Server.Services
         }
 
         //Tries to compile, if successful, it outputs the DLL Assembly. If unsuccessful, it will output the error message
-        private bool TryCompile(string source, out Assembly assembly, out IEnumerable<Diagnostic> errorDiagnostics)
+        private (bool success, Assembly script) TryCompileScript(string source, out IEnumerable<Diagnostic> errorDiagnostics)
         {
-            assembly = null;
             var scriptCompilation = CSharpCompilation.CreateScriptCompilation(
                 Path.GetRandomFileName(),
                 CSharpSyntaxTree.ParseText(source, CSharpParseOptions.Default.WithKind(SourceCodeKind.Script).WithLanguageVersion(LanguageVersion.Preview)),
@@ -141,23 +136,23 @@ namespace MasterCsharpHosted.Server.Services
             errorDiagnostics = scriptCompilation.GetDiagnostics().Where(x => x.Severity == DiagnosticSeverity.Error);
             if (errorDiagnostics.Any())
             {
-                return false;
+                return (false, null);
             }
 
-            using var peStream = new MemoryStream();
-            var emitResult = scriptCompilation.Emit(peStream);
+            using var outputAssembly = new MemoryStream();
+            var emitResult = scriptCompilation.Emit(outputAssembly);
 
-            if (!emitResult.Success) return false;
+            if (!emitResult.Success) return (false, null);
             submissionIndex++;
             runningCompilation = scriptCompilation;
-            assembly = Assembly.Load(peStream.ToArray());
-            return true;
+            var script = Assembly.Load(outputAssembly.ToArray());
+            return (true, script);
 
         }
     }
     public static class CompileExtensions
     {
-        public static bool IsClassWithMainMethod(this IEnumerable<ClassDeclarationSyntax> memberClasses)
+        public static bool HasEntryMethod(this IEnumerable<ClassDeclarationSyntax> memberClasses)
         {
             return memberClasses.Any(cls => cls.Members.OfType<MethodDeclarationSyntax>().Any(mthd => mthd.Identifier.Text == "Main"));
         }

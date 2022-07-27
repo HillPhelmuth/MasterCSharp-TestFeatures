@@ -15,10 +15,10 @@ namespace MasterCsharpHosted.Server.Services
     {
         protected string Output;
 
-        public async Task<string> RunConsole(string code, IEnumerable<MetadataReference> references)
+        public async Task<string> RunConsole(string source, IEnumerable<MetadataReference> references)
         {
             _references = references;
-            await RunInternal(code);
+            await ExecuteConsoleApp(source);
             return Output;
         }
        
@@ -57,7 +57,7 @@ namespace MasterCsharpHosted.Server.Services
             return (true, Assembly.Load(outputAssembly.ToArray()));
         }
         //private static ScriptState scriptState = null;
-        private async Task RunInternal(string code)
+        private async Task ExecuteConsoleApp(string code)
         {
             Output = "";
 
@@ -80,7 +80,7 @@ namespace MasterCsharpHosted.Server.Services
                         entry = entry.DeclaringType.GetMethod("Main", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static); // reflect for the async Task Main
                     }
                     var hasArgs = entry.GetParameters().Length > 0;
-                    var result = entry.Invoke(null, hasArgs ? new object[] { new string[0] } : null);
+                    var result = entry.Invoke(null, hasArgs ? new object[] { Array.Empty<string>() } : null);
                     if (result is Task t)
                     {
                         await t;
