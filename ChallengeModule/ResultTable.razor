@@ -1,13 +1,23 @@
-﻿@typeparam TItem
+﻿@inherits AppComponentBase
 
 <table class="table">
     <thead>
-    <tr>@TableHeader</tr>
+        <tr>
+            <th>#</th>
+            <th>Result</th>
+            <th>Expected</th>
+            <th>Passed</th>
+        </tr>
     </thead>
     <tbody>
-    @foreach (var item in Items)
-    {
-        <tr>@RowTemplate(item)</tr>
-    }
+        @foreach (var output in AppState.ChallengeOutput?.Outputs ?? new List<Output>())
+        {
+            <tr class="@output?.CssClass">
+                <td>@output?.TestIndex</td>
+                <td>@output?.Codeout</td>
+                <td>@output?.Test.TestAgainst</td>
+                <td>@output?.TestResult</td>
+            </tr>
+        }
     </tbody>
 </table>

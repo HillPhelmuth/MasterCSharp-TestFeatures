@@ -1,9 +1,15 @@
-﻿@if (IsOpen)
+﻿
+@if (IsOpen)
 {
-    <div class="modal-overlay">
-        <div class="window @(Enum.GetName(ModalLocation)?.ToLower())">
-            <button class="close" @onclick="Close"><span>&times;</span></button>
-            @ChildContent
+    <div class="modal-overlay" @onclick=OutClick>
+        <div style="width:@(ModalOptions.Width); height:@(ModalOptions.Height)" class="window @(Enum.GetName(ModalLocation)?.ToLower())" @onclick:stopPropagation>
+            <button class="close" @onclick="CloseSelf"><span>&times;</span></button>
+            <div class="text-center title">@ModalOptions?.Title</div>
+            @if(ComponentType != null)
+            {
+                <DynamicComponent Type="ComponentType" Parameters="ModalParameters"></DynamicComponent>
+            }
+            
         </div>
     </div>
 }

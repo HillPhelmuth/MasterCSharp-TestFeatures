@@ -1,25 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MasterCsharpHosted.Shared;
 using Microsoft.AspNetCore.Components;
+using SharedComponents;
 
 namespace ChallengeModule
 {
-    public partial class ResultTable<TItem>
+    public partial class ResultTable : AppComponentBase
     {
-        [Parameter]
-        public RenderFragment TableHeader { get; set; }
-
-        [Parameter]
-        public RenderFragment<TItem> RowTemplate { get; set; }
-
-        [Parameter]
-        public IReadOnlyList<TItem> Items { get; set; }
-        [Parameter]
-        public Func<TItem, TestResult> CssSelector { get; set; }
-
+        protected override List<string> InterestingProperties => new()
+        {
+            nameof(AppState.ActiveChallenge),
+            nameof(AppState.ChallengeOutput)
+        };
+        protected override void UpdateState(object sender, PropertyChangedEventArgs e)
+        {
+            if (!InterestingProperties.Contains(e.PropertyName)) return;
+            if (e.PropertyName == nameof(AppState.ActiveChallenge))
+            {
+                AppState.ChallengeOutput = null;
+            }
+            StateHasChanged();
+        }
     }
 }

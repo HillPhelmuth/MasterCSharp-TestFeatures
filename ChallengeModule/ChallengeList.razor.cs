@@ -17,6 +17,14 @@ namespace ChallengeModule
         protected override Task OnInitializedAsync()
         {
             var challenges = ChallengeModel.GetChallengesFromFile();
+            if (AppState.CurrentUser != null && AppState.CurrentUser.IsAuthenticated && AppState.CurrentUser.CompletedChallenges?.Any() == true)
+            {
+                var completed = AppState.CurrentUser.CompletedChallenges.Select(x => x.ChallengeName);
+                foreach (var challenge in challenges.Where(x => completed.Contains(x.Name)))
+                {
+                    challenge.UserCompleted = true;
+                }
+            }
             _challengeViews.Add(new ChallengeView("Very Easy", challenges.FindAll(x => x.Difficulty == Difficulty.Easiest), 1, true));
             _challengeViews.Add(new ChallengeView("Easy", challenges.FindAll(x => x.Difficulty == Difficulty.Easier), 2));
             _challengeViews.Add(new ChallengeView("Sorta Easy", challenges.FindAll(x => x.Difficulty == Difficulty.Easy), 3));

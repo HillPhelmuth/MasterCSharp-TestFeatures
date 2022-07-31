@@ -23,4 +23,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MasterCsharpHosted\Shared\MasterCsharpHosted.Shared.csproj" />
+  </ItemGroup>
+
 </Project>

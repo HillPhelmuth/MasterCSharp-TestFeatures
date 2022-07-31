@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace MasterCsharpHosted.Shared
@@ -6,7 +7,8 @@ namespace MasterCsharpHosted.Shared
     public class CodeOutputModel
     {
         [JsonPropertyName("outputs")]
-        public List<Output> Outputs { get; set; }
+        public List<Output> Outputs { get; set; } = new();
+        public bool PassAll => Outputs.All(x => x.TestResult);
     }
     public class Output
     {

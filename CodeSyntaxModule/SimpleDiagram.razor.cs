@@ -74,27 +74,8 @@ namespace CodeSyntaxModule
             {
                 if (selected is SimpleNodeModel model)
                 {
-                    //if (!model.Selected) return;
-                    //if (model.IsExpanded)
-                    //{
-                    //    RemoveChildNodes(model);
-                    //    model.IsExpanded = false;
-                    //    TryLayout();
-                    //    await InvokeAsync(StateHasChanged);
-                    //}
-                    //else if (model.SimpleSyntaxTree.Members.Any())
-                    //{
-                    //    //expandedNodes.Add(model.Id);
-                    //    model.IsExpanded = true;
-                    //    AddChildNodes(model.SimpleSyntaxTree, model);
-                    //    TryLayout();
-                    //    await InvokeAsync(StateHasChanged);
-                    //}
-                    
                     await SendCode.InvokeAsync(model.SimpleSyntaxTree?.RawCode ?? "No Code");
                     Console.WriteLine($"POSITION: {model.Position?.X}, {model.Position?.Y}");
-                    
-
                 }
             };
         }

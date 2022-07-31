@@ -9,6 +9,8 @@ namespace MasterCsharpHosted.Shared
     public class AppUser
     {
         private ICollection<UserSnippet> _snippets;
+        private ICollection<CompletedChallenge> completedChallenges;
+
         public int Id { get; set; }
         public string UserName { get; set; }
         public bool IsAuthenticated { get; set; }
@@ -19,7 +21,11 @@ namespace MasterCsharpHosted.Shared
             set => _snippets = value;
         }
 
-        public ICollection<CompletedChallenge> CompletedChallenges { get; set; }
+        public ICollection<CompletedChallenge> CompletedChallenges 
+        { 
+            get => completedChallenges ?? new List<CompletedChallenge>(); 
+            set => completedChallenges = value; 
+        }
     }
 
     public class UserSnippet

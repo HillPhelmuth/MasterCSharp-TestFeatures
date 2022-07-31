@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using MasterCsharpHosted.Shared;
+using MasterCsharpHosted.Shared.Services;
 
 namespace MasterCsharpHosted.Client
 {
@@ -29,6 +30,7 @@ namespace MasterCsharpHosted.Client
             builder.Services.AddScoped<ICodeClient, PublicClient>();
             builder.Services.AddScoped<IUserClient, PublicClient>();
             builder.Services.AddScoped<IChallengeClient, PublicClient>();
+            builder.Services.AddScoped<ModalService>();
             builder.Services.AddSingleton<AppState>();
             await builder.Build().RunAsync();
         }

@@ -13,7 +13,8 @@
                         {
                             <li>
                                 <hr />
-                                <button @onclick="@(() => AppState.SelectChallenge(challenge))">@challenge.Name</button>
+                                @{var css = challenge.UserCompleted ? "completed" : "";}
+                                <button class="@css" @onclick="@(() => AppState.SelectChallenge(challenge))">@challenge.Name</button>
 
                             </li>
 

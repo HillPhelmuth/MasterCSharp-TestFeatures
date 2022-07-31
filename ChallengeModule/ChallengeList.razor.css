@@ -14,7 +14,9 @@
         padding: 1px 6px;
         width: 100%;
     }
-
+.header {
+    cursor:pointer;
+}
 .header:hover {
     box-shadow: 4px 4px 4px 0px #000000, inset 2px 2px 10px 0px #000000, 4px 4px 12px 4px rgba(0,0,0,0);
 }
@@ -57,4 +59,10 @@
 
     .item button:hover {
         color: mediumvioletred;
+    }
+    .completed::after {
+        content:url(images/completed-star.png);
+        height:2rem;
+        width:2rem;
+        margin-left:3px;
     }

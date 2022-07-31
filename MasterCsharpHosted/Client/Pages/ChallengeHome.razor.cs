@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ChallengeModule;
 using MasterCsharpHosted.Shared;
+using MasterCsharpHosted.Shared.Services;
 using Microsoft.AspNetCore.Components;
+using Newtonsoft.Json;
 
 namespace MasterCsharpHosted.Client.Pages
 {
@@ -13,14 +16,18 @@ namespace MasterCsharpHosted.Client.Pages
         private AppState AppState { get; set; }
         [Inject]
         private IChallengeClient PublicClient { get; set; }
+        [Inject]
+        private IUserClient UserClient { get; set; }
+        [Inject]
+        private ModalService ModalService { get; set; }
 
-        private CodeOutputModel results;
         private TestResult _testResult;
         private bool _isReady;
         private bool _isMenuOpen = true;
         private bool _isWorking;
         private bool _showOutput;
         private string _cssClass = "active";
+        
 
         protected override Task OnInitializedAsync()
         {
@@ -41,20 +48,22 @@ namespace MasterCsharpHosted.Client.Pages
             _isMenuOpen = false;
             StateHasChanged();
         }
-        private void HandleSubmit(string code)
+        
+        private async Task Submit(string code)
         {
             _isWorking = true;
             StateHasChanged();
-            _ = Submit(code);
-        }
-        private async Task Submit(string code)
-        {
+            await Task.Delay(1000);
             var submitChallenge = new ChallengeModel
             {
                 Solution = code,
                 Tests = AppState.ActiveChallenge.Tests
             };
             var output = await PublicClient.SubmitChallenge(submitChallenge);
+            _isWorking = false;
+            await Task.Delay(1);
+            StateHasChanged();
+            AppState.ChallengeOutput = output;
             foreach (string result in output.Outputs.Select(x => x.Codeout))
             {
                 AppState.AddLineToOutput(result);
@@ -63,15 +72,35 @@ namespace MasterCsharpHosted.Client.Pages
             {
                 System.Console.WriteLine($"test: {result.TestIndex}, result: {result.TestResult}, against: {result.Test.TestAgainst}, output: {result.Codeout}");
             }
-            bool challengeSucceed = output.Outputs.All(x => x.TestResult);
-            _testResult = challengeSucceed ? TestResult.Pass : TestResult.Fail;
-            //var debugString = challengeSucceed ? "True" : "False";
-            //System.Console.WriteLine($"isChallengeSucceed = {debugString}");
-            //_isChallengeFail = !challengeSucceed;
-            //System.Console.WriteLine($"isChallengeFail = {_isChallengeFail}");
-            _isWorking = false;
-            results = output;
-            await InvokeAsync(StateHasChanged);
+            var modalTitle = output.PassAll ? "You succeeded! Woo hoo!" : "You failed! Boooooo!";
+            await ModalService.OpenAsync<ResultTable>(options:new ModalOptions { Title = modalTitle, Height= "50vh", Width = "40vw"});
+            
+            if (output.PassAll)
+                await TryAddChallengeToUser(code);
+            
+        }
+        private async void ShowResults()
+        {
+            if (AppState.ChallengeOutput == null) return;
+            await ModalService.OpenAsync<ResultTable>(options: new ModalOptions { Title = "Challenge Results" });
+        }
+        private void ShowSolution()
+        {
+            var snippet = AppState.CurrentUser.CompletedChallenges.FirstOrDefault(x => x.ChallengeName == AppState.ActiveChallenge.Name)?.Solution;
+            if (string.IsNullOrEmpty(snippet)) return;
+            AppState.UpdateSnippet(snippet);
+        }
+        private async Task<bool> TryAddChallengeToUser(string code)
+        {
+            System.Console.WriteLine("TryAddChallengeToUser() executed");
+            bool submitSuccess = false;
+            if (AppState.CurrentUser.IsAuthenticated && (AppState.CurrentUser.CompletedChallenges == null || AppState.CurrentUser.CompletedChallenges?.Any(x => x.ChallengeName == AppState.ActiveChallenge.Name) == false))
+            {
+                AppState.CurrentUser.CompletedChallenges.Add(new CompletedChallenge(AppState.ActiveChallenge.Name, code));
+                submitSuccess = await UserClient.UpdateUser(AppState.CurrentUser);
+            }
+            System.Console.WriteLine($"TryAddChallengeToUser() Completed. Success: {submitSuccess}");
+            return submitSuccess;
         }
     }
 }

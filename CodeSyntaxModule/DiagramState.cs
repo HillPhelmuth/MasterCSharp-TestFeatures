@@ -33,10 +33,6 @@ namespace CodeSyntaxModule
                 _diagram.Nodes.Add(subNode);
                 _diagram.Links.Add(link);
                 node.ChildrenIds.Add(subNode.Id);
-                //if (subItem.Members.Any())
-                //{
-                //    AddChildNodes(subItem, subNode);
-                //}
             }
             UpdateLayout.Invoke();
         }
@@ -44,7 +40,6 @@ namespace CodeSyntaxModule
         {
             if (!nodeModel.SimpleSyntaxTree.Members.Any()) return;
             RemoveChildren(nodeModel);
-
             UpdateLayout.Invoke();
         }
 

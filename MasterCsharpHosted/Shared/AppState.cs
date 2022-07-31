@@ -21,6 +21,7 @@ namespace MasterCsharpHosted.Shared
         private string _editorTheme = "vs-dark";
         private string treeContent;
         private List<SimpleSyntaxTree> simpleSyntaxTrees = new();
+        private CodeOutputModel challengeOutput;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -121,13 +122,22 @@ namespace MasterCsharpHosted.Shared
             }
         }
 
-        
+
         public List<SimpleSyntaxTree> SimpleSyntaxTrees
         {
-            get => simpleSyntaxTrees; 
+            get => simpleSyntaxTrees;
             set
             {
                 simpleSyntaxTrees = value;
+                OnPropertyChanged();
+            }
+        }
+        public CodeOutputModel ChallengeOutput
+        {
+            get => challengeOutput; 
+            set
+            {
+                challengeOutput = value;
                 OnPropertyChanged();
             }
         }
