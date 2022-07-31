@@ -11,15 +11,17 @@ namespace MasterCsharpHosted.Server.Services
     {
         private readonly CompilerService _compilerService = new();
         private readonly PublicGithubClient _githubClient;
+        private readonly CompileResources _compileResources;
 
-        public ServerApi(PublicGithubClient githubClient)
+        public ServerApi(PublicGithubClient githubClient, CompileResources compileResources)
         {
             _githubClient = githubClient;
+            _compileResources = compileResources;
         }
 
         public async Task<string> CompileCodeAsync(string code)
         {
-            var refs = CompileResources.PortableExecutableReferences;
+            var refs = _compileResources.PortableExecutableReferences;
             return await _compilerService.SubmitCode(code, refs);
         }
 

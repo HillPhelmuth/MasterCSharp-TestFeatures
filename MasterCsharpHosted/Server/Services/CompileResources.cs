@@ -6,15 +6,26 @@ using Microsoft.CodeAnalysis;
 
 namespace MasterCsharpHosted.Server.Services
 {
-    public static class CompileResources
+    public class CompileResources
     {
-        public static List<PortableExecutableReference> PortableExecutableReferences =>
-            AppDomain.CurrentDomain.GetAssemblies().Where(x =>
+        public List<PortableExecutableReference> PortableExecutableReferences => GetPortableExecutableReferences();
+        public List<PortableExecutableReference> PortableExecutableCompletionReferences => GetPortableExecutableCompletionReferences();
+
+        private List<PortableExecutableReference> portableExecutableReferences;
+        private List<PortableExecutableReference> portableExecutableCompletionReferences;
+        private List<PortableExecutableReference> GetPortableExecutableReferences()
+        {
+            portableExecutableReferences ??= AppDomain.CurrentDomain.GetAssemblies().Where(x =>
                 !x.IsDynamic && !string.IsNullOrWhiteSpace(x.Location) &&
-                (x.FullName.Contains("System")||x.FullName.Contains("Microsoft.CodeAnalysis"))).Select(assembly => MetadataReference.CreateFromFile(assembly.Location)).ToList();
-        public static List<PortableExecutableReference> PortableExecutableCompletionReferences =>
-           AppDomain.CurrentDomain.GetAssemblies().Where(x =>
-               !x.IsDynamic && !string.IsNullOrWhiteSpace(x.Location)).Select(assembly => MetadataReference.CreateFromFile(assembly.Location, documentation:DocumentationProvider.Default)).ToList();
+                (x.FullName.Contains("System") || x.FullName.Contains("Microsoft.CodeAnalysis"))).Select(assembly => MetadataReference.CreateFromFile(assembly.Location)).ToList();
+            return portableExecutableReferences;
+        }
+        private List<PortableExecutableReference> GetPortableExecutableCompletionReferences()
+        {
+            portableExecutableCompletionReferences ??= AppDomain.CurrentDomain.GetAssemblies().Where(x =>
+               !x.IsDynamic && !string.IsNullOrWhiteSpace(x.Location)).Select(assembly => MetadataReference.CreateFromFile(assembly.Location, documentation: DocumentationProvider.Default)).ToList();
+            return portableExecutableCompletionReferences;
+        }
     }
     
     public static class Extension

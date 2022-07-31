@@ -15,6 +15,12 @@ namespace MasterCsharpHosted.Server.Controllers
     public class ChallengeController : ControllerBase
     {
         private readonly CompilerService CompilerService = new();
+        private readonly CompileResources CompileResources;
+        public ChallengeController(CompileResources compileResources)
+        {
+            CompileResources = compileResources;
+        }
+
         [HttpPost("submit")]
         public async Task<CodeOutputModel> Submit([FromBody] CodeInputModel codeInput)
         {

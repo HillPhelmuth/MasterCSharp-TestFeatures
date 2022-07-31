@@ -17,15 +17,18 @@ namespace MasterCsharpHosted.Server.Controllers
     public class CodeController : ControllerBase
     {
         private PublicGithubClient _githubClient;
-        public CodeController(PublicGithubClient githubClient)
+        private readonly CompileResources CompileResources;
+        public CodeController(PublicGithubClient githubClient, CompileResources compileResources)
         {
             _githubClient = githubClient;
+            CompileResources = compileResources;
         }
         private readonly CompilerService _compilerService = new();
         [HttpPost("sugestComplete")]
         public async ValueTask<CustomSuggestionList> GetSuggest([FromBody] SourceInfo sourceInfo)
         {
-            var suggestions = await CodeCompletion.GetCodeCompletion(sourceInfo);
+            var refs = CompileResources.PortableExecutableReferences;
+            var suggestions = await CodeCompletion.GetCodeCompletion(sourceInfo, refs);
             return new CustomSuggestionList {Items = suggestions};
         }
 

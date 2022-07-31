@@ -24,9 +24,9 @@ namespace MasterCsharpHosted.Server.Services;
 
 public class CodeCompletion
 {
-    public static async Task<List<CustomSuggestion>> GetCodeCompletion(SourceInfo sourceInfo)
+    public static async Task<List<CustomSuggestion>> GetCodeCompletion(SourceInfo sourceInfo, List<PortableExecutableReference> refs)
     {
-        var refs = CompileResources.PortableExecutableCompletionReferences;
+        //List<PortableExecutableReference> refs = CompileResources.PortableExecutableCompletionReferences;
 
         List<string> usings = new() {"System",
             "System.IO",
@@ -79,7 +79,7 @@ public class CodeCompletion
         if (results == null && sourceInfo.LineNumberOffsetFromTemplate < sourceInfo.SourceCode.Length)
         {
             sourceInfo.LineNumberOffsetFromTemplate++;
-            await GetCodeCompletion(sourceInfo);
+            await GetCodeCompletion(sourceInfo, refs);
         }
 
         if (sourceInfo.SourceCode[sourceInfo.LineNumberOffsetFromTemplate - 1].ToString() == "(")
@@ -89,7 +89,7 @@ public class CodeCompletion
         }
 
         //Method parameters
-        var overloads = GetMethodOverloads(scriptCode, position);
+        var overloads = GetMethodOverloads(scriptCode, position, refs);
         var suggestionList = new List<CustomSuggestion>();
         if (results != null)
         {
@@ -128,7 +128,7 @@ public class CodeCompletion
         return suggestionList;
             
     }
-    public static SortedList<string, string> GetMethodOverloads(string scriptCode, int position)
+    public static SortedList<string, string> GetMethodOverloads(string scriptCode, int position, List<PortableExecutableReference> refs)
     {
         var overloadDocs = new SortedList<string, string>();
         var meta = AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES");
@@ -136,7 +136,7 @@ public class CodeCompletion
         var sourceLanguage = new CSharpLanguage();
         var syntaxTree = sourceLanguage.ParseText(scriptCode, SourceCodeKind.Script);
         var compilation = CSharpCompilation.Create("MyCompilation",
-            new[] { syntaxTree }, CompileResources.PortableExecutableCompletionReferences);
+            new[] { syntaxTree }, refs);
 
         var model = compilation.GetSemanticModel(syntaxTree);
 
