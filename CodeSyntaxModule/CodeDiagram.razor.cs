@@ -174,7 +174,7 @@ namespace CodeSyntaxModule
                 node.SetPosition(node.Column * 240, node.Row * 220);
             });
 
-            var adjustedNodes = allNodes.AdjustRowColumns();
+           
             _diagram.Nodes.Add(allNodes);
 
             _nodeLinks.ForEach(lnk =>
@@ -216,7 +216,7 @@ namespace CodeSyntaxModule
         {
             TryLayout(layout.Value);
         }
-        private void TryLayout(string layout = "Tree")
+        private void TryLayout(string layout = "Sugiyama")
         {
             Console.WriteLine($"Layout updated to {layout}");
             var graph = new QG.BidirectionalGraph<SyntaxNode, QG.Edge<SyntaxNode>>();

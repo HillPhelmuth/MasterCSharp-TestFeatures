@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MasterCsharpHosted.Shared.Services;
 using Microsoft.AspNetCore.Components;
 
 namespace MasterCsharpHosted.Client.Components
@@ -10,6 +11,8 @@ namespace MasterCsharpHosted.Client.Components
     {
         [Parameter]
         public EventCallback<string> OnSave { get; set; }
+        [Inject]
+        private ModalService ModalService { get; set; }
 
         private string _description;
         private string _name;
@@ -25,6 +28,8 @@ namespace MasterCsharpHosted.Client.Components
             }
             string combinedValues = $"{_name}|{_description}";
             OnSave.InvokeAsync(combinedValues);
+            var results = new ModalResults(true, new ModalParameters() {{"CombinedValues", combinedValues}});
+            ModalService.Close(results);
         }
 
         private void InputHandler(ChangeEventArgs args)

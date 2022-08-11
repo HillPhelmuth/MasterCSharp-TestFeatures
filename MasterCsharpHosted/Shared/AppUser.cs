@@ -9,7 +9,7 @@ namespace MasterCsharpHosted.Shared
     public class AppUser
     {
         private ICollection<UserSnippet> _snippets;
-        private ICollection<CompletedChallenge> completedChallenges;
+        private ICollection<CompletedChallenge> _completedChallenges;
 
         public int Id { get; set; }
         public string UserName { get; set; }
@@ -23,8 +23,8 @@ namespace MasterCsharpHosted.Shared
 
         public ICollection<CompletedChallenge> CompletedChallenges 
         { 
-            get => completedChallenges ?? new List<CompletedChallenge>(); 
-            set => completedChallenges = value; 
+            get => _completedChallenges ?? new List<CompletedChallenge>(); 
+            set => _completedChallenges = value; 
         }
     }
 

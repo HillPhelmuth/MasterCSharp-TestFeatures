@@ -20,7 +20,7 @@ namespace MasterCsharpHosted.Shared
         private SyntaxTreeInfo _syntaxTreeInfo;
         private string _editorTheme = "vs-dark";
         private string treeContent;
-        private List<SimpleSyntaxTree> simpleSyntaxTrees = new();
+        private List<FullSyntaxTree> _fullSyntaxTrees = new();
         private CodeOutputModel challengeOutput;
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -123,12 +123,12 @@ namespace MasterCsharpHosted.Shared
         }
 
 
-        public List<SimpleSyntaxTree> SimpleSyntaxTrees
+        public List<FullSyntaxTree> FullSyntaxTrees
         {
-            get => simpleSyntaxTrees;
+            get => _fullSyntaxTrees;
             set
             {
-                simpleSyntaxTrees = value;
+                _fullSyntaxTrees = value;
                 OnPropertyChanged();
             }
         }
@@ -141,6 +141,12 @@ namespace MasterCsharpHosted.Shared
                 OnPropertyChanged();
             }
         }
+
+        public void SetAnalysisResults(SyntaxTreeInfo syntaxTree, List<FullSyntaxTree> fullSyntax)
+        {
+            FullSyntaxTrees = fullSyntax;
+            SyntaxTreeInfo = syntaxTree;
+        }
         public void AddLineToOutput(string output) => CurrentOutput += $"{Environment.NewLine}{output}";
 
         public void ClearOutput() => CurrentOutput = "";
@@ -151,6 +157,13 @@ namespace MasterCsharpHosted.Shared
         {
             Snippet = challenge.Snippet;
             ActiveChallenge = challenge;
+        }
+
+        public event Action OnSubmitCode;
+
+        public void SubmitCode()
+        {
+            OnSubmitCode?.Invoke();
         }
         public event Action<bool> OnShowCode;
         public void ShowCode(bool show) => OnShowCode?.Invoke(show);

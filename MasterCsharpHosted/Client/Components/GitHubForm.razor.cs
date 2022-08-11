@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using MasterCsharpHosted.Shared;
+using MasterCsharpHosted.Shared.Services;
 using Microsoft.AspNetCore.Components;
 
 namespace MasterCsharpHosted.Client.Components
@@ -14,7 +15,10 @@ namespace MasterCsharpHosted.Client.Components
         private AppState AppState { get; set; }
         [Inject]
         private ICodeClient PublicClient { get; set; }
-        class FormModel
+        [Inject]
+        private ModalService ModalService { get; set; }
+
+        private class FormModel
         {
             [Required]
             public string Organization { get; set; }
@@ -24,7 +28,7 @@ namespace MasterCsharpHosted.Client.Components
             public string FileName { get; set; }
 
             public bool InRoot { get; set; } = true;
-            public List<string> Folders => new(3){$"/{Folder1}", $"/{Folder2}", $"/{Folder3}" };
+            public List<string> Folders => new(3) { $"/{Folder1}", $"/{Folder2}", $"/{Folder3}" };
             public string Folder1 { get; set; }
             public string Folder2 { get; set; }
             public string Folder3 { get; set; }
@@ -47,18 +51,19 @@ namespace MasterCsharpHosted.Client.Components
             folderCount -= 1;
             StateHasChanged();
         }
-        private FormModel ghFrm = new();
+        private readonly FormModel _ghFrm = new();
         private async void HandleValidSubmit()
         {
-            string enforcedFileExt = ghFrm.FileName.EndsWith(".cs") ? ghFrm.FileName : $"{ghFrm.FileName}.cs";
-            ghFrm.FileName = enforcedFileExt;
-            var folder1 = string.IsNullOrWhiteSpace(ghFrm.Folder1) ? "" : $"/{ghFrm.Folder1}";
-            var folder2 = string.IsNullOrWhiteSpace(ghFrm.Folder2) ? "" : $"/{ghFrm.Folder2}";
-            var folder3 = string.IsNullOrWhiteSpace(ghFrm.Folder3) ? "" : $"/{ghFrm.Folder3}";
-            var fullPath = folder1 + folder2 + folder3 + "/" + ghFrm.FileName;
-            AppState.Snippet =
-                await PublicClient.GetFromPublicRepo(ghFrm.Organization, ghFrm.Repo, fullPath);
-            StateHasChanged();
+            var enforcedFileExt = _ghFrm.FileName.EndsWith(".cs") ? _ghFrm.FileName : $"{_ghFrm.FileName}.cs";
+            _ghFrm.FileName = enforcedFileExt;
+            var folder1 = string.IsNullOrWhiteSpace(_ghFrm.Folder1) ? "" : $"/{_ghFrm.Folder1}";
+            var folder2 = string.IsNullOrWhiteSpace(_ghFrm.Folder2) ? "" : $"/{_ghFrm.Folder2}";
+            var folder3 = string.IsNullOrWhiteSpace(_ghFrm.Folder3) ? "" : $"/{_ghFrm.Folder3}";
+            var fullPath = folder1 + folder2 + folder3 + "/" + _ghFrm.FileName;
+            //AppState.Snippet =
+            //    await PublicClient.GetFromPublicRepo(_ghFrm.Organization, _ghFrm.Repo, fullPath);
+            //StateHasChanged();
+            ModalService.Close(new ModalResults(true, new ModalParameters { { "Organization", _ghFrm.Organization }, { "Repo", _ghFrm.Repo }, { "FullPath", fullPath } }));
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 namespace MasterCsharpHosted.Shared
 {
-    public class ChallengeModel
+    public class ChallengeModel : IEquatable<ChallengeModel>
     {
         [JsonPropertyName("name")]
         public string Name { get; set; }
@@ -47,10 +47,29 @@ namespace MasterCsharpHosted.Shared
             return JsonSerializer.Deserialize<List<ChallengeModel>>(json, options);
         }
 
+        public override bool Equals(object obj)
+        {
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj.GetType() == this.GetType() && Equals((ChallengeModel) obj);
+        }
+
         public static List<ChallengeModel> GetChallengesFromFile()
         {
             string challengeJson = Helpers.GetJsonContentFromFile("Challenges.json");
             return FromJson(challengeJson);
+        }
+
+        public bool Equals(ChallengeModel other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Name == other.Name && Description == other.Description && AddedBy == other.AddedBy;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Name, Description, AddedBy);
         }
     }
 

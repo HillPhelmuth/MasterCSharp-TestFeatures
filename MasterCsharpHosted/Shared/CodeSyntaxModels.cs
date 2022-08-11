@@ -33,14 +33,14 @@ namespace MasterCsharpHosted.Shared
     public class NameSpaceInfo : SyntaxInfoBase
     {
         [JsonPropertyName("Classes")]
-        public List<ClassInfo> Classes { get; private set; } = new();
+        public List<ClassInfo> Classes { get; } = new();
         public void AddClasses(List<ClassInfo> classes)
         {
             classes.ForEach(c => c.GroupId = this.Id);
             Classes.AddRange(classes);
         }
         [JsonPropertyName("Enums")]
-        public List<EnumInfo> Enums { get; private set; } = new();
+        public List<EnumInfo> Enums { get; } = new();
         public void AddEnums(List<EnumInfo> enums)
         {
             enums.ForEach(c => c.GroupId = this.Id);
@@ -50,7 +50,7 @@ namespace MasterCsharpHosted.Shared
     public class EnumInfo : SyntaxInfoBase
     {
         [JsonPropertyName("Fields")]
-        public List<PropertyInfo> Fields { get; private set; } = new();
+        public List<PropertyInfo> Fields { get; } = new();
         public void AddFields(List<PropertyInfo> fields)
         {
             fields.ForEach(c => c.GroupId = this.Id);
@@ -62,7 +62,7 @@ namespace MasterCsharpHosted.Shared
         [JsonPropertyName("ParentName")]
         public string ParentName { get; set; }
         [JsonPropertyName("NestedClasses")]
-        public List<ClassInfo> NestedClasses { get; private set; } = new();
+        public List<ClassInfo> NestedClasses { get; } = new();
         [JsonPropertyName("Constructors")]
         public List<MethodInfo> Constructors { get; set; } = new();
         public void AddNestedClasses(List<ClassInfo> classes)
@@ -79,28 +79,28 @@ namespace MasterCsharpHosted.Shared
             NestedClasses.Add(cls);
         }
         [JsonPropertyName("Methods")]
-        public List<MethodInfo> Methods { get; private set; } = new();
+        public List<MethodInfo> Methods { get; } = new();
         public void AddMethods(List<MethodInfo> methods)
         {
             methods.ForEach(m => m.GroupId = this.Id);
             Methods.AddRange(methods);
         }
         [JsonPropertyName("Properties")]
-        public List<PropertyInfo> Properties { get; private set; } = new();
+        public List<PropertyInfo> Properties { get; } = new();
         public void AddProperties(List<PropertyInfo> properties)
         {
             properties.ForEach(m => m.GroupId = this.Id);
             Properties.AddRange(properties);
         }
         [JsonPropertyName("Fields")]
-        public List<PropertyInfo> Fields { get; private set; } = new();
+        public List<PropertyInfo> Fields { get; } = new();
         public void AddFields(List<PropertyInfo> fields)
         {
             fields.ForEach(m => m.GroupId = this.Id);
             Fields.AddRange(fields);
         }
         [JsonPropertyName("Enums")]
-        public List<EnumInfo> Enums { get; private set; } = new();
+        public List<EnumInfo> Enums { get; } = new();
         public void AddEnums(List<EnumInfo> enums)
         {
             enums.ForEach(c => c.GroupId = this.Id);
@@ -128,9 +128,10 @@ namespace MasterCsharpHosted.Shared
         public Dictionary<string, string> Parameters { get; set; }
 
         [JsonPropertyName("BodySyntax")]
-        public List<GlobalDeclarationInfo> BodySyntax { get; private set; } = new();
+        public List<GlobalDeclarationInfo> BodySyntax { get; } = new();
         public void AddMethodMemebers(List<GlobalDeclarationInfo> globalDeclarations)
         {
+            if (globalDeclarations == null || !globalDeclarations.Any()) return;
             globalDeclarations.ForEach(m => m.GroupId = this.Id);
             BodySyntax.AddRange(globalDeclarations);
         }

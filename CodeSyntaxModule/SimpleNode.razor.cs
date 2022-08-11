@@ -38,11 +38,18 @@ public partial class SimpleNode
             DiagramState.AddChildNodes(Node);
         }
     }
+
+    private void HandleExpandAll()
+    {
+        if (Node.IsExpanded) return;
+        Node.IsExpanded = true;
+        DiagramState.AddChildNodes(Node, true);
+    }
 }
 public static class NodeExtensions
 {
     public static string HasMembersCss(this SimpleNodeModel model)
     {
-        return model.SimpleSyntaxTree.Members.Any() ? "expand" : "";
+        return model.FullSyntaxTree.Members.Any() ? "expand" : "";
     }
 }

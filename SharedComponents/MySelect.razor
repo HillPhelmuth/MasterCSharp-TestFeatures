@@ -7,7 +7,10 @@
     }
     <div class="select">
         <select id="standard-select" @onchange="SelectionChanged">
-            <option value="">@Label...</option>
+            @if (SelectedValue == null)
+            {
+                <option value="">@Label...</option>
+            }
             @foreach (var option in _optionPairs)
             {
                 <option value="@option.Key" class="item">@option.Value?.GetStringPropValue(DisplayPropertyName)</option>

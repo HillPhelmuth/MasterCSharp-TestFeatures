@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace MasterCsharpHosted.Client.Pages
 {
-    public partial class CodeSyntaxHome
+    public partial class CodeSyntaxHome : IDisposable
     {
         [Inject]
         private AppState AppState { get; set; }
@@ -21,7 +21,7 @@ namespace MasterCsharpHosted.Client.Pages
         private bool _isSimple;
         protected override Task OnInitializedAsync()
         {
-            AppState.OnShowCode += HandleCodeWindow;
+            //AppState.OnShowCode += HandleCodeWindow;
             AppState.PropertyChanged += AppStateChanged;
             return base.OnInitializedAsync();
         }
@@ -30,10 +30,11 @@ namespace MasterCsharpHosted.Client.Pages
         {
             if (firstRender)
             {
-                AppState.SyntaxTreeInfo ??= await PublicClient.GetAnalysis(AppState.Snippet);
+                //AppState.SyntaxTreeInfo ??= await PublicClient.GetAnalysis(AppState.Snippet);
                 await Task.Delay(250);
                 await _editor.SetValue(AppState.Snippet);
             }
+            System.Console.WriteLine("CodeSyntaxHome Rendered");
             _shouldRender = false;
            await base.OnAfterRenderAsync(firstRender);
         }
@@ -50,7 +51,7 @@ namespace MasterCsharpHosted.Client.Pages
             _shouldRender = true;
             StateHasChanged();
         }
-        private bool showEdit = true;
+        private bool _showEdit = true;
         #region Editor
         private MonacoEditor _editor = new();
         protected StandaloneEditorConstructionOptions EditorOptionsSmall(MonacoEditor editor)
@@ -84,9 +85,12 @@ namespace MasterCsharpHosted.Client.Pages
 
         private async Task SubmitForAnalysis()
         {
+            System.Console.WriteLine("SubmitForAnalysis triggered");
             _selfTrigger = true;
-            string code = await _editor.GetValue();
-            AppState.SyntaxTreeInfo = await PublicClient.GetAnalysis(code);
+            var code = await _editor.GetValue();
+            var analysisResult = await PublicClient.GetCodeAnalysis(code);
+            AppState.SetAnalysisResults(analysisResult.SyntaxTree, analysisResult.FullSyntaxTrees);
+            //AppState.SyntaxTreeInfo = await PublicClient.GetAnalysis(code);
             AppState.Snippet = code;
         }
         private async void AppStateChanged(object sender, PropertyChangedEventArgs e)
@@ -103,11 +107,18 @@ namespace MasterCsharpHosted.Client.Pages
             _isSimple = !_isSimple;
             StateHasChanged();
         }
-        private void HandleCodeWindow(bool isShow)
+
+        private void HandleCodeWindow(bool isShow = false)
         {
             _shouldRender = true;
-            showEdit = !showEdit;
+            _showEdit = !_showEdit;
             StateHasChanged();
+        }
+
+        public void Dispose()
+        {
+            //AppState.OnShowCode -= HandleCodeWindow;
+            AppState.PropertyChanged -= AppStateChanged;
         }
     }
 }

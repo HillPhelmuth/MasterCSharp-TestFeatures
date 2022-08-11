@@ -1,8 +1,10 @@
 ﻿
-<div @ondblclick="SubmitCodeDefault"><MonacoEditor Id="main-editor" CssClass="my-editor" @ref="_editor" OnDidChangeCursorPosition="EditorDidChangeCursorPosition" ConstructionOptions="EditorOptionsRoslyn" OnDidInit="EditorOnDidInit" OnContextMenu="OnContextMenu" /></div>
-@if (AppState.SyntaxTreeInfo != null || (AppState.SimpleSyntaxTrees != null && AppState.SimpleSyntaxTrees.Any()))
+<div>
+    <MonacoEditor Id="main-editor" CssClass="my-editor" @ref="_editor" OnDidChangeCursorPosition="EditorDidChangeCursorPosition" ConstructionOptions="EditorOptionsRoslyn" OnDidInit="EditorOnDidInit"/>
+</div>
+@if (AppState.SyntaxTreeInfo != null || (AppState.FullSyntaxTrees != null && AppState.FullSyntaxTrees.Any()))
 {
-    <div class="nav-item px-3" style="font-size:110%">
+    <div class="nav-item px-3" style="font-size:90%">
         <NavLink class="nav-link" href="analyze">
             <span style="margin-bottom:-.9rem" class="analysis-icon" aria-hidden="true"></span> C# Syntax Analysis Available!
         </NavLink>

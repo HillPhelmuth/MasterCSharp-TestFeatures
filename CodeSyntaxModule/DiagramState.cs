@@ -23,24 +23,30 @@ namespace CodeSyntaxModule
         {
             OnSendRawCode?.Invoke(code);
         }
-        public void AddChildNodes(SimpleNodeModel node)
+        public void AddChildNodes(SimpleNodeModel node, bool isAllNodes = false)
         {
-            foreach (var subItem in node.SimpleSyntaxTree.Members)
+            foreach (var subItem in node.FullSyntaxTree.Members)
             {
-                var subNode = new SimpleNodeModel() { SimpleSyntaxTree = subItem };
+                var subNode = new SimpleNodeModel() { FullSyntaxTree = subItem, IsExpanded = isAllNodes};
                 subNode.AddNodePorts();
                 var link = new LinkModel(node.GetPort(PortAlignment.Bottom), subNode.GetPort(PortAlignment.Top));
                 _diagram.Nodes.Add(subNode);
                 _diagram.Links.Add(link);
                 node.ChildrenIds.Add(subNode.Id);
+                if (isAllNodes && subItem.Members.Any())
+                {
+                    AddChildNodes(subNode, true);
+                }
             }
-            UpdateLayout.Invoke();
+            UpdateLayout?.Invoke();
         }
+
+        
         public void RemoveChildNodes(SimpleNodeModel nodeModel)
         {
-            if (!nodeModel.SimpleSyntaxTree.Members.Any()) return;
+            if (!nodeModel.FullSyntaxTree.Members.Any()) return;
             RemoveChildren(nodeModel);
-            UpdateLayout.Invoke();
+            UpdateLayout?.Invoke();
         }
 
         private void RemoveChildren(SimpleNodeModel nodeModel)

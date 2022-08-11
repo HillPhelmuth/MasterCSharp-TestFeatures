@@ -10,15 +10,15 @@ namespace CodeSyntaxModule
 {
     public class SimpleNodeModel : NodeModel
     {
-        private SimpleSyntaxTree simpleSyntaxTree;
+        private FullSyntaxTree _fullSyntaxTree;
 
-        public SimpleSyntaxTree SimpleSyntaxTree
+        public FullSyntaxTree FullSyntaxTree
         {
-            get => simpleSyntaxTree; 
+            get => _fullSyntaxTree; 
             set
             {
-                simpleSyntaxTree = value;
-                this.Title = simpleSyntaxTree.Kind;
+                _fullSyntaxTree = value;
+                this.Title = _fullSyntaxTree.Kind;
             }
         }
         public bool IsExpanded { get; set; }

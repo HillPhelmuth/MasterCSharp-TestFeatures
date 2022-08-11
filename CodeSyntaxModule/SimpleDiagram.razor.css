@@ -1,5 +1,5 @@
 ﻿.diagram-container {
-    width: 90%;
+    width: 95vw;
     height: 85vh;
     position: absolute;
     top: 17vh;
@@ -7,19 +7,39 @@
 }
 .fit-btn {
     border: none;
+    position: relative;
     color: darkviolet;
     font-size: 1.125rem;
     padding: 2px 6px;
     margin: 1px .5rem;
     background-color: transparent;
 }
-
-.zoom-to-fit {
-    position: sticky;
-    top: .3rem;
-    left: 2rem;
-    box-shadow: 3px 3px 5px 3px black;
-    width: max-content;
-    z-index: 9999;
-    padding: 6px 10px;
-}
+    .fit-btn .btn-tooltip {
+        visibility: hidden;
+        width: 100px;
+        bottom: 100%;
+        left: 50%;
+        margin-left: -50px;
+        background-color: black;
+        color: #fff;
+        text-align: center;
+        padding: 5px 0;
+        border-radius: 6px;
+        position: absolute;
+        z-index: 1;
+    }
+    .fit-btn:hover .btn-tooltip {
+        visibility: visible;
+    }
+    .fit-btn:focus {
+        outline: none;
+    }
+    .zoom-to-fit {
+        position: sticky;
+        top: .3rem;
+        left: 2rem;
+        box-shadow: 3px 3px 5px 3px black;
+        width: max-content;
+        z-index: 9999;
+        padding: 6px 10px;
+    }

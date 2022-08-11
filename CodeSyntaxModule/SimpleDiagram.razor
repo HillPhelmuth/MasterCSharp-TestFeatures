@@ -1,10 +1,16 @@
 ﻿<div class="zoom-to-fit">
     <button class="fit-btn" @onclick="ZoomToFit">Zoom to fit</button>
    
-    <button class="fit-btn" @onclick=@(() => TryLayout())>Tree Layout</button>
-    <button class="fit-btn" style="font-size:.9rem; margin-left:30px" @onclick=ToggleCodeWindow>Toggle Code Window</button>
-    <button class="fit-btn" style="font-size:.9rem;" @onclick=ExpandAll>Expand All</button>
-    <button class="fit-btn" style="font-size:.9rem;" @onclick=CollapseAll>Collapse All</button>
+    <button class="fit-btn" @onclick=ToggleLayout>@(_isTree ? "Sugiyama layout" : "Tree layout")</button>
+    @*<button class="fit-btn" style="font-size:.9rem; margin-left:30px" @onclick=ToggleCodeWindow>Toggle Code Window</button>*@
+    <button class="fit-btn" style="font-size: .9rem; margin-right: 0; padding-right: 0" @onclick=ExpandAll>
+        <img alt="expand all" src="_content/CodeSyntaxModule/icons/expand-all-32.png"/>
+        <span class="btn-tooltip">expand all</span>
+    </button>
+    <button class="fit-btn" style="font-size: .9rem; margin-left: 0; padding-left: 0" @onclick=CollapseAll>
+        <img alt="collapse all" src="_content/CodeSyntaxModule/icons/collapse-all-32.png" />
+        <span class="btn-tooltip">collapse all</span>
+    </button>
     <br />
     @*<input type="checkbox" @bind="_isExpandMethods" /> Expand Methods On Select*@
 </div>

@@ -12,6 +12,9 @@
     .modal-overlay .window {
         position: absolute;
         height: auto;
+        max-height:90vh;
+        overflow-y: auto;
+        overflow-x:hidden;
         width: auto;
         background-color: white;
         padding: 1rem 2rem;
@@ -54,7 +57,8 @@
     font-size: 2rem;
     font-weight: bold;
 }
+
 .title {
     font-size: 1.2rem;
-    top:5px;
+    top: 5px;
 }

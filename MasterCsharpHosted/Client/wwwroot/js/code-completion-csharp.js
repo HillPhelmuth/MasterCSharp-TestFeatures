@@ -3,14 +3,68 @@
 
 require(["vs/editor/editor.main"], function () {
     monaco.languages.registerCompletionItemProvider('csharp', getcsharpCompletionProvider(monaco));
+    monaco.languages.registerSignatureHelpProvider('csharp', getcsharpSignatureHelpProvidor(monaco));
 });
+
+function getcsharpSignatureHelpProvidor(monaco) {
+    return {
+        signatureHelpTriggerCharacters: ['('],
+        provideSignatureHelp: function(model, position) {
+            var request = createRequestObject(model, position);
+            return new Promise((resolve, reject) => {
+                $.ajax({
+                    url: '/api/code/suggestSignature',
+                    data: JSON.stringify(request),
+                    type: 'Post',
+                    traditional: true,
+                    contentType: 'application/json',
+                    success: function (data) {
+                        if (data) {
+                            const returnValue = {
+                                signatures: [],
+                                activeSignature: data.activeSignature,
+                                activeParameter: data.activeParameter
+                            };
+                            for (let i = 0; i < data.signatures.length; i++) {
+                                const signatureInfo = {
+                                    label: data.signatures[i].label,
+                                    documentation: data.signatures[i].structuredDocumentation.summaryText,
+                                    parameters: []
+                                };
+                                
+                                for (let j = 0; j < data.signatures[i].parameters; j++) {
+                                    const parameterInfo = {
+                                        label: data.signatures[i].parameters[j].label,
+                                        documentation: this.getParameterDocumentation(data.signatures[i].parameters[j])
+                                    };
+                                    signatureInfo.parameters.push(parameterInfo);
+                                }
+                                returnValue.signatures.push(signatureInfo);
+                            }
+                            const returnObj = {
+                                value: returnValue,
+                                dispose: () => { }
+                            };
+                            resolve(returnObj);
+                        }
+                    },
+                    error: function (error) {
+                        console.error(error);
+                    }
+
+                });
+            });
+        }
+}
+
+}
 function getcsharpCompletionProvider(monaco) {
     return {
-        triggerCharacters: ['.', '(', ',', ')'],
+        triggerCharacters: ['.'],
         provideCompletionItems: function (model, position) {
 
-            var textUntilPosition = model.getValueInRange({ startLineNumber: 1, startColumn: 1, endLineNumber: position.lineNumber, endColumn: position.column });
-            var cursor = textUntilPosition.length;
+            const textUntilPosition = model.getValueInRange({ startLineNumber: 1, startColumn: 1, endLineNumber: position.lineNumber, endColumn: position.column });
+            const cursor = textUntilPosition.length;
             var sourceInfo = { SourceCode: model.getValue(), lineNumberOffsetFromTemplate: cursor };
             //var funcUrl = "https://codecompletionfunction.azurewebsites.net/api/CompleteCode";
             return new Promise((resolve, reject) => {
@@ -21,10 +75,10 @@ function getcsharpCompletionProvider(monaco) {
                     traditional: true,
                     contentType: 'application/json',
                     success: function (data) {
-                        var availableResolvers = [];
+                        const availableResolvers = [];
                         if (data && data.items) {
-                            for (var i = 0; i < data.items.length; i++) {
-                                var withSymbol = {
+                            for (let i = 0; i < data.items.length; i++) {
+                                const withSymbol = {
                                     label: data.items[i].label,
                                     insertText: data.items[i].insertText,
                                     kind: convertRoslynKindToMonacoKind(data.items[i].kind),
@@ -36,7 +90,7 @@ function getcsharpCompletionProvider(monaco) {
 
                             }
                             console.log("Completions from function: " + availableResolvers.length);
-                            var returnObj = {
+                            const returnObj = {
                                 suggestions: availableResolvers
                             };
                             resolve(returnObj);
@@ -59,4 +113,30 @@ function convertRoslynKindToMonacoKind(kind) {
         case "6": return monaco.languages.CompletionItemKind.Field;
         case "8": return monaco.languages.CompletionItemKind.Variable;
     }
+}
+function createRequestObject(model, position) {
+
+    var Line, Column;
+
+    Line = position.lineNumber - 1;
+    Column = position.column - 1;
+
+    const request = {
+        SourceCode: model.getValue(),
+        Line,
+        Column
+    };
+
+    return request;
+}
+function getParameterDocumentation(parameter) {
+    const summary = parameter.documentation;
+    if (summary.length > 0) {
+        const paramText = `**${parameter.name}**: ${summary}`;
+        return {
+            value: paramText
+        };
+    }
+
+    return "";
 }

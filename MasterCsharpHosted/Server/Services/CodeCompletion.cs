@@ -19,16 +19,108 @@ using Microsoft.CodeAnalysis.Text;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SyntaxTree = Microsoft.CodeAnalysis.SyntaxTree;
+using OmniSharp.Roslyn.CSharp.Services.Documentation;
+using OmniSharp.Roslyn.CSharp.Helpers;
+using System.Text;
+using System.Reflection.Metadata;
+using OmniSharp.Models.SignatureHelp;
+using OmniSharp.Options;
+using Document = Microsoft.CodeAnalysis.Document;
 
 namespace MasterCsharpHosted.Server.Services;
 
 public class CodeCompletion
 {
-    public static async Task<List<CustomSuggestion>> GetCodeCompletion(SourceInfo sourceInfo, List<PortableExecutableReference> refs)
+    public Document ScriptDocument { get; private set; }
+
+    public async Task<List<CustomSuggestion>> GetCodeCompletion(SourceInfo sourceInfo, List<PortableExecutableReference> refs)
     {
         //List<PortableExecutableReference> refs = CompileResources.PortableExecutableCompletionReferences;
+        if (refs == null || refs.Count == 0) return null;
+        var doc = GetDocument(sourceInfo, refs);
+        ScriptDocument ??= doc;
+        // cursor position is at the end
+        var position = sourceInfo.LineNumberOffsetFromTemplate;
+        var completionService = CompletionService.GetService(ScriptDocument);
+        var results = await completionService.GetCompletionsAsync(ScriptDocument, position);
+        if (results == null && sourceInfo.LineNumberOffsetFromTemplate < sourceInfo.SourceCode.Length)
+        {
+            sourceInfo.LineNumberOffsetFromTemplate++;
+            await GetCodeCompletion(sourceInfo, refs);
+        }
 
-        List<string> usings = new() {"System",
+        if (sourceInfo.SourceCode[sourceInfo.LineNumberOffsetFromTemplate - 1].ToString() == "(")
+        {
+            sourceInfo.LineNumberOffsetFromTemplate--;
+            results = completionService.GetCompletionsAsync(ScriptDocument, sourceInfo.LineNumberOffsetFromTemplate).Result;
+        }
+        
+        //Method parameters
+        //var overloads = GetMethodOverloads(scriptCode, position, refs);
+        var suggestionList = new List<CustomSuggestion>();
+        if (results == null) return suggestionList;
+        
+        try
+        {
+            foreach (var completion in results.Items)
+            {
+                var suggestion = new CustomSuggestion
+                {
+                    Label = completion.Properties.ContainsKey("SymbolName")
+                        ? completion.Properties["SymbolName"]
+                        : completion.DisplayText,
+                    InsertText = completion.Properties.ContainsKey("SymbolName")
+                        ? completion.Properties["SymbolName"]
+                        : completion.DisplayText,
+                    Kind = completion.Properties.ContainsKey("SymbolKind")
+                        ? completion.Properties["SymbolKind"]
+                        : "8",
+                    Detail = completion.InlineDescription
+                };
+                var description = await completionService.GetDescriptionAsync(ScriptDocument, completion);
+                var textBuilder = new StringBuilder();
+                MarkdownHelpers.TaggedTextToMarkdown(description.TaggedParts, textBuilder, new FormattingOptions(), MarkdownFormat.FirstLineAsCSharp, out _);
+                suggestion.Documentation = textBuilder.ToString();
+                suggestionList.Add(suggestion);
+            }
+            //suggestionList.AddRange(results.Items.Select(completion => new CustomSuggestion()
+            //{
+            //    Label = completion.Properties.ContainsKey("SymbolName") ? completion.Properties["SymbolName"] : completion.DisplayText,
+            //    InsertText = completion.Properties.ContainsKey("SymbolName") ? completion.Properties["SymbolName"] : completion.DisplayText,
+            //    Kind = completion.Properties.ContainsKey("SymbolKind") ? completion.Properties["SymbolKind"] : "8",
+            //    Detail = completion.Tags != null && completion.Tags.Length > 0 ? completion.Tags[0] : "None",
+            //    Documentation = completion.Tags != null && completion.Tags.Length > 1 ? completion.Tags[1] : "None"
+            //}));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error from: \r\n{JsonConvert.SerializeObject(results)}\r\n{ex.Message}\r\n{ex.StackTrace}");
+            throw;
+        }
+        return suggestionList;
+        //if (overloads.Count == 0) return suggestionList;
+        //suggestionList = new List<CustomSuggestion>();
+        //var builder = ImmutableArray.CreateBuilder<CompletionItem>();
+        //foreach (var (description, documentation) in overloads)
+        //{
+        //    suggestionList.Add(new CustomSuggestion()
+        //    {
+        //        Label = description.Split('(', ')')[1],
+        //        InsertText = description.Split('(', ')')[1],
+        //        Kind = "8",
+        //        Detail = documentation,
+        //        Documentation = documentation
+        //    });
+        //}
+        //return suggestionList;
+            
+    }
+
+    private static Document GetDocument(SourceInfo sourceInfo, IEnumerable<PortableExecutableReference> refs)
+    {
+        List<string> usings = new()
+        {
+            "System",
             "System.IO",
             "System.Collections.Generic",
             "System.Collections",
@@ -41,8 +133,10 @@ public class CodeCompletion
             "System.Text",
             "System.Net",
             "System.Threading.Tasks",
-            "System.Numerics"};
-        var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(a => !a.IsDynamic && File.Exists(a.Location) && !a.FullName.Contains("JSInterop.WebAssembly")).ToList();
+            "System.Numerics"
+        };
+        var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(a =>
+            !a.IsDynamic && File.Exists(a.Location) && !a.FullName.Contains("JSInterop.WebAssembly")).ToList();
 
         var partTypes = MefHostServices.DefaultAssemblies.Concat(assemblies)
             .Distinct()?
@@ -56,12 +150,13 @@ public class CodeCompletion
 
         var workspace = new AdhocWorkspace(host);
 
-        var scriptCode = sourceInfo.SourceCode;
+        //var scriptCode = sourceInfo.SourceCode;
         var _ = typeof(Microsoft.CodeAnalysis.CSharp.Formatting.CSharpFormattingOptions);
         var compilationOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, usings: usings);
-        if (refs == null || refs.Count == 0) return null;
-         
-        var scriptProjectInfo = ProjectInfo.Create(ProjectId.CreateNewId(), VersionStamp.Create(), "Script", "Script", LanguageNames.CSharp, isSubmission: true)
+
+
+        var scriptProjectInfo = ProjectInfo.Create(ProjectId.CreateNewId(), VersionStamp.Create(), "Script", "Script",
+                LanguageNames.CSharp, isSubmission: true)
             .WithMetadataReferences(refs)
             .WithCompilationOptions(compilationOptions);
 
@@ -69,64 +164,17 @@ public class CodeCompletion
         var scriptDocumentInfo = DocumentInfo.Create(
             DocumentId.CreateNewId(scriptProject.Id), "Script",
             sourceCodeKind: SourceCodeKind.Script,
-            loader: TextLoader.From(TextAndVersion.Create(SourceText.From(scriptCode), VersionStamp.Create())));
-        var scriptDocument = workspace.AddDocument(scriptDocumentInfo);
+            loader: TextLoader.From(TextAndVersion.Create(SourceText.From(sourceInfo.SourceCode), VersionStamp.Create())));
+        var doc = workspace.AddDocument(scriptDocumentInfo);
+        return doc;
+    }
 
-        // cursor position is at the end
-        var position = sourceInfo.LineNumberOffsetFromTemplate;
-        var completionService = CompletionService.GetService(scriptDocument);
-        var results = await completionService.GetCompletionsAsync(scriptDocument, position);
-        if (results == null && sourceInfo.LineNumberOffsetFromTemplate < sourceInfo.SourceCode.Length)
-        {
-            sourceInfo.LineNumberOffsetFromTemplate++;
-            await GetCodeCompletion(sourceInfo, refs);
-        }
-
-        if (sourceInfo.SourceCode[sourceInfo.LineNumberOffsetFromTemplate - 1].ToString() == "(")
-        {
-            sourceInfo.LineNumberOffsetFromTemplate--;
-            results = completionService.GetCompletionsAsync(scriptDocument, sourceInfo.LineNumberOffsetFromTemplate).Result;
-        }
-
-        //Method parameters
-        var overloads = GetMethodOverloads(scriptCode, position, refs);
-        var suggestionList = new List<CustomSuggestion>();
-        if (results != null)
-        {
-            try
-            {
-                suggestionList.AddRange(results.Items.Select(completion => new CustomSuggestion()
-                {
-                    Label = completion.Properties.ContainsKey("SymbolName") ? completion.Properties["SymbolName"] : completion.DisplayText,
-                    InsertText = completion.Properties.ContainsKey("SymbolName") ? completion.Properties["SymbolName"] : completion.DisplayText,
-                    Kind = completion.Properties.ContainsKey("SymbolKind") ? completion.Properties["SymbolKind"] : "8",
-                    Detail = completion.Tags != null && completion.Tags.Length > 0 ? completion.Tags[0] : "None",
-                    Documentation = completion.Tags != null && completion.Tags.Length > 1 ? completion.Tags[1] : "None"
-                }));
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error from: \r\n{JsonConvert.SerializeObject(results)}\r\n{ex.Message}\r\n{ex.StackTrace}");
-                throw;
-            }
-        }
-            
-        if (overloads.Count == 0) return suggestionList;
-        suggestionList = new List<CustomSuggestion>();
-        var builder = ImmutableArray.CreateBuilder<CompletionItem>();
-        foreach (var (description, documentation) in overloads)
-        {
-            suggestionList.Add(new CustomSuggestion()
-            {
-                Label = description.Split('(', ')')[1],
-                InsertText = description.Split('(', ')')[1],
-                Kind = "8",
-                Detail = documentation,
-                Documentation = documentation
-            });
-        }
-        return suggestionList;
-            
+    public async Task<SignatureHelpResponse> GetMethodSignatureItems(SourceInfo sourceInfo, IEnumerable<PortableExecutableReference> refs)
+    {
+        var sigHelpService = new SignatureSuggestService();
+        var request = new SignatureHelpRequest() {Column = sourceInfo.Column, Line = sourceInfo.Line};
+        ScriptDocument ??= GetDocument(sourceInfo, refs);
+        return await sigHelpService.Handle(request, ScriptDocument);
     }
     public static SortedList<string, string> GetMethodOverloads(string scriptCode, int position, List<PortableExecutableReference> refs)
     {

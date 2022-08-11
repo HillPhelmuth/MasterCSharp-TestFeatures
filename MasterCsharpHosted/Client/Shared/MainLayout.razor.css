@@ -84,3 +84,22 @@
     margin: 1px .5rem;
     color: white;
 }
+/*.icon {
+    position: relative;
+}
+.icon .icon-tooltip {
+    position: absolute;
+    visibility: hidden;
+    width: 100px;
+    top: 100%;
+    left: 50%;
+    margin-left: -50px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    padding: 3px 0;
+    border-radius: 6px;
+}
+.icon:hover .icon-tooltip {
+    visibility: visible;
+}*/

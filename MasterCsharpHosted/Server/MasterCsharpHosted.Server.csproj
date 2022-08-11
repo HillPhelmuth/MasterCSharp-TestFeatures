@@ -1,29 +1,51 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <UserSecretsId>bd80fa6b-bc35-4b34-bdab-d267d0300288</UserSecretsId>
-  </PropertyGroup>
-  
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.4" />
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<UserSecretsId>bd80fa6b-bc35-4b34-bdab-d267d0300288</UserSecretsId>
+	</PropertyGroup>
 
-    <PackageReference Include="Microsoft.CodeAnalysis" Version="4.1.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.1.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features" Version="4.1.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.1.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.1.0" />
+	<ItemGroup>
+	  <Compile Remove="Services\OmniSharopSignatureHelpService.cs" />
+	</ItemGroup>
 
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.4" />
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Cosmos" Version="6.0.4" />
-  </ItemGroup>
+	<ItemGroup>
+	  <None Remove="Services\OmniSharopSignatureHelpService.tt" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Client\MasterCsharpHosted.Client.csproj" />
-    <ProjectReference Include="..\Shared\MasterCsharpHosted.Shared.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.4" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.4" />
+
+		<PackageReference Include="Microsoft.CodeAnalysis" Version="4.1.0" />
+
+		<PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.1.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.1.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features" Version="4.1.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.1.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.1.0" />
+
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.4" />
+
+		<PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.1.0" />
+		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Cosmos" Version="6.0.4" />
+		<PackageReference Include="OmniSharp.Roslyn.CSharp" Version="1.37.4" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Update="Resources\System.Runtime.xml">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Client\MasterCsharpHosted.Client.csproj" />
+		<ProjectReference Include="..\Shared\MasterCsharpHosted.Shared.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+	</ItemGroup>
 
 
 </Project>

@@ -1,23 +1,23 @@
 ﻿
 <div class="form">
     <h5 class="text-center">From Github Public Repo</h5>
-    <EditForm Model="@ghFrm" OnValidSubmit="@HandleValidSubmit">
+    <EditForm Model="@_ghFrm" OnValidSubmit="@HandleValidSubmit">
         <DataAnnotationsValidator/>
         <ValidationSummary/>
 
         <label>
             Organization<br/>
-            <InputOnInput id="org" @bind-Value="ghFrm.Organization"/>
+            <InputOnInput id="org" @bind-Value="_ghFrm.Organization"/>
         </label>
         <label>
             Repository Name<br/>
-            <InputOnInput @bind-Value="ghFrm.Repo"></InputOnInput>
+            <InputOnInput @bind-Value="_ghFrm.Repo"></InputOnInput>
         </label><br />
         <label>
-            <InputCheckbox @bind-Value="ghFrm.InRoot"></InputCheckbox>
+            <InputCheckbox @bind-Value="_ghFrm.InRoot"></InputCheckbox>
             Code file is in Root directory
         </label><br/>
-        @if (!ghFrm.InRoot)
+        @if (!_ghFrm.InRoot)
         {
             <Tooltip Text="Add Folder">
                  <button type="button" @onclick="AddFolder"><img height="24" width="24" src="icons/plus-40.png" alt="Add"/></button>
@@ -30,27 +30,27 @@
             {
                 <label>
                     Folder 1<br/>
-                    <InputOnInput @bind-Value="ghFrm.Folder1"/>
+                    <InputOnInput @bind-Value="_ghFrm.Folder1"/>
                 </label><span style="font-size:1.2rem">/</span>
             }
             @if (folderCount > 1)
             {
                 <label>
                     Folder 2<br/>
-                    <InputOnInput @bind-Value="ghFrm.Folder2"/>
+                    <InputOnInput @bind-Value="_ghFrm.Folder2"/>
                 </label><span style="font-size:1.2rem">/</span>
             }
             @if (folderCount > 2)
             {
                 <label>
                     Folder 3<br/>
-                    <InputOnInput @bind-Value="ghFrm.Folder3"/>
+                    <InputOnInput @bind-Value="_ghFrm.Folder3"/>
                 </label><span style="font-size:1.2rem">/</span>
             }
         }
         <label>
             File name<br />
-            <InputOnInput @bind-Value="ghFrm.FileName"/>
+            <InputOnInput @bind-Value="_ghFrm.FileName"/>
         </label>
         <button type="submit">Retrieve Code</button>
     </EditForm>

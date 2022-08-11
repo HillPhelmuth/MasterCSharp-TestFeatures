@@ -3,38 +3,34 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using MasterCsharpHosted.Client.Components;
 using MasterCsharpHosted.Shared;
+using MasterCsharpHosted.Shared.Services;
 using Microsoft.AspNetCore.Components;
+using SharedComponents;
 
 namespace MasterCsharpHosted.Client.Pages
 {
-    public partial class Console : IDisposable
+    public partial class Console : AppComponentBase/*, IDisposable*/
     {
-        [Inject]
-        private AppState AppState { get; set; }
+        
         [Inject]
         private PublicClient PublicClient { get; set; }
-        private string cssClass = "inactive";
+        [Inject]
+        private ModalService ModalService { get; set; }
+        private string _cssClass = "inactive";
         private bool _isMenuOpen;
-        private bool _showModal;
-        private bool _showSaveModal;
-        private string _syntax;
         private readonly List<string> _themeOptions = new() {"vs", "vs-dark", "hc-black"};
        
         protected override Task OnInitializedAsync()
         {
-            AppState.PropertyChanged += HandleAppStateStateChange;
+            //AppState.PropertyChanged += HandleAppStateStateChange;
             return base.OnInitializedAsync();
         }
 
-        private void CloseModal(bool closed)
-        {
-            _showModal = false;
-            //StateHasChanged();
-        }
         private async Task OpenMenu()
         {
-            cssClass = "active";
+            _cssClass = "active";
             StateHasChanged();
             await Task.Delay(500);
             _isMenuOpen = true;
@@ -42,16 +38,21 @@ namespace MasterCsharpHosted.Client.Pages
         private void CloseMenu()
         {
             if (!_isMenuOpen) return;
-            cssClass = "inactive";
+            _cssClass = "inactive";
             _isMenuOpen = false;
             StateHasChanged();
         }
 
         private string _snippetCode;
-        private void SaveSnippet(string code)
+        private async void SaveSnippet(string code)
         {
             _snippetCode = code;
-            _showSaveModal = true;
+            var modalResult =
+                await ModalService.OpenAsync<SaveSnippetForm>(options: new ModalOptions {Location = Location.TopRight});
+            if (modalResult is not {IsSuccess: true}) return;
+            var saveData = modalResult.Parameters?.Get<string>("CombinedValues");
+            if (string.IsNullOrEmpty(saveData)) return;
+            HandleSave(saveData);
         }
 
         private void HandleSave(string snippetData)
@@ -63,7 +64,7 @@ namespace MasterCsharpHosted.Client.Pages
             var snippet = new UserSnippet(name, _snippetCode, description);
             if (AppState.CurrentUser.Snippets.Any(x => x.Name == name))
             {
-                snippet = AppState.CurrentUser.Snippets.FirstOrDefault(x => x.Name == name);
+                snippet = AppState.CurrentUser.Snippets.FirstOrDefault(x => x.Name == name) ?? new UserSnippet();
                 snippet.Code = _snippetCode;
                 snippet.Description = description;
             }
@@ -73,30 +74,45 @@ namespace MasterCsharpHosted.Client.Pages
             }
 
             _ = PublicClient.UpdateUser(AppState.CurrentUser);
-            _showSaveModal = false;
             StateHasChanged();
 
         }
 
         private void HandleThemeChange(string theme)
         {
-            AppState.EditorTheme = theme;
-            StateHasChanged();
+            //AppState.EditorTheme = theme;
+            //StateHasChanged();
         }
-        private void HandleAnalyze(string syntaxOjb)
+        //private void HandleAnalyze(string syntaxOjb)
+        //{
+        //    StateHasChanged();
+        //}
+
+        private async void ShowGetCodeFromGithub()
         {
-            _syntax = syntaxOjb;
-            StateHasChanged();
-        }
-        private void HandleAppStateStateChange(object _, PropertyChangedEventArgs args)
-        {
-            if (args.PropertyName != nameof(AppState.Content)) return;
+            var modalOptions = new ModalOptions {Location = Location.TopLeft, Width = "30rem"};
+            var requestContent = await ModalService.OpenAsync<GitHubForm>(options: modalOptions);
+            if (requestContent is {IsSuccess: true})
+            {
+                var org = requestContent.Parameters?.Get<string>("Organization") ?? "";
+                var repo = requestContent.Parameters?.Get<string>("Repo") ?? "";
+                var path = requestContent.Parameters?.Get<string>("FullPath") ?? "";
+                AppState.Snippet = await PublicClient.GetFromPublicRepo(org, repo, path);
+            }
             StateHasChanged();
         }
 
-        public void Dispose()
-        {
-            AppState.PropertyChanged -= HandleAppStateStateChange;
-        }
+        protected override List<string> InterestingProperties => new() {nameof(AppState.Content)};
+
+        //private void HandleAppStateStateChange(object _, PropertyChangedEventArgs args)
+        //{
+        //    if (args.PropertyName != nameof(AppState.Content)) return;
+        //    StateHasChanged();
+        //}
+
+        //public void Dispose()
+        //{
+        //    AppState.PropertyChanged -= HandleAppStateStateChange;
+        //}
     }
 }

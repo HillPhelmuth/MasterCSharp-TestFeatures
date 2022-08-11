@@ -1,42 +1,69 @@
 ﻿.editor-container {
-    bottom:90%;
-    left:100%;
+    bottom: 90%;
+    left: 100%;
     position: sticky;
-    width:23rem;
-    height:15rem;
+    width: 23rem;
+    height: 15rem;
 }
+
 ::deep .editor {
-    width:100%;
-    height:100%;
+    width: 100%;
+    height: 100%;
 }
+
 .syntax-diagram {
-    width:100%;
-    min-height:20rem;
+    width: 100%;
+    min-height: 20rem;
 }
+
 button {
     background-color: darkviolet;
     color: white;
     border-radius: 8px;
     padding: 1px 4px;
 }
+
 .hide {
-    display:none;
+    display: none;
 }
+
 .float-button {
     font-size: 70%;
     bottom: 94%;
     left: 100%;
     position: sticky;
-    cursor:pointer;
+    cursor: pointer;
 }
-.float-button:hover{
-    color:blue;
-}
+
+    .float-button:hover {
+        color: blue;
+    }
+
 button:hover {
     background-color: mediumvioletred;
 }
+
 .missing {
-    font-size:1.15rem;
+    font-size: 1.15rem;
     color: darkred;
-    font-weight:bold
+    font-weight: bold
 }
+
+.fit-btn {
+    border: none;
+    position: relative;
+    color: darkviolet;
+    font-size: .9rem;
+    padding: 1px 6px;
+    margin: 0;
+    background-color: transparent;
+}
+
+    .fit-btn:hover {
+        color: mediumvioletred;
+        background-color: transparent;
+    }
+
+    .fit-btn:focus {
+        outline: none;
+    }

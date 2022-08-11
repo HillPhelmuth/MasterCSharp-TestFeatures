@@ -31,8 +31,8 @@
 }
 
 .port {
-    width: 20px;
-    height: 20px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
     background-color: #f5f5f5;
     border: 1px solid #d4d4d4;
@@ -47,24 +47,24 @@
 
 .port.bottom {
     position: absolute;
-    bottom: -10px;
-    left: 49%;
+    bottom: -5px;
+    left: 50%;
 }
 
 .port.top {
     position: absolute;
-    top: -10px;
-    left: 49%;
+    top: -5px;
+    left: 50%;
 }
 
 .port.right {
     position: absolute;
-    bottom: 49%;
-    right: -10px;
+    bottom: 50%;
+    right: -5px;
 }
 
 .port.left {
     position: absolute;
-    bottom: 49%;
-    left: -10px;
+    bottom: 50%;
+    left: -5px;
 }

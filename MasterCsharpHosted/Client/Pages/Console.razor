@@ -1,6 +1,8 @@
 ﻿@page "/practice"
+@using MasterCsharpHosted.Shared.Services
+@inherits AppComponentBase
 <div class="menu-slider">
-    <div class="menu @cssClass">
+    <div class="menu @_cssClass">
         <SampleMenu OnCloseMenu="CloseMenu" />
     </div>
     <div class="console" @onmouseup="CloseMenu">
@@ -10,24 +12,14 @@
                     <button @onclick="OpenMenu"><img height="24" width="24" src="icons/chevron-right-64.png" alt="menu icon"/></button>
                 </span>
             </Tooltip>
-            <button class="standard-btn" @onclick="@(() => _showModal = true)">Get code from Github</button>
-            <div style="margin-left: 75%; margin-top: -2rem">
-                <MySelect TItem="string" OptionsList="_themeOptions" OnSelectItem="HandleThemeChange" />
+            <MyButton OnClick="ShowGetCodeFromGithub" Label="Get code from Github"></MyButton>
+            <MyButton FontSize=".9rem" OnClick="AppState.SubmitCode" Label="Execute"></MyButton>
+            <div style="margin-left: 65%; margin-top: -2rem">
+                <MySelect TItem="string" OptionsList="_themeOptions" @bind-SelectedValue="AppState.EditorTheme" OnSelectItem="HandleThemeChange" />
             </div>
-            <AuthorizeView>
-                <Authorized>
-                   
-                    <Modal @bind-IsOpen="_showSaveModal" ModalLocation="Location.TopRight">
-                        <SaveSnippetForm OnSave="HandleSave"/>
-                    </Modal>
-                </Authorized>
-            </AuthorizeView>
-            <Modal @bind-IsOpen="_showModal" ModalLocation="Location.TopLeft">
-                <div class="form">
-                    <GitHubForm />
-                </div>
-            </Modal>
+           
             <CodeEditor OnSave="SaveSnippet" OnAnalyze="HandleAnalyze" />
+           
         </div>
         <div>
             <Tooltip Text="Clear output window">
@@ -50,3 +42,14 @@
 
     </div>
 </div>
+@code
+{
+    private void HandleAnalyze(string syntaxOjb)
+    {
+        ModalService.Open((ms =>@<div class="nav-item px-3" style="font-size:110%">
+                                                           <NavLink class="nav-link" href="analyze">
+                                                               <span style="margin-bottom:-.9rem" class="analysis-icon" aria-hidden="true"></span> View C# Syntax Analysis Results!
+                                                           </NavLink>
+                                                       </div>), options:new ModalOptions(){Title = "Analysis Results"});
+    }
+}

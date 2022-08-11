@@ -1,13 +1,16 @@
 ﻿@using Blazor.Diagrams.Components.Renderers;
 <div class="card @(Node.Selected ? "selected" : "") @Node.HasMembersCss()">
-    <h6 class="text-center">@Node.SimpleSyntaxTree.Kind</h6>
-    @if (!string.IsNullOrEmpty(Node.SimpleSyntaxTree.Name))
+    <h6 class="text-center">@Node.FullSyntaxTree.Kind</h6>
+    @if (!string.IsNullOrEmpty(Node.FullSyntaxTree.Name))
     {
-        <code class="text-center">@Node.SimpleSyntaxTree.Name</code>
+        <code class="text-center">@Node.FullSyntaxTree.Name</code>
     }
-    @if (Node.SimpleSyntaxTree.Members.Any())
+    @if (Node.FullSyntaxTree.Members.Any())
     {
-        <div style="margin-left:40%" class="@expandCollapseCss" @onclick=HandleExpandMembers></div>
+        <div class="expand-collapse-grid">
+            <div class="expand-all-icon" @onclick="HandleExpandAll"></div>
+            <div class="@expandCollapseCss" @onclick=HandleExpandMembers></div>
+        </div>
     }
     @foreach (var port in Node.Ports)
     {

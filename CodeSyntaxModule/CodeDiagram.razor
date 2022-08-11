@@ -2,8 +2,8 @@
 <div class="zoom-to-fit">
     <button class="fit-btn" @onclick="ZoomToFit">Zoom to fit</button>
     @*<DropdownButton NameProperty="Name" Items="layoutOptions" Text="Select Layout" TItem="LayoutOptions" Click="TryLayout"/>*@
-    <button class="fit-btn" @onclick=@(() => TryLayout())>Tree Layout</button>
-    <button class="fit-btn" style="font-size:.9rem; margin-left:30px" @onclick=ToggleCodeWindow>Toggle Code Window</button>
+    <button class="fit-btn" @onclick=@(() => TryLayout())>Reset Layout</button>
+    @*<button class="fit-btn" style="font-size:.9rem; margin-left:30px" @onclick=ToggleCodeWindow>Toggle Code Window</button>*@
     <br />
     @*<input type="checkbox" @bind="_isExpandMethods" /> Expand Methods On Select*@
 </div>

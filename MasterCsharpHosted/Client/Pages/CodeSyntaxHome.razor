@@ -7,7 +7,7 @@
         <CodeDiagram SyntaxTreeInfo="AppState.SyntaxTreeInfo" SendCode="HandleSendCode" />
     </div>
 }
-else if (AppState.SimpleSyntaxTrees != null && AppState.SimpleSyntaxTrees.Any() && _isSimple){
+else if (AppState.FullSyntaxTrees != null && AppState.FullSyntaxTrees.Any() && _isSimple){
     <div class="syntax-diagram">
         <SimpleDiagram SendCode="HandleSendCode"/>
     </div>
@@ -19,7 +19,10 @@ else
 <div style="position:absolute; top:60px; right:45vw; ">
     <button @onclick=ToggleSimple>@(_isSimple ? "Show Syntax Tree Details" : "Show Full Syntax Tree")</button>
 </div>
-@if (showEdit)
+<div style="position: absolute; top: 52px; right:1rem">
+    <button @onclick="@(() => HandleCodeWindow())" class="fit-btn">@(_showEdit ? "Hide Editor" : "Show Editor")</button>
+</div>
+@if (_showEdit)
 {
     <div class="editor-container">
         <MonacoEditor Id="small-editor" CssClass="editor" @ref="_editor" ConstructionOptions="EditorOptionsSmall" OnDidInit="EditorOnDidInit"></MonacoEditor>

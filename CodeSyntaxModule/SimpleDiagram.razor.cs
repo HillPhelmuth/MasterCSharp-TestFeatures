@@ -21,6 +21,7 @@ namespace CodeSyntaxModule
         [Parameter]
         public EventCallback<string> SendCode { get; set; }
         public DiagramState DiagramState { get; set; }
+        
         private static readonly DiagramOptions _options = new()
         {
             DeleteKey = "None",
@@ -43,6 +44,15 @@ namespace CodeSyntaxModule
         
         private readonly Diagram _diagram = new(_options);
         private readonly List<LinkModel> _nodeLinks = new();
+        private bool _isTree = true;
+        private string _currentLayout = "Tree";
+
+        private void ToggleLayout()
+        {
+            _isTree= !_isTree;
+            _currentLayout = _isTree ? "Tree" : "Sugiyama";
+            TryLayout(_currentLayout);
+        }
         protected override Task OnInitializedAsync()
         {
             DiagramState = new DiagramState(_diagram);
@@ -67,24 +77,30 @@ namespace CodeSyntaxModule
         {
             DiagramState.UpdateLayout += async () =>
             {
-                TryLayout();
+                TryLayout(_currentLayout);
                 await InvokeAsync(StateHasChanged);
             };
             _diagram.SelectionChanged += async (selected) =>
             {
-                if (selected is SimpleNodeModel model)
-                {
-                    await SendCode.InvokeAsync(model.SimpleSyntaxTree?.RawCode ?? "No Code");
-                    Console.WriteLine($"POSITION: {model.Position?.X}, {model.Position?.Y}");
-                }
+                if (selected is not SimpleNodeModel model) return;
+                await SendCode.InvokeAsync(model.FullSyntaxTree?.RawCode ?? "No Code");
+                Console.WriteLine($"node position: x:{model.Position?.X}, y:{model.Position?.Y}");
+            };
+            AppState.PropertyChanged += async (_, e) =>
+            {
+                if (e.PropertyName != nameof(AppState.FullSyntaxTrees)) return;
+                TryLayout();
+                await Task.Delay(1);
+                ZoomToFit();
+                StateHasChanged();
             };
         }
         private void InitDiagram()
         {
             _diagram.RegisterModelComponent<SimpleNodeModel, SimpleNode>();
-            foreach (var treeItem in AppState.SimpleSyntaxTrees)
+            foreach (var treeItem in AppState.FullSyntaxTrees)
             {
-                var node = new SimpleNodeModel() { SimpleSyntaxTree = treeItem };
+                var node = new SimpleNodeModel() { FullSyntaxTree = treeItem };
                 node.AddNodePorts();
                 _diagram.Nodes.Add(node);
                 //AddChildNodes(treeItem, node);
@@ -93,30 +109,30 @@ namespace CodeSyntaxModule
         private void ExpandAll()
         {
             _diagram.Nodes.Clear();
-            foreach (var treeItem in AppState.SimpleSyntaxTrees)
+            foreach (var treeItem in AppState.FullSyntaxTrees)
             {
-                var node = new SimpleNodeModel() { SimpleSyntaxTree = treeItem, IsExpanded = true };
+                var node = new SimpleNodeModel() { FullSyntaxTree = treeItem, IsExpanded = true };
                 node.AddNodePorts();
                 _diagram.Nodes.Add(node);
                 AddChildNodes(treeItem, node);
             }
-            TryLayout();
+            TryLayout(_currentLayout);
         }
         private void CollapseAll()
         {
             _diagram.Nodes.Clear();
-            foreach (var treeItem in AppState.SimpleSyntaxTrees)
+            foreach (var treeItem in AppState.FullSyntaxTrees)
             {
-                var node = new SimpleNodeModel() { SimpleSyntaxTree = treeItem, IsExpanded = false };
+                var node = new SimpleNodeModel() { FullSyntaxTree = treeItem, IsExpanded = false };
                 node.AddNodePorts();
                 _diagram.Nodes.Add(node);
             }
         }
-        private void AddChildNodes(SimpleSyntaxTree treeItem, SimpleNodeModel node)
+        private void AddChildNodes(FullSyntaxTree treeItem, SimpleNodeModel node)
         {
             foreach (var subItem in treeItem.Members)
             {
-                var subNode = new SimpleNodeModel() { SimpleSyntaxTree = subItem, IsExpanded = true };
+                var subNode = new SimpleNodeModel() { FullSyntaxTree = subItem, IsExpanded = true };
                 subNode.AddNodePorts();
                 var link = new LinkModel(node.GetPort(PortAlignment.Bottom), subNode.GetPort(PortAlignment.Top));
                 _diagram.Nodes.Add(subNode);
@@ -130,7 +146,7 @@ namespace CodeSyntaxModule
         }
         private void RemoveChildNodes(SimpleNodeModel nodeModel)
         {
-            if (!nodeModel.SimpleSyntaxTree.Members.Any()) return;
+            if (!nodeModel.FullSyntaxTree.Members.Any()) return;
             var childNodes = _diagram.Nodes.Where(x => nodeModel.ChildrenIds.Contains(x.Id)).ToList();
             foreach (var node in childNodes)
             {
@@ -150,7 +166,7 @@ namespace CodeSyntaxModule
         }
         #region Graph Algo Implementation
 
-        private void TryLayout(string layout = "Tree")
+        private void TryLayout(string layout = "Sugiyama")
         {
             Console.WriteLine($"Layout updated to {layout}");
             var graph = new QG.BidirectionalGraph<SimpleNodeModel, QG.Edge<SimpleNodeModel>>();

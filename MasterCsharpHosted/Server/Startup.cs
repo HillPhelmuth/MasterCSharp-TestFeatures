@@ -48,6 +48,7 @@ namespace MasterCsharpHosted.Server
             services.AddSingleton<CompileResources>();
             services.AddDbContextFactory<AppUserContext>(opts =>
                 opts.UseCosmos(Configuration["Cosmos:ConnectionString"], "AppUserDb"));
+            services.AddScoped<CodeCompletion>();
             services.AddControllersWithViews();
             services.AddRazorPages();
         }

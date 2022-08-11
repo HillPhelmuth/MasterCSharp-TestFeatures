@@ -13,12 +13,12 @@ namespace SharedComponents
     {
         
         [Parameter]
-        public string Label { get; set; }
+        public string? Label { get; set; }
         [Parameter]
-        public IReadOnlyList<TItem> OptionsList { get; set; }
+        public IReadOnlyList<TItem>? OptionsList { get; set; }
 
         [Parameter]
-        public TItem SelectedValue { get; set; }
+        public TItem? SelectedValue { get; set; }
 
         [Parameter]
         public string DisplayPropertyName { get; set; } = "";
@@ -32,11 +32,24 @@ namespace SharedComponents
         
         protected override Task OnParametersSetAsync()
         {
-            if (OptionsList == null) return Task.CompletedTask;
-            if (_optionPairs.Count == 0)
-            {
+            
+            if (OptionsList == null) return base.OnParametersSetAsync();
+
+            if (_optionPairs.Count != 0) return base.OnParametersSetAsync();
+            if(SelectedValue == null)
                 _optionPairs = OptionsList.ToDictionary(_ => Guid.NewGuid().ToString(), x => x);
+            else
+            {
+                _optionPairs.Add(Guid.NewGuid().ToString(), SelectedValue);
+                foreach (var option in OptionsList.Where(x => !x!.Equals(SelectedValue)))
+                {
+                    if (!option.Equals(SelectedValue))
+                    {
+                        _optionPairs.Add(Guid.NewGuid().ToString(), option);
+                    }
+                }
             }
+
             return base.OnParametersSetAsync();
         }
 

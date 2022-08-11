@@ -83,7 +83,9 @@ namespace MasterCsharpHosted.Client
                 return apiResult;
             }
 
-            var addResult = await Client.PostAsJsonAsync("api/appUser/addUser", new AppUser {UserName = userName, Snippets = new List<UserSnippet>{new("Default", CodeSnippets.DefaultCode, "Default sample snippet")}, CompletedChallenges = new List<CompletedChallenge>(), IsAuthenticated = true});
+            var random = new Random();
+            var id = random.Next(1, 999999);
+            var addResult = await Client.PostAsJsonAsync("api/appUser/addUser", new AppUser {Id = id, UserName = userName, Snippets = new List<UserSnippet>{new("Default", CodeSnippets.DefaultCode, "Default sample snippet")}, CompletedChallenges = new List<CompletedChallenge>(), IsAuthenticated = true});
             string result = await addResult.Content.ReadAsStringAsync();
             sw.Stop();
             Console.WriteLine($"api/appUser/addUser returned a value in {sw.ElapsedMilliseconds}ms\r\nResult: {result}");
@@ -110,20 +112,27 @@ namespace MasterCsharpHosted.Client
             Console.WriteLine($"Classes:\r\n{string.Join("\r\n\t", syntaxResult.NameSpaces.SelectMany(x => x?.Classes?.Select(c => x.Name)))}");
             return syntaxResult;
         }
-        public async Task<List<SimpleSyntaxTree>> GetSimpleAnalysis(string code)
+        public async Task<List<FullSyntaxTree>> GetFullAnalysis(string code)
         {
-            List<SimpleSyntaxTree> result = new();
+            List<FullSyntaxTree> result = new();
             try
             {
                 var apiResult = await Client.PostAsJsonAsync("api/code/simpleSyntax", code);
                 var asString = await apiResult.Content.ReadAsStringAsync();
-                result = JsonConvert.DeserializeObject<List<SimpleSyntaxTree>>(asString);
+                result = JsonConvert.DeserializeObject<List<FullSyntaxTree>>(asString);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Boooooo!!!!\r\nSee Exception:\r\n{ex}");
             }
             return result;
+        }
+
+        public async Task<SyntaxAnalysisResult> GetCodeAnalysis(string code)
+        {
+            var treeInfo = await GetAnalysis(code);
+            var fullTrees = await GetFullAnalysis(code);
+            return new SyntaxAnalysisResult(treeInfo, fullTrees);
         }
 
         public async Task<bool> UpdateUser(AppUser user)

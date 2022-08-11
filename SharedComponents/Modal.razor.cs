@@ -26,8 +26,20 @@ namespace SharedComponents
         {
             Console.WriteLine("Modal Initialized");
             ModalService.OnOpenComponent += Open;
+            ModalService.OnOpenFragment += OpenFragment;
             ModalService.OnModalClose += Close;
             return base.OnInitializedAsync();
+        }
+
+        private void OpenFragment(RenderFragment<ModalService> childContent, ModalParameters? parameters = null,
+            ModalOptions? options = null)
+        {
+            Console.WriteLine("ModalService OnOpenFragment handled in Modal.razor");
+            ChildContent = childContent.Invoke(ModalService);
+            ModalParameters = parameters;
+            ModalOptions = options ?? new ModalOptions();
+            IsOpen = true;
+            StateHasChanged();
         }
         private void Open(Type type, ModalParameters? parameters = null, ModalOptions? options = null)
         {

@@ -3,18 +3,30 @@
 @inject NavigationManager Navigation
 @inject AppState AppState
 @implements IDisposable
-<InitAppState/>
+<InitAppState />
 <Modal></Modal>
 <div class="page">
-   
+
     <div class="main">
         <div class="top-row px-4">
             <MasterCsharpHosted.Client.Pages.AuthLogin />
             <h3 class="title"><img src="icons/c-sharp-logo-240.png" height="40" width="40" alt="title icon" /> C# @AppState.Title Module</h3>
-            <a href="@($"{Navigation.BaseUri}")"><i class="home-icon"></i></a>
-            <a href="@($"{Navigation.BaseUri}practice")"><i class="practice-icon"></i></a>
-            <a href="@($"{Navigation.BaseUri}challenges")"><i class="challenge-icon"></i></a>
-            <a href="@($"{Navigation.BaseUri}analyze")"><i class="analysis-icon"></i></a>
+            <a class="icon" href="@($"{Navigation.BaseUri}")">
+                <i class="icon home-icon"></i>
+                <span class="icon-tooltip">Home</span>
+            </a>
+            <a class="icon" href="@($"{Navigation.BaseUri}practice")">
+                <i class="practice-icon"></i>
+                <span class="icon-tooltip">Practice</span>
+            </a>
+            <a class="icon" href="@($"{Navigation.BaseUri}challenges")">
+                <span class="icon-tooltip">Challenges</span>
+                <i class="icon challenge-icon"></i>
+            </a>
+            <a class="icon" href="@($"{Navigation.BaseUri}analyze")">
+                <i class="icon analysis-icon"></i>
+                <span class="icon-tooltip">Syntax</span>
+            </a>
             <a href="https://github.com/HillPhelmuth/MasterCSharp-TestFeatures" target="_blank" class="ml-md-auto"><i class="githubIcon"></i></a>
         </div>
         <div class="content px-4">

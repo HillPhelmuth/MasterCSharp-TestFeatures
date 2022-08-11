@@ -13,10 +13,10 @@
     }
 
 .expand {
-    
     border: 3px solid green;
 }
-.expand-icon, .collapsed-icon {
+
+.expand-icon, .collapsed-icon, .expand-all-icon {
     /*font-size: 32px;*/
     width: 2em;
     height: 1em;
@@ -35,6 +35,7 @@
         transition: 0.3s ease-in-out all;
         border-radius: 0.03em;
     }
+
     .collapsed-icon::after {
         content: url(icons/collapse-arrow.png);
         position: absolute;
@@ -45,15 +46,18 @@
         transition: 0.3s ease-in-out all;
         border-radius: 0.03em;
     }
-    /*.expand-collapse-icon::after {
-        transform: rotate(90deg);
-    }
 
-.collapsed.expand-collapse-icon::after {
-    transform: rotate(180deg);
+.expand-collapse-grid {
+    display: grid;
+    margin-left: auto;
+    margin-right:auto;
+    grid-template-columns: 35px 35px;
+    column-gap: 1px;
 }
 
-
-.collapsed.expand-collapse-icon::before {
-    transform: rotate(90deg) scale(0);
-}*/
+.expand-all-icon::after {
+    content: url(icons/expand-all-32.png);
+    position: absolute;
+    top: -5px;
+    background-color: transparent;
+}

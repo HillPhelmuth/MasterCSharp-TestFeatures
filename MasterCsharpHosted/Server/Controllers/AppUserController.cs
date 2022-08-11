@@ -55,7 +55,7 @@ namespace MasterCsharpHosted.Server.Controllers
         {
             try
             {
-                await using var context = _userContext.CreateDbContext();
+                await using var context = await _userContext.CreateDbContextAsync();
                 var appUser = await context.AppUsers.FirstOrDefaultAsync(x => x.UserName == user.UserName);
                 appUser.Snippets = user.Snippets;
                 appUser.CompletedChallenges = user.CompletedChallenges;

@@ -21,15 +21,15 @@ namespace MasterCsharpHosted.Server.Services
         {
 
         }
-        public static List<SimpleSyntaxTree> AnalyzeSimpleTree(string programText)
+        public static List<FullSyntaxTree> AnalyzeSimpleTree(string programText)
         {
             var tree = CSharpSyntaxTree.ParseText(programText);
             CompilationUnitSyntax root = tree.GetCompilationUnitRoot();
-            var result = new List<SimpleSyntaxTree>();
+            var result = new List<FullSyntaxTree>();
             foreach (var member in root.Members)
             {
                 var node = member.Kind();
-                var simple = new SimpleSyntaxTree
+                var simple = new FullSyntaxTree
                 {
                     Kind = Enum.GetName(node),
                     RawCode = member.ToFullString(),
@@ -41,21 +41,21 @@ namespace MasterCsharpHosted.Server.Services
             return result;
         }
 
-        private static void GetChildMembers(SyntaxNode member, SimpleSyntaxTree simple)
+        private static void GetChildMembers(SyntaxNode member, FullSyntaxTree full)
         {
-            //var subResult = new List<SimpleSyntaxTree>();
+            //var subResult = new List<FullSyntaxTree>();
             foreach (var child in member.ChildNodes())
             {
                 var kind = Enum.GetName(child.Kind());
                 var code = child.ToFullString();
-                var subSimple = new SimpleSyntaxTree
+                var subSimple = new FullSyntaxTree
                 {
                     Kind = kind,
                     RawCode = code,
                     Name = child.ToIdentifier(),
                 };
                 //subResult.Add(subSimple);
-                simple.Members.Add(subSimple);
+                full.Members.Add(subSimple);
                 if (child.ChildNodes().Any())
                 {
                     GetChildMembers(child, subSimple);
@@ -71,13 +71,14 @@ namespace MasterCsharpHosted.Server.Services
             }
             var tree = CSharpSyntaxTree.ParseText(programText);
             CompilationUnitSyntax root = tree.GetCompilationUnitRoot();
-
+            var fileScopedNamespaces = root.Members.OfType<FileScopedNamespaceDeclarationSyntax>().Select(syntax =>
+                WriteNamespaceInfo(syntax)).ToList();
             var treeInfo = new SyntaxTreeInfo
             {
                 SourceCode = programText,
                 Usings = root.Usings.Select(x => x.Name.ToString()).ToList(),
                 NameSpaces = root.Members.OfType<NamespaceDeclarationSyntax>().Select(syntax =>
-                    WriteNamespaceInfo(syntax)).ToList(),
+                    WriteNamespaceInfo(syntax)).Concat(fileScopedNamespaces).ToList(),
                 Classes = root.Members.OfType<ClassDeclarationSyntax>().Select(syntax => WriteClassInfo(syntax))
                     .ToList(),
                 Methods = root.Members.OfType<MethodDeclarationSyntax>().Select(syntax => WriteMethodInfo(syntax))
@@ -90,7 +91,7 @@ namespace MasterCsharpHosted.Server.Services
         }
 
         #region Convert Roslyn to simplified syntax
-        private NameSpaceInfo WriteNamespaceInfo(NamespaceDeclarationSyntax nameSpace, int rootLevel = 1)
+        private NameSpaceInfo WriteNamespaceInfo(BaseNamespaceDeclarationSyntax nameSpace, int rootLevel = 1)
         {
             int modifier = _rowColumns[rootLevel] >= 5 ? 1 : 0;
             rootLevel += modifier;
@@ -304,19 +305,20 @@ namespace MasterCsharpHosted.Server.Services
         {
             return declaration switch
             {
-                EventDeclarationSyntax eventSyntax => eventSyntax.Identifier.Text,
-                PropertyDeclarationSyntax propSyntax => propSyntax.Identifier.Text,
+                EventDeclarationSyntax eventSyntax => $"{eventSyntax.Type.ToFullString()} {eventSyntax.Identifier.Text}",
+                PropertyDeclarationSyntax propSyntax => $"{propSyntax.Type.ToFullString()} {propSyntax.Identifier.Text}",
                 EventFieldDeclarationSyntax eventField => eventField.Declaration.Variables[0].Identifier.Text,
-                FieldDeclarationSyntax field => field.Declaration.Variables[0].Identifier.Text,
-                MethodDeclarationSyntax method => method.Identifier.Text,
+                FieldDeclarationSyntax field => $"{field.Declaration.Type} {field.Declaration.Variables[0].Identifier.Text}",
+                MethodDeclarationSyntax method => $"{method.ReturnType.ToFullString()} {method.Identifier.Text}",
                 ClassDeclarationSyntax cls => cls.Identifier.Text,
                 EnumDeclarationSyntax enm => enm.Identifier.Text,
                 EnumMemberDeclarationSyntax enumMem => enumMem.Identifier.Text,
                 NamespaceDeclarationSyntax name => name.Name.ToFullString(),
-                VariableDeclaratorSyntax variable => variable.Identifier.Text,
-                VariableDeclarationSyntax varDec => varDec.Variables[0].Identifier.Text,
-                LocalDeclarationStatementSyntax local => local.Declaration.Variables[0].Identifier.Text,
-                LocalFunctionStatementSyntax localFunc => localFunc.Identifier.Text,
+                VariableDeclaratorSyntax variable => $"{variable.Identifier.Text}",
+                VariableDeclarationSyntax varDec => $"{varDec.Type.ToFullString()} {varDec.Variables[0].Identifier.Text}",
+                LocalDeclarationStatementSyntax local => $"{local.Declaration.Type.ToFullString()} {local.Declaration.Variables[0].Identifier.Text}",
+                LocalFunctionStatementSyntax localFunc => $"{localFunc.ReturnType.ToFullString()} {localFunc.Identifier.Text}",
+                ParameterSyntax parameter => $"{parameter.Type?.ToFullString()} {parameter.Identifier.Text}",
                 _ => ""
             };
         }
