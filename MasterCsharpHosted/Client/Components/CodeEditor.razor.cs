@@ -95,7 +95,7 @@ namespace MasterCsharpHosted.Client.Components
                 null, null, "navigation", 6.5, ExecuteAction);
             await _editor.AddAction("Suggest", "Request Suggestion", new[] { (int)KeyMode.CtrlCmd | (int)KeyCode.KEY_J },
                 null, null, "navigation", 7.5, ExecuteAction);
-            await _editor.AddAction("Suggest", "Request Signature Help", new[] { (int)KeyMode.CtrlCmd | (int)KeyCode.KEY_L },
+            await _editor.AddAction("SignatureHelp", "Request Signature Help", new[] { (int)KeyMode.CtrlCmd | (int)KeyCode.KEY_L },
                 null, null, "navigation", 8.5, ExecuteAction);
             if (!string.IsNullOrEmpty(AppState.CurrentUser?.UserName))
             {

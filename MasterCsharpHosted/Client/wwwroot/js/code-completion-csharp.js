@@ -111,20 +111,22 @@ function convertRoslynKindToMonacoKind(kind) {
         case "15": return monaco.languages.CompletionItemKind.Property;
         case "11": return monaco.languages.CompletionItemKind.Class;
         case "6": return monaco.languages.CompletionItemKind.Field;
-        case "8": return monaco.languages.CompletionItemKind.Variable;
+        case "8": return monaco.languages.CompletionItemKind.Keyword;
+        case "5": return monaco.languages.CompletionItemKind.Event;
+        case "17": return monaco.languages.CompletionItemKind.TypeParameter;
+        
     }
+    return monaco.languages.CompletionItemKind.Variable;
 }
 function createRequestObject(model, position) {
 
-    var Line, Column;
-
-    Line = position.lineNumber - 1;
-    Column = position.column - 1;
+    var line = position.lineNumber - 1;
+    var col = position.column - 1;
 
     const request = {
         SourceCode: model.getValue(),
-        Line,
-        Column
+        Line: line,
+        Column: col
     };
 
     return request;
