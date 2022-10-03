@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -14,17 +15,21 @@ namespace MasterCsharpHosted.Server.Services
 {
     public class CodeAnalysis
     {
-        private int maxLevel = 2;
-        private int _currentColumn;
-        private Dictionary<int, int> _rowColumns = new();
-        public CodeAnalysis()
+        private int _maxLevel = 2;
+        private readonly Dictionary<int, int> _rowColumns = new();
+        private readonly CompileResources _compileResources;
+        private SemanticModel _semanticModel;
+        public CodeAnalysis(CompileResources compileResources)
         {
-
+            _compileResources = compileResources;
         }
-        public static List<FullSyntaxTree> AnalyzeSimpleTree(string programText)
+        public List<FullSyntaxTree> AnalyzeSimpleTree(string programText)
         {
             var tree = CSharpSyntaxTree.ParseText(programText);
-            CompilationUnitSyntax root = tree.GetCompilationUnitRoot();
+            var compilation = CSharpCompilation.Create(Path.GetRandomFileName())
+                .AddReferences(_compileResources.PortableExecutableReferences).AddSyntaxTrees(tree);
+            _semanticModel = compilation.GetSemanticModel(tree);
+            var root = tree.GetCompilationUnitRoot();
             var result = new List<FullSyntaxTree>();
             foreach (var member in root.Members)
             {
@@ -33,7 +38,9 @@ namespace MasterCsharpHosted.Server.Services
                 {
                     Kind = Enum.GetName(node),
                     RawCode = member.ToFullString(),
-                    Name = member.ToDeclarationIdentifier()
+                    Name = member.ToDeclarationIdentifier(),
+                    Type = _semanticModel.GetTypeInfo(member).Type?.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat) ?? 
+                           _semanticModel.GetTypeInfo(member).ConvertedType?.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)
                 };
                 GetChildMembers(member, simple);
                 result.Add(simple);
@@ -41,36 +48,38 @@ namespace MasterCsharpHosted.Server.Services
             return result;
         }
 
-        private static void GetChildMembers(SyntaxNode member, FullSyntaxTree full)
+        private void GetChildMembers(SyntaxNode member, FullSyntaxTree full)
         {
             //var subResult = new List<FullSyntaxTree>();
             foreach (var child in member.ChildNodes())
             {
                 var kind = Enum.GetName(child.Kind());
                 var code = child.ToFullString();
-                var subSimple = new FullSyntaxTree
+                var subFullTree = new FullSyntaxTree
                 {
                     Kind = kind,
                     RawCode = code,
                     Name = child.ToIdentifier(),
+                    Type = _semanticModel.GetTypeInfo(child).Type?.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat) ?? 
+                           _semanticModel.GetTypeInfo(child).ConvertedType?.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)
                 };
                 //subResult.Add(subSimple);
-                full.Members.Add(subSimple);
+                full.Members.Add(subFullTree);
                 if (child.ChildNodes().Any())
                 {
-                    GetChildMembers(child, subSimple);
+                    GetChildMembers(child, subFullTree);
                 }
             }
         }
 
         public SyntaxTreeInfo Analyze(string programText)
         {
-            for (int i = 0; i < 100; i++)
+            for (var i = 0; i < 100; i++)
             {
                 _rowColumns[i] = 0;
             }
             var tree = CSharpSyntaxTree.ParseText(programText);
-            CompilationUnitSyntax root = tree.GetCompilationUnitRoot();
+            var root = tree.GetCompilationUnitRoot();
             var fileScopedNamespaces = root.Members.OfType<FileScopedNamespaceDeclarationSyntax>().Select(syntax =>
                 WriteNamespaceInfo(syntax)).ToList();
             var treeInfo = new SyntaxTreeInfo
@@ -84,7 +93,7 @@ namespace MasterCsharpHosted.Server.Services
                 Methods = root.Members.OfType<MethodDeclarationSyntax>().Select(syntax => WriteMethodInfo(syntax))
                     .ToList(),
                 GlobalDeclarations = root.Members.OfType<GlobalStatementSyntax>()
-                    .Select(syntax => WriteStatementInfo(syntax.Statement, maxLevel)).ToList()
+                    .Select(syntax => WriteStatementInfo(syntax.Statement, _maxLevel)).ToList()
             };
             Console.WriteLine(JsonConvert.SerializeObject(treeInfo, Formatting.Indented));
             return treeInfo;
@@ -93,10 +102,10 @@ namespace MasterCsharpHosted.Server.Services
         #region Convert Roslyn to simplified syntax
         private NameSpaceInfo WriteNamespaceInfo(BaseNamespaceDeclarationSyntax nameSpace, int rootLevel = 1)
         {
-            int modifier = _rowColumns[rootLevel] >= 5 ? 1 : 0;
+            var modifier = _rowColumns[rootLevel] >= 5 ? 1 : 0;
             rootLevel += modifier;
-            maxLevel = rootLevel > maxLevel ? rootLevel : maxLevel;
-            int column = _rowColumns[rootLevel];
+            _maxLevel = rootLevel > _maxLevel ? rootLevel : _maxLevel;
+            var column = _rowColumns[rootLevel];
             _rowColumns[rootLevel] = _rowColumns[rootLevel] >= 5 ? 0 : _rowColumns[rootLevel] + 1;
 
             var namespaceInfo = new NameSpaceInfo
@@ -111,13 +120,13 @@ namespace MasterCsharpHosted.Server.Services
             return namespaceInfo;
         }
 
-        private ClassInfo WriteClassInfo(ClassDeclarationSyntax cls, int rootLevel = 1)
+        private ClassInfo WriteClassInfo(TypeDeclarationSyntax cls, int rootLevel = 1)
         {
-            int modifier = _rowColumns[rootLevel] >= 5 ? 1 : 0;
+            var modifier = _rowColumns[rootLevel] >= 5 ? 1 : 0;
             rootLevel += modifier;
-            int root = rootLevel + 1;
-            maxLevel = rootLevel > maxLevel ? rootLevel : maxLevel;
-            int column = _rowColumns[rootLevel];
+            var root = rootLevel + 1;
+            _maxLevel = rootLevel > _maxLevel ? rootLevel : _maxLevel;
+            var column = _rowColumns[rootLevel];
             _rowColumns[rootLevel] = _rowColumns[rootLevel] >= 5 ? 0 : _rowColumns[rootLevel] + 1;
 
             var classinfo = new ClassInfo
@@ -147,11 +156,11 @@ namespace MasterCsharpHosted.Server.Services
         }
         private EnumInfo WriteEnumInfo(EnumDeclarationSyntax enm, int rootLevel = 1)
         {
-            int modifier = _rowColumns[rootLevel] >= 5 ? 1 : 0;
+            var modifier = _rowColumns[rootLevel] >= 5 ? 1 : 0;
             rootLevel += modifier;
-            int root = rootLevel + 1;
-            maxLevel = rootLevel > maxLevel ? rootLevel : maxLevel;
-            int column = _rowColumns[rootLevel];
+            var root = rootLevel + 1;
+            _maxLevel = rootLevel > _maxLevel ? rootLevel : _maxLevel;
+            var column = _rowColumns[rootLevel];
             _rowColumns[rootLevel] = _rowColumns[rootLevel] >= 5 ? 0 : _rowColumns[rootLevel] + 1;
             var enumInfo = new EnumInfo
             {
@@ -166,7 +175,7 @@ namespace MasterCsharpHosted.Server.Services
         }
         private MethodInfo WriteConstructorSyntax(ConstructorDeclarationSyntax constructor, int rootLevel = 1)
         {
-            (int column, int row) = SetColumnRow(rootLevel);
+            (var column, var row) = SetColumnRow(rootLevel);
             var ctorInfo = new MethodInfo
             {
                 ParentName = constructor.Parent?.GetText().Lines[0].ToString().TrimStart() ?? "No ParentName",
@@ -185,7 +194,7 @@ namespace MasterCsharpHosted.Server.Services
         }
         private MethodInfo WriteMethodInfo(MethodDeclarationSyntax method, int rootLevel = 1)
         {
-            (int column, int row) = SetColumnRow(rootLevel);
+            (var column, var row) = SetColumnRow(rootLevel);
             var methodInfo = new MethodInfo
             {
                 ParentName = method.Parent?.GetText().Lines[0].ToString().TrimStart() ?? "No ParentName",
@@ -205,9 +214,9 @@ namespace MasterCsharpHosted.Server.Services
 
         private GlobalDeclarationInfo WriteStatementInfo(StatementSyntax statement, int rootLevel = 1)
         {
-            (int column, int row) = SetColumnRow(rootLevel);
-            SyntaxKind kind = statement.Kind();
-            string type = statement switch
+            (var column, var row) = SetColumnRow(rootLevel);
+            var kind = statement.Kind();
+            var type = statement switch
             {
                 LocalDeclarationStatementSyntax variable => variable.Declaration.Type.ToFullString(),
                 LocalFunctionStatementSyntax func => func.ReturnType.ToFullString(),
@@ -227,7 +236,7 @@ namespace MasterCsharpHosted.Server.Services
         }
         private PropertyInfo WritePropTypeInfo<T>(T member, int rootLevel) where T : MemberDeclarationSyntax
         {
-            (int column, int row) = SetColumnRow(rootLevel);
+            (var column, var row) = SetColumnRow(rootLevel);
             return member switch
             {
                 EventDeclarationSyntax eventSyntax => new PropertyInfo
@@ -284,10 +293,10 @@ namespace MasterCsharpHosted.Server.Services
 
         private (int column, int row) SetColumnRow(int rootLevel)
         {
-            int modifier = _rowColumns[rootLevel] >= 5 ? 1 : 0;
-            int row = rootLevel + modifier;
-            maxLevel = row > maxLevel ? row : maxLevel;
-            int column = _rowColumns[row];
+            var modifier = _rowColumns[rootLevel] >= 5 ? 1 : 0;
+            var row = rootLevel + modifier;
+            _maxLevel = row > _maxLevel ? row : _maxLevel;
+            var column = _rowColumns[row];
             _rowColumns[row] = _rowColumns[row] >= 5 ? 0 : _rowColumns[row] + 1;
             return (column, row);
         }
@@ -319,6 +328,7 @@ namespace MasterCsharpHosted.Server.Services
                 LocalDeclarationStatementSyntax local => $"{local.Declaration.Type.ToFullString()} {local.Declaration.Variables[0].Identifier.Text}",
                 LocalFunctionStatementSyntax localFunc => $"{localFunc.ReturnType.ToFullString()} {localFunc.Identifier.Text}",
                 ParameterSyntax parameter => $"{parameter.Type?.ToFullString()} {parameter.Identifier.Text}",
+                MemberAccessExpressionSyntax ass => $"{ass.Name.Identifier.Text} ({ass.Name.Kind()} {ass.Name.Identifier.ValueText})",
                 _ => ""
             };
         }

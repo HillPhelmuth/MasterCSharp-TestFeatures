@@ -3,7 +3,7 @@
 @inherits AppComponentBase
 <div class="menu-slider">
     <div class="menu @_cssClass">
-        <SampleMenu OnCloseMenu="CloseMenu" />
+        <SampleMenu OnCloseMenu="CloseMenu" OnDeleteSnippet="HandleDeleteSnippet" />
     </div>
     <div class="console" @onmouseup="CloseMenu">
         <div>
@@ -38,8 +38,13 @@
             }
             
         </div>
-       
-
+        @if (AppState.CurrentUser?.UserName.Equals("adamholm@gmail.com", StringComparison.OrdinalIgnoreCase) == true)
+        {
+            <div>
+                <p>Upload .dll to decompile</p>
+                <InputFile OnChange="UploadFile"></InputFile>
+            </div>
+        }
     </div>
 </div>
 @code

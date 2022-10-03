@@ -1,23 +1,23 @@
 ﻿if (!require.getConfig().paths.vs)
-    require.config({ paths: { 'vs': '_content/BlazorMonaco/lib/monaco-editor/min/vs' } });
+    require.config({ paths: { 'vs': "_content/BlazorMonaco/lib/monaco-editor/min/vs" } });
 
 require(["vs/editor/editor.main"], function () {
-    monaco.languages.registerCompletionItemProvider('csharp', getcsharpCompletionProvider(monaco));
-    monaco.languages.registerSignatureHelpProvider('csharp', getcsharpSignatureHelpProvidor(monaco));
+    monaco.languages.registerCompletionItemProvider("csharp", getcsharpCompletionProvider(monaco));
+    monaco.languages.registerSignatureHelpProvider("csharp", getcsharpSignatureHelpProvidor(monaco));
 });
 
 function getcsharpSignatureHelpProvidor(monaco) {
     return {
-        signatureHelpTriggerCharacters: ['('],
+        signatureHelpTriggerCharacters: ["("],
         provideSignatureHelp: function(model, position) {
             var request = createRequestObject(model, position);
             return new Promise((resolve, reject) => {
                 $.ajax({
-                    url: '/api/code/suggestSignature',
+                    url: "/api/code/suggestSignature",
                     data: JSON.stringify(request),
-                    type: 'Post',
+                    type: "Post",
                     traditional: true,
-                    contentType: 'application/json',
+                    contentType: "application/json",
                     success: function (data) {
                         if (data) {
                             const returnValue = {
@@ -60,7 +60,7 @@ function getcsharpSignatureHelpProvidor(monaco) {
 }
 function getcsharpCompletionProvider(monaco) {
     return {
-        triggerCharacters: ['.'],
+        triggerCharacters: ["."],
         provideCompletionItems: function (model, position) {
 
             const textUntilPosition = model.getValueInRange({ startLineNumber: 1, startColumn: 1, endLineNumber: position.lineNumber, endColumn: position.column });
@@ -69,14 +69,14 @@ function getcsharpCompletionProvider(monaco) {
             //var funcUrl = "https://codecompletionfunction.azurewebsites.net/api/CompleteCode";
             return new Promise((resolve, reject) => {
                 $.ajax({
-                    url: '/api/code/sugestComplete',
+                    url: "/api/code/sugestComplete",
                     data: JSON.stringify(sourceInfo),
-                    type: 'POST',
+                    type: "POST",
                     traditional: true,
-                    contentType: 'application/json',
+                    contentType: "application/json",
                     success: function (data) {
-                        const availableResolvers = [];
                         if (data && data.items) {
+                            const availableResolvers = [];
                             for (let i = 0; i < data.items.length; i++) {
                                 const withSymbol = {
                                     label: data.items[i].label,
@@ -98,7 +98,7 @@ function getcsharpCompletionProvider(monaco) {
                     },
                     error: function (error) {
                         console.log(error);
-                    },
+                    }
                 });
             });
 

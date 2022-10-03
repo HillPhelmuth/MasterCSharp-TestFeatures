@@ -114,6 +114,11 @@
                             <Tooltip Text="@snippet.Description">
                                 <button @onclick="@(() => AppState.UpdateSnippet(snippet.Code))">@snippet.Name</button>
                             </Tooltip>
+                            <Tooltip Text="@($"Delete {snippet.Name}")">
+                                <button @onclick="@(() => OnDeleteSnippet.InvokeAsync(snippet))">
+                                    <span style="font-size: 1.1rem" class="material-icons">delete</span>
+                                </button>
+                            </Tooltip>
                         </li>
                     }
                 </ul>

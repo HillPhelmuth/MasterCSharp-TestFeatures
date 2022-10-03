@@ -46,6 +46,7 @@ namespace MasterCsharpHosted.Server
             services.AddScoped<SignOutSessionStateManager>();
             services.AddScoped<LazyAssemblyLoader>();
             services.AddSingleton<CompileResources>();
+            services.AddSingleton<CodeAnalysis>();
             services.AddDbContextFactory<AppUserContext>(opts =>
                 opts.UseCosmos(Configuration["Cosmos:ConnectionString"], "AppUserDb"));
             services.AddScoped<CodeCompletion>();

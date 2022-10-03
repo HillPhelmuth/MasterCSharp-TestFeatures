@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -20,11 +21,13 @@ namespace MasterCsharpHosted.Server.Controllers
         private readonly PublicGithubClient _githubClient;
         private readonly CompileResources _compileResources;
         private readonly CodeCompletion _codeCompletion;
-        public CodeController(PublicGithubClient githubClient, CompileResources compileResources, CodeCompletion codeCompletion)
+        private readonly CodeAnalysis _codeAnalysis;
+        public CodeController(PublicGithubClient githubClient, CompileResources compileResources, CodeCompletion codeCompletion, CodeAnalysis codeAnalysis)
         {
             _githubClient = githubClient;
             _compileResources = compileResources;
             _codeCompletion = codeCompletion;
+            _codeAnalysis = codeAnalysis;
         }
         private readonly CompilerService _compilerService = new();
         [HttpPost("sugestComplete")]
@@ -47,7 +50,20 @@ namespace MasterCsharpHosted.Server.Controllers
             var refs = _compileResources.PortableExecutableReferences;
             return await _compilerService.SubmitCode(code, refs);
         }
+        
+        [HttpPost("decompile")]
+        public async Task<string> Decompile([FromBody] string code)
+        {
+            var refs = _compileResources.PortableExecutableReferences;
+            return await DecompileService.CompileAndDecompileCode(code, refs);
+        }
 
+        [HttpPost("decompileFile")]
+        public async Task<string> DecompileFile([FromBody] byte[] fileContents)
+        {
+            Stream content = new MemoryStream(fileContents);
+            return await DecompileService.DecompileAssemblyStreamAsync(content);
+        }
         [HttpGet("githubCode/{fileName}")]
         public async Task<string> GetFromGithub([FromRoute]string fileName)
         {
@@ -70,13 +86,12 @@ namespace MasterCsharpHosted.Server.Controllers
         [HttpPost("syntax")]
         public Task<SyntaxTreeInfo> GetSyntaxAnalysis([FromBody] string code)
         {
-            var analysis = new CodeAnalysis();
-            return Task.FromResult(analysis.Analyze(code));
+            return Task.FromResult(_codeAnalysis.Analyze(code));
         }
         [HttpPost("simpleSyntax")]
         public Task<string> GetSimpleSyntax([FromBody] string code)
         {
-            var analysis = CodeAnalysis.AnalyzeSimpleTree(code);
+            var analysis = _codeAnalysis.AnalyzeSimpleTree(code);
             return Task.FromResult(JsonConvert.SerializeObject(analysis, settings:new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore} ));
         }
     }

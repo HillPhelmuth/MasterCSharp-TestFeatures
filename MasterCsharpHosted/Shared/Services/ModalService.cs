@@ -11,6 +11,7 @@ namespace MasterCsharpHosted.Shared.Services;
 public class ModalService
 {
     private readonly List<TaskCompletionSource<ModalResults>> _tasks = new();
+    private readonly List<TaskCompletionSource<bool>> _confirmTasks = new();
     private readonly List<object> _modals = new();
     public bool IsOpen { get; set; }
     public ModalParameters Parameters { get; set; }
@@ -18,11 +19,22 @@ public class ModalService
     public event Action OnOpen;
     public event Action<Type, ModalParameters, ModalOptions> OnOpenComponent;
     public event Action<RenderFragment<ModalService>, ModalParameters, ModalOptions> OnOpenFragment;
+    public event Action<ModalConfirmOptions> OnConfirmOpen;
     public event Action<ModalParameters, ModalOptions> OnOpenSimple;
+    public event Action<bool> OnModalConfirmClose;
     public void Open()
     {
         IsOpen = true;
         OnOpen.Invoke();
+    }
+
+    public Task<bool> ConfirmAsync(ModalConfirmOptions options)
+    {
+        TaskCompletionSource<bool> taskCompletionSource = new();
+        _confirmTasks.Add(taskCompletionSource);
+        _modals.Add(new object());
+        OnConfirmOpen?.Invoke(options);
+        return taskCompletionSource.Task;
     }
     public void Open<T>(ModalParameters parameters = null, ModalOptions options = null) where T : class
     {
@@ -61,6 +73,22 @@ public class ModalService
     {
         Close(results);
     }
+
+    public void CloseConfirm(bool confirmed)
+    {
+        var modal = _modals.LastOrDefault();
+        if (modal != null)
+        {
+            IsOpen = false;
+            OnConfirmClose(confirmed);
+            _modals.Remove(modal);
+        }
+
+        var taskCompletionSource = _confirmTasks.LastOrDefault();
+        if (taskCompletionSource == null || taskCompletionSource.Task.IsCompleted) return;
+        _confirmTasks.Remove(taskCompletionSource);
+        taskCompletionSource.SetResult(confirmed);
+    }
     public void Close(ModalResults result)
     {
         var modal = _modals.LastOrDefault();
@@ -82,6 +110,11 @@ public class ModalService
         OnModalClose?.Invoke(results);
     }
 
+    private void OnConfirmClose(bool confirmed)
+    {
+        OnModalConfirmClose?.Invoke(confirmed);
+    }
+
 }
 
 public class ModalResults
@@ -96,7 +129,7 @@ public class ModalResults
 
     public static ModalResults Empty(bool success)
     {
-        return new(success, new ModalParameters());
+        return new ModalResults(success, new ModalParameters());
     }
 }
 public class ModalParameters : Dictionary<string, object>
@@ -137,3 +170,18 @@ public class ModalOptions
     public string Width { get; set; } = "auto";
     public bool CloseOnOuterClick { get; set; } = true;
 }
+
+public class ModalConfirmOptions
+{
+    public ModalConfirmOptions(string title)
+    {
+        Title = title;
+    }
+ 
+    public string Title { get; set; }
+    public string Content { get; set; } = "Are you sure?";
+    public ConfirmButton ConfirmButton { get; set; } = new("Yes");
+    public DeclineButton DeclineButton { get; set; } = new("No");
+}
+public record ConfirmButton(string Label);
+public record DeclineButton(string Label);

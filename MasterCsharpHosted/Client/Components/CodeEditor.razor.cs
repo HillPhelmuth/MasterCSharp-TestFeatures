@@ -19,6 +19,8 @@ namespace MasterCsharpHosted.Client.Components
         [Inject]
         private ICodeClient PublicClient { get; set; }
         [Inject]
+        private PublicClient TempClient { get; set; }
+        [Inject]
         private AppState AppState { get; set; }
         [Inject]
         private IJSRuntime Js { get; set; }
@@ -102,6 +104,16 @@ namespace MasterCsharpHosted.Client.Components
                 await _editor.AddAction("Save", "Save Code", new[] { (int)KeyMode.CtrlCmd | (int)KeyCode.KEY_S }, null,
                     null, "navigation", 9.5, ExecuteAction);
             }
+
+            await _editor.AddAction("Decompile", "Compile and Decompile",
+                new[] {(int) KeyMode.CtrlCmd | (int) KeyCode.KEY_D},
+                null, null, "navigation", 10.5, async (editor, keys) =>
+                {
+                    var code = await _editor.GetValue();
+                    var decompiledCode = await TempClient.CompileAndDecompile(code);
+                    await _editor.SetValue(decompiledCode);
+                    StateHasChanged();
+                });
         }
 
         private async Task ZoomInTask()

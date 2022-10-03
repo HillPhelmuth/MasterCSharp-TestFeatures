@@ -7,5 +7,6 @@ public class FullSyntaxTree
     public string RawCode { get; set; }
     public string Kind { get; set; }
     public string Name { get; set; }
+    public string Type { get; set; }
     public List<FullSyntaxTree> Members { get; set; } = new();
 }

@@ -7,7 +7,6 @@ namespace MasterCsharpHosted.Client
     public interface ICodeClient : IPublicClient
     {
         Task<string> GetFromPublicRepo(string org, string repo, string filePath);
-        Task<SyntaxTreeInfo> GetAnalysis(string code);
         Task<List<FullSyntaxTree>> GetFullAnalysis(string code);
         Task<SyntaxAnalysisResult> GetCodeAnalysis(string code);
     }

@@ -35,13 +35,13 @@ namespace MasterCsharpHosted.Server.Services
 
         public async Task<string> SubmitCode(string code, IEnumerable<MetadataReference> references)
         {
-            SyntaxTree tree = CSharpSyntaxTree.ParseText(code);
-            CompilationUnitSyntax root = tree.GetCompilationUnitRoot();
+            var tree = CSharpSyntaxTree.ParseText(code);
+            var root = tree.GetCompilationUnitRoot();
             var members = root.Members;
             
-            bool hasGlobalStatement = members.OfType<GlobalStatementSyntax>().Any();
+            var hasGlobalStatement = members.OfType<GlobalStatementSyntax>().Any();
             bool hasEntryPoint = members.OfType<ClassDeclarationSyntax>().HasEntryMethod();
-            bool hasNamespace = members.Any(x => x.Kind() == SyntaxKind.NamespaceDeclaration);
+            var hasNamespace = members.Any(x => x.Kind() == SyntaxKind.NamespaceDeclaration);
             if (hasNamespace || !hasGlobalStatement && hasEntryPoint)
             {
                 CodeOutput = await RunConsole(code, references);
@@ -52,7 +52,7 @@ namespace MasterCsharpHosted.Server.Services
             Console.WriteLine($"Code output: {CodeOutput}");
             return CodeOutput;
         }
-      
+     
         public async Task RunSubmission(string code, IEnumerable<MetadataReference> references)
         {
             _references = references;
@@ -60,35 +60,15 @@ namespace MasterCsharpHosted.Server.Services
             var previousOut = Console.Out;
             try
             {
-                (bool success, var script) = TryCompileScript(code, out var errorDiagnostics);
+                var (success, script) = TryCompileScript(code, out var errorDiagnostics);
                 if (success)
                 {
-                    var writer = new StringWriter();
-                    Console.SetOut(writer);
-
-                    var entryPoint = runningCompilation.GetEntryPoint(CancellationToken.None);
-                    var type = script.GetType($"{entryPoint.ContainingNamespace.MetadataName}.{entryPoint.ContainingType.MetadataName}");
-                    var entryPointMethod = type.GetMethod(entryPoint.MetadataName);
-
-                    var submission = (Func<object[], Task>)entryPointMethod.CreateDelegate(typeof(Func<object[], Task>));
-
-                    if (submissionIndex >= submissionStates.Length)
-                    {
-                        Array.Resize(ref submissionStates, Math.Max(submissionIndex, submissionStates.Length * 2));
-                    }
-
-                    var returnValue = await (Task<object>)submission(submissionStates);
-                    if (returnValue != null)
-                    {
-                        Console.Write(CSharpObjectFormatter.Instance.FormatObject(returnValue));
-                    }
-
-                    CodeOutput = writer.ToString();
-                    string output = HttpUtility.HtmlEncode(writer.ToString());
+                    await WriteScript(script);
+                    //var output = HttpUtility.HtmlEncode(writer.ToString());
                 }
                 else
                 {
-                    string errorOutput = errorDiagnostics.Aggregate("", (current, diag) => current + HttpUtility.HtmlEncode(diag));
+                    var errorOutput = errorDiagnostics.Aggregate("", (current, diag) => current + HttpUtility.HtmlEncode(diag));
 
                     CodeOutput = $"COMPILE ERROR: {errorOutput}";
                     
@@ -102,6 +82,32 @@ namespace MasterCsharpHosted.Server.Services
             {
                 Console.SetOut(previousOut);
             }
+        }
+
+        private async Task WriteScript(Assembly script)
+        {
+            var writer = new StringWriter();
+            Console.SetOut(writer);
+
+            var entryPoint = runningCompilation.GetEntryPoint(CancellationToken.None);
+            var type = script.GetType(
+                $"{entryPoint.ContainingNamespace.MetadataName}.{entryPoint.ContainingType.MetadataName}");
+            var entryPointMethod = type.GetMethod(entryPoint.MetadataName);
+
+            var submission = (Func<object[], Task>) entryPointMethod.CreateDelegate(typeof(Func<object[], Task>));
+
+            if (submissionIndex >= submissionStates.Length)
+            {
+                Array.Resize(ref submissionStates, Math.Max(submissionIndex, submissionStates.Length * 2));
+            }
+
+            var returnValue = await (Task<object>) submission(submissionStates);
+            if (returnValue != null)
+            {
+                Console.Write(CSharpObjectFormatter.Instance.FormatObject(returnValue));
+            }
+
+            CodeOutput = writer.ToString();
         }
 
         //Tries to compile, if successful, it outputs the DLL Assembly. If unsuccessful, it will output the error message

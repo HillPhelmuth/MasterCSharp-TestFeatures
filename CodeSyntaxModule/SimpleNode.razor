@@ -1,12 +1,21 @@
 ﻿@using Blazor.Diagrams.Components.Renderers;
 <div class="card @(Node.Selected ? "selected" : "") @Node.HasMembersCss()">
     <h6 class="text-center">@Node.FullSyntaxTree.Kind</h6>
-    @if (!string.IsNullOrEmpty(Node.FullSyntaxTree.Name))
+    @if (!string.IsNullOrEmpty(Node.FullSyntaxTree.Name) && !string.IsNullOrEmpty(Node.FullSyntaxTree.Type))
+    {
+        <code class="text-center">@Node.FullSyntaxTree.Name : <span class="type">@Node.FullSyntaxTree.Type</span></code>
+    }
+    else if (!string.IsNullOrEmpty(Node.FullSyntaxTree.Name))
     {
         <code class="text-center">@Node.FullSyntaxTree.Name</code>
     }
+    else if (!string.IsNullOrEmpty(Node.FullSyntaxTree.Type))
+    {
+        <code class="text-center type">@Node.FullSyntaxTree.Type</code>
+    }
     @if (Node.FullSyntaxTree.Members.Any())
     {
+        <br/>
         <div class="expand-collapse-grid">
             <div class="expand-all-icon" @onclick="HandleExpandAll"></div>
             <div class="@expandCollapseCss" @onclick=HandleExpandMembers></div>

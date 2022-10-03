@@ -961,5 +961,33 @@
     ],
     "addedBy": "HillPhelmuth",
     "userCompleted": false
+  },
+  {
+    "name": "Add Integers",
+    "difficulty": "Easiest",
+    "description": "<p>Write a function that adds two integers together and returns the result.</p>",
+    "examples": "<p>SumOfInts(1, 2) => 3</p><p>SumOfInts(-3, 100) => 97</p>",
+    "snippet": "public static int SumOfInts(int num1, int num2)\n{\n\t//solution here\n}",
+    "solution": "public static bool SumOfInts(int num1, int num2)\n{\n\treturn num1 + num2;\n}",
+    "tests": [
+      {
+        "append": "\nConsole.WriteLine(SumOfInts(1, 2));",
+        "testAgainst": "3"
+      },
+      {
+        "append": "\nConsole.WriteLine(SumOfInts(-3, 100));",
+        "testAgainst": "97"
+      },
+      {
+        "append": "\nConsole.WriteLine(SumOfInts(111, 222));",
+        "testAgainst": "333"
+      },
+      {
+        "append": "\nConsole.WriteLine(SumOfInts(-39, -11));",
+        "testAgainst": "-50"
+      }
+    ],
+    "addedBy": "adam holm",
+    "userCompleted": false
   }
 ]

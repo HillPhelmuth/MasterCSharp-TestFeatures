@@ -140,5 +140,12 @@ namespace MasterCsharpHosted.Client
             var apiResult = await Client.PostAsJsonAsync("api/appUser/updateUser", user);
             return apiResult.IsSuccessStatusCode;
         }
+
+        public async Task<string> CompileAndDecompile(string code)
+        {
+            var apiResult = await Client.PostAsJsonAsync("api/code/decompile", code);
+            var result = await apiResult.Content.ReadAsStringAsync();
+            return result;
+        }
     }
 }

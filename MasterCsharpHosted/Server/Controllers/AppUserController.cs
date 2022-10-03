@@ -36,14 +36,14 @@ namespace MasterCsharpHosted.Server.Controllers
         {
             try
             {
-                await using var context = _userContext.CreateDbContext();
+                await using var context = await _userContext.CreateDbContextAsync();
                 await context.AddAsync(user);
                 await context.SaveChangesAsync();
                 return new OkObjectResult(user);
             }
             catch (Exception ex)
             {
-                string errorString = $"{ex.Message}\nStack: {ex.StackTrace}\nInner: {ex.InnerException}";
+                var errorString = $"{ex.Message}\nStack: {ex.StackTrace}\nInner: {ex.InnerException}";
                 Console.WriteLine(errorString);
                 return new BadRequestObjectResult(errorString);
             }
@@ -57,6 +57,7 @@ namespace MasterCsharpHosted.Server.Controllers
             {
                 await using var context = await _userContext.CreateDbContextAsync();
                 var appUser = await context.AppUsers.FirstOrDefaultAsync(x => x.UserName == user.UserName);
+                if (appUser is null) return new BadRequestObjectResult("User not found");
                 appUser.Snippets = user.Snippets;
                 appUser.CompletedChallenges = user.CompletedChallenges;
                 await context.SaveChangesAsync();
@@ -64,7 +65,7 @@ namespace MasterCsharpHosted.Server.Controllers
             }
             catch(Exception ex)
             {
-                string errorString = $"{ex.Message}\nStack: {ex.StackTrace}\nInner: {ex.InnerException}";
+                var errorString = $"{ex.Message}\nStack: {ex.StackTrace}\nInner: {ex.InnerException}";
                 Console.WriteLine(errorString);
                 return new BadRequestObjectResult(errorString);
             }

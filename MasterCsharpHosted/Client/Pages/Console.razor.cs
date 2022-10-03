@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 using MasterCsharpHosted.Client.Components;
 using MasterCsharpHosted.Shared;
 using MasterCsharpHosted.Shared.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using SharedComponents;
 
 namespace MasterCsharpHosted.Client.Pages
@@ -15,9 +20,12 @@ namespace MasterCsharpHosted.Client.Pages
     {
         
         [Inject]
-        private PublicClient PublicClient { get; set; }
+        private ICodeClient CodeClient { get; set; }
+        [Inject]
+        private IUserClient UserClient { get; set; }
         [Inject]
         private ModalService ModalService { get; set; }
+
         private string _cssClass = "inactive";
         private bool _isMenuOpen;
         private readonly List<string> _themeOptions = new() {"vs", "vs-dark", "hc-black"};
@@ -27,7 +35,25 @@ namespace MasterCsharpHosted.Client.Pages
             //AppState.PropertyChanged += HandleAppStateStateChange;
             return base.OnInitializedAsync();
         }
-
+        [Inject]
+        private PublicClient Client { get; set; }
+        private async void UploadFile(InputFileChangeEventArgs args)
+        {
+            var file = args.File;
+            if (!file.Name.EndsWith(".dll")) return;
+            var fileContent =
+                new StreamContent(file.OpenReadStream());
+            fileContent.Headers.ContentType =
+                new MediaTypeHeaderValue(file.ContentType);
+            var streamContent = file.OpenReadStream();
+            using var memStream = new MemoryStream();
+            await streamContent.CopyToAsync(memStream);
+            var httpClient = Client.Client;
+            var response = await httpClient.PostAsJsonAsync("api/code/decompileFile", memStream.ToArray());
+            var content = await response.Content.ReadAsStringAsync();
+            AppState.Snippet = content;
+            StateHasChanged();
+        }
         private async Task OpenMenu()
         {
             _cssClass = "active";
@@ -55,6 +81,18 @@ namespace MasterCsharpHosted.Client.Pages
             HandleSave(saveData);
         }
 
+        private async void HandleDeleteSnippet(UserSnippet snippet)
+        {
+            var confirm = await ModalService.ConfirmAsync(new ModalConfirmOptions($"Delete Snippet ({snippet.Name})")
+            {
+                ConfirmButton = new ConfirmButton("Yep, ditch it"), DeclineButton = new DeclineButton("Noooo!!!")
+            });
+            if (!confirm) return;
+            AppState.DeleteUserSnippet(snippet);
+            await UserClient.UpdateUser(AppState.CurrentUser);
+            StateHasChanged();
+
+        }
         private void HandleSave(string snippetData)
         {
             var splitData = snippetData.Split('|');
@@ -73,7 +111,7 @@ namespace MasterCsharpHosted.Client.Pages
                 AppState.CurrentUser.Snippets.Add(snippet);
             }
 
-            _ = PublicClient.UpdateUser(AppState.CurrentUser);
+            _ = UserClient.UpdateUser(AppState.CurrentUser);
             StateHasChanged();
 
         }
@@ -97,7 +135,7 @@ namespace MasterCsharpHosted.Client.Pages
                 var org = requestContent.Parameters?.Get<string>("Organization") ?? "";
                 var repo = requestContent.Parameters?.Get<string>("Repo") ?? "";
                 var path = requestContent.Parameters?.Get<string>("FullPath") ?? "";
-                AppState.Snippet = await PublicClient.GetFromPublicRepo(org, repo, path);
+                AppState.Snippet = await CodeClient.GetFromPublicRepo(org, repo, path);
             }
             StateHasChanged();
         }

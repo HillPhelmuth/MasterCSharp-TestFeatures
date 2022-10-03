@@ -13,6 +13,15 @@
             {
                 @ChildContent
             }
+            @if (ModalConfirmOptions != null)
+            {
+                <div class="text-center title">@ModalConfirmOptions.Title</div>
+                <p>@ModalConfirmOptions.Content</p>                                                        
+                <div class="confirm-grid">
+                    <button class="confirm" @onclick="@(() => ConfirmClose(true))">@ModalConfirmOptions.ConfirmButton.Label</button>
+                    <button class="decline" @onclick="@(() => ConfirmClose(false))">@ModalConfirmOptions.DeclineButton.Label</button>
+                </div>
+            }
             
         </div>
     </div>

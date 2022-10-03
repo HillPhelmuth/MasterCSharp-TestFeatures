@@ -17,6 +17,8 @@ namespace MasterCsharpHosted.Client.Components
         private IPublicClient PublicClient { get; set; }
         [Parameter]
         public EventCallback<bool> OnCloseMenu { get; set; }
+        [Parameter]
+        public EventCallback<UserSnippet> OnDeleteSnippet { get; set; }
         private void MouseOverContent(string content)
         {
             AppState.Content = content;

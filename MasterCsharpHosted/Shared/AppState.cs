@@ -159,6 +159,12 @@ namespace MasterCsharpHosted.Shared
             ActiveChallenge = challenge;
         }
 
+        public void DeleteUserSnippet(UserSnippet snippet)
+        {
+            if (CurrentUser?.Snippets == null || !CurrentUser.Snippets.Any()) return;
+            CurrentUser.Snippets.Remove(snippet);
+        }
+
         public event Action OnSubmitCode;
 
         public void SubmitCode()
