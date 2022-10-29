@@ -23,3 +23,7 @@ button[type=submit] {
     min-width:18rem;
     background-color: white
 }
+.folder-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}

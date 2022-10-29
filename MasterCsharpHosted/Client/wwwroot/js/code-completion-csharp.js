@@ -60,12 +60,13 @@ function getcsharpSignatureHelpProvidor(monaco) {
 }
 function getcsharpCompletionProvider(monaco) {
     return {
-        triggerCharacters: ["."],
+        triggerCharacters: ['.','='],
         provideCompletionItems: function (model, position) {
 
             const textUntilPosition = model.getValueInRange({ startLineNumber: 1, startColumn: 1, endLineNumber: position.lineNumber, endColumn: position.column });
             const cursor = textUntilPosition.length;
             var sourceInfo = { SourceCode: model.getValue(), lineNumberOffsetFromTemplate: cursor };
+
             //var funcUrl = "https://codecompletionfunction.azurewebsites.net/api/CompleteCode";
             return new Promise((resolve, reject) => {
                 $.ajax({

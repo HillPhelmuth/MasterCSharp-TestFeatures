@@ -92,8 +92,8 @@ namespace SharedComponents
         private void ConfirmClose(bool confirm)
         {
             Console.WriteLine("ModalService OnClose handled in Modal.razor");
-            ModalService.CloseConfirm(confirm);
-            IsOpen = false;
+            ModalService.Close(confirm);
+            //IsOpen = false;
             StateHasChanged();
         }
         private void OutClick()

@@ -2,59 +2,72 @@
 <div class="form">
     <h5 class="text-center">From Github Public Repo</h5>
     <EditForm Model="@_ghFrm" OnValidSubmit="@HandleValidSubmit">
-        <DataAnnotationsValidator/>
-        <ValidationSummary/>
+        <DataAnnotationsValidator />
+        <ValidationSummary />
 
         <label>
-            Organization<br/>
-            <InputOnInput id="org" @bind-Value="_ghFrm.Organization"/>
+            Organization<br />
+            <InputOnInput id="org" @bind-Value="_ghFrm.Organization" />
         </label>
         <label>
-            Repository Name<br/>
+            Repository Name<br />
             <InputOnInput @bind-Value="_ghFrm.Repo"></InputOnInput>
         </label><br />
         <label>
             <InputCheckbox @bind-Value="_ghFrm.InRoot"></InputCheckbox>
             Code file is in Root directory
-        </label><br/>
+        </label><br />
         @if (!_ghFrm.InRoot)
         {
             <Tooltip Text="Add Folder">
-                 <button type="button" @onclick="AddFolder"><img height="24" width="24" src="icons/plus-40.png" alt="Add"/></button>
+                <button type="button" @onclick="AddFolder"><img height="24" width="24" src="icons/plus-40.png" alt="Add" /></button>
             </Tooltip>
             <Tooltip Text="Remove Folder">
-                 <button type="button" @onclick="RemoveFolder"><img height="24" width="24" src="icons/minus-40.png" alt="Remove"/></button>
-            </Tooltip><br/>
+                <button type="button" @onclick="RemoveFolder"><img height="24" width="24" src="icons/minus-40.png" alt="Remove" /></button>
+            </Tooltip>
 
-            @if (folderCount > 0)
-            {
-                <label>
-                    Folder 1<br/>
-                    <InputOnInput @bind-Value="_ghFrm.Folder1"/>
-                </label><span style="font-size:1.2rem">/</span>
-            }
-            @if (folderCount > 1)
-            {
-                <label>
-                    Folder 2<br/>
-                    <InputOnInput @bind-Value="_ghFrm.Folder2"/>
-                </label><span style="font-size:1.2rem">/</span>
-            }
-            @if (folderCount > 2)
-            {
-                <label>
-                    Folder 3<br/>
-                    <InputOnInput @bind-Value="_ghFrm.Folder3"/>
-                </label><span style="font-size:1.2rem">/</span>
-            }
+            <br />
+            <div class="folder-grid">
+                @foreach (var folder in _ghFrm.Folders)
+                {
+                    <div>
+                        <label>
+                            Folder @folder.Index<br />
+                            <InputOnInput @bind-Value="folder.Value" />
+                        </label>
+                        <span style="font-size:1.2rem">/</span>
+                    </div>
+                }
+            </div>
+            @*@if (folderCount > 0)
+        {
+        <label>
+        Folder 1<br/>
+        <InputOnInput @bind-Value="_ghFrm.Folder1"/>
+        </label><span style="font-size:1.2rem">/</span>
+        }
+        @if (folderCount > 1)
+        {
+        <label>
+        Folder 2<br/>
+        <InputOnInput @bind-Value="_ghFrm.Folder2"/>
+        </label><span style="font-size:1.2rem">/</span>
+        }
+        @if (folderCount > 2)
+        {
+        <label>
+        Folder 3<br/>
+        <InputOnInput @bind-Value="_ghFrm.Folder3"/>
+        </label><span style="font-size:1.2rem">/</span>
+        }*@
         }
         <label>
             File name<br />
-            <InputOnInput @bind-Value="_ghFrm.FileName"/>
+            <InputOnInput @bind-Value="_ghFrm.FileName" />
         </label>
         <button type="submit">Retrieve Code</button>
     </EditForm>
-    
+
 </div>
 
 

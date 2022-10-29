@@ -3,7 +3,11 @@
 {
     <div class="modal-overlay" @onclick=OutClick>
         <div style="width:@(ModalOptions.Width); min-height:@(ModalOptions.Height)" class="window @(Enum.GetName(ModalOptions.Location)?.ToLower())" @onclick:stopPropagation>
-            <button class="close" @onclick="CloseSelf"><span>&times;</span></button>
+            @if (!ModalOptions.HideCloseButton)
+            {
+                <button class="close" @onclick="CloseSelf"><span>&times;</span></button>
+            }
+            
             <div class="text-center title">@ModalOptions?.Title</div>
             @if(ComponentType != null)
             {

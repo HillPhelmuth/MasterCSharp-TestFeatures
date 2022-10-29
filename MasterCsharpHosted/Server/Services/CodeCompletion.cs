@@ -37,7 +37,7 @@ public class CodeCompletion
     {
         //List<PortableExecutableReference> refs = CompileResources.PortableExecutableCompletionReferences;
         if (refs == null || refs.Count == 0) return null;
-        var doc = GetDocument(sourceInfo, refs);
+        Document doc = GetDocument(sourceInfo, refs);
         ScriptDocument ??= doc;
         // cursor position is at the end
         var position = sourceInfo.LineNumberOffsetFromTemplate;
@@ -136,7 +136,7 @@ public class CodeCompletion
             "System.Numerics"
         };
         var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(a =>
-            !a.IsDynamic && File.Exists(a.Location) && !a.FullName.Contains("JSInterop.WebAssembly")).ToList();
+            !a.IsDynamic && File.Exists(a.Location) && !a.FullName.Contains("JSInterop.WebAssembly") && !a.FullName.Contains("OmniSharp")).ToList();
 
         var partTypes = MefHostServices.DefaultAssemblies.Concat(assemblies)
             .Distinct()?

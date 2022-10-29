@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using MasterCsharpHosted.Shared;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Scripting.Hosting;
@@ -22,7 +23,37 @@ namespace MasterCsharpHosted.Server.Services
         private int submissionIndex = 0;
         
         public string CodeOutput { get; set; }
-        
+
+        public async Task<CodeOutputModel> SubmitChallenge(CodeInputModel codeInput, IEnumerable<MetadataReference> references)
+        {
+            var testCode = codeInput.Solution;
+            var outputs = new CodeOutputModel { Outputs = new List<Output>() };
+            var index = 1;
+            var swTot = new Stopwatch();
+            Console.WriteLine("start all tasks");
+            swTot.Start();
+
+            foreach (var snip in codeInput.Tests)
+            {
+                var sw = new Stopwatch();
+
+                var output = new Output { TestIndex = index, Test = snip };
+                var code = $"{testCode}\n{snip.Append}";
+                var expected = snip.TestAgainst;
+                sw.Start();
+                output.TestResult = await SubmitSolution(code, references, expected);
+                output.Codeout = CodeOutput;
+                output.Test = snip;
+                sw.Stop();
+                Console.WriteLine($"Complete task 2 in {sw.ElapsedMilliseconds}ms");
+                index++;
+                outputs.Outputs.Add(output);
+
+            }
+            swTot.Stop();
+            Console.WriteLine($"Completed all tasks in {swTot.ElapsedMilliseconds}ms");
+            return outputs;
+        }
         public async Task<bool> SubmitSolution(string code, IEnumerable<MetadataReference> references, string testAgainst = "true")
         {
             Console.WriteLine("Compiling and running code");
@@ -40,7 +71,7 @@ namespace MasterCsharpHosted.Server.Services
             var members = root.Members;
             
             var hasGlobalStatement = members.OfType<GlobalStatementSyntax>().Any();
-            bool hasEntryPoint = members.OfType<ClassDeclarationSyntax>().HasEntryMethod();
+            var hasEntryPoint = members.OfType<ClassDeclarationSyntax>().HasEntryMethod();
             var hasNamespace = members.Any(x => x.Kind() == SyntaxKind.NamespaceDeclaration);
             if (hasNamespace || !hasGlobalStatement && hasEntryPoint)
             {

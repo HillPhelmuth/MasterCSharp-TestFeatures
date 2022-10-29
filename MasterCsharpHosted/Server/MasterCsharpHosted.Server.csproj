@@ -16,7 +16,7 @@
 	<ItemGroup>
 		<PackageReference Include="ICSharpCode.Decompiler" Version="7.2.1.6856" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.9" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.9" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.10" />
 
 		<PackageReference Include="Microsoft.CodeAnalysis" Version="4.1.0" />
 
@@ -28,10 +28,10 @@
 
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.9" />
 
-		<PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.1.0" />
+		<!--<PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.1.0" />-->
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Cosmos" Version="6.0.9" />
-		<PackageReference Include="OmniSharp.Roslyn.CSharp" Version="1.37.4" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Cosmos" Version="6.0.10" />
+		<PackageReference Include="OmniSharp.Roslyn.CSharp" Version="1.37.5" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Update="Resources\System.Runtime.xml">
