@@ -115,7 +115,12 @@ namespace MasterCsharpHosted.Client.Pages
             StateHasChanged();
 
         }
-
+        private async void HandleExplain(string explain)
+        {
+            var modalparams = new ModalParameters() {{"Content", explain}};
+            var modalOptions = new ModalOptions() {CloseOnOuterClick = true, Title = "GPT-3 Explanation"};
+            await ModalService.OpenAsync<ExplanationView>(modalparams, modalOptions);
+        }
         private void HandleThemeChange(string theme)
         {
             //AppState.EditorTheme = theme;

@@ -9,6 +9,10 @@
             }
             
             <div class="text-center title">@ModalOptions?.Title</div>
+            @if (!string.IsNullOrWhiteSpace(ModalOptions?.Content))
+            {
+            <div><div class="content-item">@ModalOptions?.Content</div></div>
+            }
             @if(ComponentType != null)
             {
                 <DynamicComponent Type="ComponentType" Parameters="ModalParameters"></DynamicComponent>

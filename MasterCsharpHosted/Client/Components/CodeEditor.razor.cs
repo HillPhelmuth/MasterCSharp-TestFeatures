@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Newtonsoft.Json;
 using JsonSerializer = System.Text.Json.JsonSerializer;
+using Range = BlazorMonaco.Range;
 
 namespace MasterCsharpHosted.Client.Components
 {
@@ -33,6 +34,8 @@ namespace MasterCsharpHosted.Client.Components
         public EventCallback<string> OnSave { get; set; }
         [Parameter]
         public EventCallback<string> OnAnalyze { get; set; }
+        [Parameter]
+        public EventCallback<string> OnExplain { get; set; }
         private MonacoEditor _editor = new();
         private string[] _deltaDecorationIds;
         private bool _shouldRender;
@@ -69,7 +72,6 @@ namespace MasterCsharpHosted.Client.Components
                 Lightbulb = new EditorLightbulbOptions { Enabled = true },
                 SuggestOnTriggerCharacters = true,
                 Language = "csharp",
-                //Theme = "vs-dark",
                 GlyphMargin = true,
                 Value = AppState.Snippet ?? CodeSnippets.DefaultCode
             };
@@ -107,15 +109,37 @@ namespace MasterCsharpHosted.Client.Components
 
             await _editor.AddAction("Decompile", "Compile and Decompile",
                 new[] {(int) KeyMode.CtrlCmd | (int) KeyCode.KEY_D},
-                null, null, "navigation", 10.5, async (editor, keys) =>
-                {
-                    var code = await _editor.GetValue();
-                    var decompiledCode = await TempClient.CompileAndDecompile(code);
-                    await _editor.SetValue(decompiledCode);
-                    StateHasChanged();
-                });
+                null, null, "navigation", 10.5, ExecuteAction);
+            if (!string.IsNullOrEmpty(AppState.CurrentUser?.UserName))
+            {
+                await _editor.AddAction("Explain", "Ask for an explanation from OpenAI gpt-3",
+                    new[] {(int) KeyMode.CtrlCmd | (int) KeyCode.KEY_E},
+                    null, null, "navigation", 11.5, ExecuteAction);
+            }
         }
 
+        private async Task CompileAndDecompile()
+        {
+            var code = await _editor.GetValue();
+            var decompiledCode = await TempClient.CompileAndDecompile(code);
+            await _editor.SetValue(decompiledCode);
+            StateHasChanged();
+        }
+
+        private async Task RequestExplain()
+        {
+            var code = await _editor.GetValue();
+            var model = await _editor.GetModel();
+            var selection = await _editor.GetSelection();
+            var selectedRange = new Range(selection.StartLineNumber, selection.SelectionStartColumn, selection.EndLineNumber,
+                selection.EndColumn);
+            Console.WriteLine($"SelectedRange:\n{JsonConvert.SerializeObject(selectedRange)}");
+            var text = await model.GetValueInRange(selectedRange, EndOfLinePreference.TextDefined);
+            Console.WriteLine($"Selected Text:\n{text}");
+            var requestText = string.IsNullOrWhiteSpace(text) ? code : text;
+            var explanation = await TempClient.GetExplanation(requestText);
+            await OnExplain.InvokeAsync(explanation);
+        }
         private async Task ZoomInTask()
         {
             var editorOptions = new GlobalEditorOptions { FontSize = ++_fontSize };
@@ -145,6 +169,8 @@ namespace MasterCsharpHosted.Client.Components
                 (int)KeyMode.CtrlCmd | (int)KeyCode.KEY_Z => Undo(),
                 (int)KeyMode.CtrlCmd | (int)KeyCode.KEY_Y => Redo(),
                 (int)KeyMode.CtrlCmd | (int)KeyCode.KEY_L => SuggestSignature(),
+                (int)KeyMode.CtrlCmd | (int)KeyCode.KEY_E => RequestExplain(),
+                (int)KeyMode.CtrlCmd | (int)KeyCode.KEY_D => CompileAndDecompile(),
                 _ => SubmitCodeDefault()
             };
             await editorAction;
@@ -209,10 +235,8 @@ namespace MasterCsharpHosted.Client.Components
         private async Task SubmitForAnalysis()
         {
             var code = await _editor.GetValue();
-            //AppState.SyntaxTreeInfo = await PublicClient.GetAnalysis(code);
             var result = await PublicClient.GetCodeAnalysis(code);
             AppState.SetAnalysisResults(result.SyntaxTree, result.FullSyntaxTrees);
-            //await SubmitForSimpleAnalysis(code);
             AppState.Snippet = code;
             await OnAnalyze.InvokeAsync("Go");
         }
@@ -232,7 +256,6 @@ namespace MasterCsharpHosted.Client.Components
         private async Task SuggestSignature() => await _editor.Trigger("whatever...", "editor.action.triggerParameterHints", "whatever...");
         private async void HandleAppStateStateChange(object _, PropertyChangedEventArgs args)
         {
-            //if (args.PropertyName != nameof(AppState.Snippet) && args.PropertyName != nameof(AppState.SyntaxTreeInfo) && args.PropertyName != nameof(AppState.EditorTheme)) return;
             Console.WriteLine($"Editor Handles AppState change of {args.PropertyName} property");
             _shouldRender = true;
             switch (args.PropertyName)

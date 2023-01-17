@@ -46,18 +46,18 @@ namespace MasterCsharpHosted.Shared
             };
             return JsonSerializer.Deserialize<List<ChallengeModel>>(json, options);
         }
-
-        public override bool Equals(object obj)
-        {
-            if (obj is null) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            return obj.GetType() == this.GetType() && Equals((ChallengeModel) obj);
-        }
-
         public static List<ChallengeModel> GetChallengesFromFile()
         {
             string challengeJson = Helpers.GetJsonContentFromFile("Challenges.json");
             return FromJson(challengeJson);
+        }
+
+        #region IEquitable Implementation
+        public override bool Equals(object obj)
+        {
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj.GetType() == this.GetType() && Equals((ChallengeModel)obj);
         }
 
         public bool Equals(ChallengeModel other)
@@ -71,6 +71,7 @@ namespace MasterCsharpHosted.Shared
         {
             return HashCode.Combine(Name, Description, AddedBy);
         }
+        #endregion
     }
 
     public class Test
@@ -83,5 +84,5 @@ namespace MasterCsharpHosted.Shared
     }
     public enum Difficulty { Easier, Easiest, Easy, Mid, Hard };
     public enum TestResult { None, Fail, Pass }
-    
+
 }

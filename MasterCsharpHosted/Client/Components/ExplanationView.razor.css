@@ -1,0 +1,6 @@
+﻿.explain-wrapper {
+    font-family: ui-monospace;
+    line-height: 1.2rem;
+    box-shadow: -2px 2px 5px 2px grey, -3px 3px 6px 3px darkviolet;
+    padding: .5rem;
+}
