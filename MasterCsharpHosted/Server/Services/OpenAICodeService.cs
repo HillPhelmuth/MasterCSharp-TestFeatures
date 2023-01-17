@@ -45,7 +45,7 @@ namespace MasterCsharpHosted.Server.Services
                     Echo = false,
                     StopAsList = new List<string> { "//c# code", "//Explain " },
                     TopP = 1,
-                    FrequencyPenalty = 0.0f,
+                    FrequencyPenalty = 0.5f,
                     //LogProbs = 0,
                     PresencePenalty = 0,
                     User = userName
