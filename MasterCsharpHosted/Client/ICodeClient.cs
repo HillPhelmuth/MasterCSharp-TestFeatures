@@ -18,6 +18,6 @@ namespace MasterCsharpHosted.Client
 
     public interface IChallengeClient
     {
-        Task<CodeOutputModel> SubmitChallenge(ChallengeModel challenge);
+        Task<CodeOutputModel> SubmitChallenge(CodeInputModel challenge);
     }
 }

@@ -38,7 +38,8 @@ public class ModalService
 
     public void Open(RenderFragment<ModalService> renderFragment, ModalParameters parameters = null, ModalOptions options = null)
     {
-        _modals.Add(new object());
+        //_modals.Add(new object());
+        _modalReferences.Push(new ModalReference());
         OnOpenFragment?.Invoke(renderFragment, parameters, options);
     }
     public Task<ModalResults> OpenAsync<T>(ModalParameters parameters = null, ModalOptions options = null) where T : ComponentBase

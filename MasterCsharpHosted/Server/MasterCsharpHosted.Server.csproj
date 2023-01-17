@@ -14,6 +14,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Betalgo.OpenAI.GPT3" Version="6.6.4" />
 		<PackageReference Include="ICSharpCode.Decompiler" Version="7.2.1.6856" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.9" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.10" />

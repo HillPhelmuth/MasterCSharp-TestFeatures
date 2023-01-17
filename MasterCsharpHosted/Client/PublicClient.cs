@@ -36,7 +36,7 @@ namespace MasterCsharpHosted.Client
             Console.WriteLine($"api/code/compile returned an value in {sw.ElapsedMilliseconds}ms");
             return result;
         }
-        public async Task<CodeOutputModel> SubmitChallenge(ChallengeModel challenge)
+        public async Task<CodeOutputModel> SubmitChallenge(CodeInputModel challenge)
         {
             var sw = new Stopwatch();
             sw.Start();
@@ -144,6 +144,13 @@ namespace MasterCsharpHosted.Client
         public async Task<string> CompileAndDecompile(string code)
         {
             var apiResult = await Client.PostAsJsonAsync("api/code/decompile", code);
+            var result = await apiResult.Content.ReadAsStringAsync();
+            return result;
+        }
+
+        public async Task<string> GetExplanation(string code, string userName = "guestUser")
+        {
+            var apiResult = await Client.PostAsJsonAsync($"api/OpenAi/explain/{userName}", code);
             var result = await apiResult.Content.ReadAsStringAsync();
             return result;
         }

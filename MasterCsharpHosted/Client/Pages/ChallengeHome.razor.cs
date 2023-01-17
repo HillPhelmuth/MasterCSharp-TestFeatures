@@ -38,7 +38,7 @@ namespace MasterCsharpHosted.Client.Pages
         {
             _cssClass = "active";
             StateHasChanged();
-            await Task.Delay(500);
+            await Task.Delay(100);
             _isMenuOpen = true;
         }
         private void CloseMenu()
@@ -54,7 +54,7 @@ namespace MasterCsharpHosted.Client.Pages
             _isWorking = true;
             StateHasChanged();
             await Task.Delay(1000);
-            var submitChallenge = new ChallengeModel
+            var submitChallenge = new CodeInputModel
             {
                 Solution = code,
                 Tests = AppState.ActiveChallenge.Tests
@@ -76,7 +76,7 @@ namespace MasterCsharpHosted.Client.Pages
             await ModalService.OpenAsync<ResultTable>(options:new ModalOptions { Title = modalTitle, Height= "50vh", Width = "40vw"});
             
             if (output.PassAll)
-                await TryAddChallengeToUser(code);
+                await AddChallengeToUser(code);
             
         }
         private async void ShowResults()
@@ -90,17 +90,16 @@ namespace MasterCsharpHosted.Client.Pages
             if (string.IsNullOrEmpty(snippet)) return;
             AppState.UpdateSnippet(snippet);
         }
-        private async Task<bool> TryAddChallengeToUser(string code)
+        private async Task AddChallengeToUser(string code)
         {
             System.Console.WriteLine("TryAddChallengeToUser() executed");
             bool submitSuccess = false;
             if (AppState.CurrentUser.IsAuthenticated && (AppState.CurrentUser.CompletedChallenges == null || AppState.CurrentUser.CompletedChallenges?.Any(x => x.ChallengeName == AppState.ActiveChallenge.Name) == false))
             {
-                AppState.CurrentUser.CompletedChallenges.Add(new CompletedChallenge(AppState.ActiveChallenge.Name, code));
+                AppState.CurrentUser?.CompletedChallenges?.Add(new CompletedChallenge(AppState.ActiveChallenge.Name, code));
                 submitSuccess = await UserClient.UpdateUser(AppState.CurrentUser);
             }
             System.Console.WriteLine($"TryAddChallengeToUser() Completed. Success: {submitSuccess}");
-            return submitSuccess;
         }
     }
 }

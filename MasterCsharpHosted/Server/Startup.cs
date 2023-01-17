@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Services;
 using Microsoft.EntityFrameworkCore;
+using OpenAI.GPT3.Extensions;
 
 namespace MasterCsharpHosted.Server
 {
@@ -50,6 +51,8 @@ namespace MasterCsharpHosted.Server
             services.AddDbContextFactory<AppUserContext>(opts =>
                 opts.UseCosmos(Configuration["Cosmos:ConnectionString"], "AppUserDb"));
             services.AddScoped<CodeCompletion>();
+            services.AddScoped<OpenAICodeService>();
+            services.AddOpenAIService();
             services.AddControllersWithViews();
             services.AddRazorPages();
         }
