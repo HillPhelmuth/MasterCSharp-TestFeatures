@@ -4,7 +4,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 using MasterCsharpHosted.Shared;
 using Newtonsoft.Json;
@@ -15,6 +17,7 @@ namespace MasterCsharpHosted.Client
     public class PublicClient : ICodeClient, IUserClient, IChallengeClient
     {
         public HttpClient Client { get; }
+
         public PublicClient(HttpClient httpClient)
         {
             Client = httpClient;
@@ -31,11 +34,13 @@ namespace MasterCsharpHosted.Client
                 Console.WriteLine($"api/code/compile returned an error in {sw.ElapsedMilliseconds}ms");
                 return $"Error on compile. {apiResult.ReasonPhrase}";
             }
+
             string result = await apiResult.Content.ReadAsStringAsync();
             sw.Stop();
             Console.WriteLine($"api/code/compile returned an value in {sw.ElapsedMilliseconds}ms");
             return result;
         }
+
         public async Task<CodeOutputModel> SubmitChallenge(CodeInputModel challenge)
         {
             var sw = new Stopwatch();
@@ -47,6 +52,7 @@ namespace MasterCsharpHosted.Client
             var output = JsonSerializer.Deserialize<CodeOutputModel>(result);
             return output;
         }
+
         public async Task<string> GetFromGithubRepo(string fileName)
         {
             var sw = new Stopwatch();
@@ -61,7 +67,7 @@ namespace MasterCsharpHosted.Client
         {
             var sw = new Stopwatch();
             sw.Start();
-            var apiResult = await Client.PostAsJsonAsync($"api/code/githubCode/{org}/{repo}",filePath);
+            var apiResult = await Client.PostAsJsonAsync($"api/code/githubCode/{org}/{repo}", filePath);
             if (!apiResult.IsSuccessStatusCode)
                 return $"Failed to Retrieve code:\r\n{apiResult.ReasonPhrase}";
 
@@ -79,16 +85,25 @@ namespace MasterCsharpHosted.Client
             if (apiResult != null && apiResult.UserName != "NONE")
             {
                 sw.Stop();
-                Console.WriteLine($"api/appUser/getUser returned a value in {sw.ElapsedMilliseconds}ms\r\nResult: {apiResult}");
+                Console.WriteLine(
+                    $"api/appUser/getUser returned a value in {sw.ElapsedMilliseconds}ms\r\nResult: {apiResult}");
                 return apiResult;
             }
 
             var random = new Random();
             var id = random.Next(1, 999999);
-            var addResult = await Client.PostAsJsonAsync("api/appUser/addUser", new AppUser {Id = id, UserName = userName, Snippets = new List<UserSnippet>{new("Default", CodeSnippets.DefaultCode, "Default sample snippet")}, CompletedChallenges = new List<CompletedChallenge>(), IsAuthenticated = true});
+            var addResult = await Client.PostAsJsonAsync("api/appUser/addUser",
+                new AppUser
+                {
+                    Id = id, UserName = userName,
+                    Snippets = new List<UserSnippet>
+                        {new("Default", CodeSnippets.DefaultCode, "Default sample snippet")},
+                    CompletedChallenges = new List<CompletedChallenge>(), IsAuthenticated = true
+                });
             string result = await addResult.Content.ReadAsStringAsync();
             sw.Stop();
-            Console.WriteLine($"api/appUser/addUser returned a value in {sw.ElapsedMilliseconds}ms\r\nResult: {result}");
+            Console.WriteLine(
+                $"api/appUser/addUser returned a value in {sw.ElapsedMilliseconds}ms\r\nResult: {result}");
             return JsonSerializer.Deserialize<AppUser>(result);
         }
 
@@ -104,14 +119,17 @@ namespace MasterCsharpHosted.Client
                 Console.WriteLine($"Error on Analyze. {apiResult.ReasonPhrase}");
                 return null;
             }
+
             string result = await apiResult.Content.ReadAsStringAsync();
             sw.Stop();
             Console.WriteLine($"api/code/syntax returned value in {sw.ElapsedMilliseconds}ms");
             var syntaxResult = JsonConvert.DeserializeObject<SyntaxTreeInfo>(result);
             Console.WriteLine($"Namespaces:\r\n{string.Join("\r\n\t", syntaxResult.NameSpaces?.Select(x => x.Name))}");
-            Console.WriteLine($"Classes:\r\n{string.Join("\r\n\t", syntaxResult.NameSpaces.SelectMany(x => x?.Classes?.Select(c => x.Name)))}");
+            Console.WriteLine(
+                $"Classes:\r\n{string.Join("\r\n\t", syntaxResult.NameSpaces.SelectMany(x => x?.Classes?.Select(c => x.Name)))}");
             return syntaxResult;
         }
+
         public async Task<List<FullSyntaxTree>> GetFullAnalysis(string code)
         {
             List<FullSyntaxTree> result = new();
@@ -125,6 +143,7 @@ namespace MasterCsharpHosted.Client
             {
                 Console.WriteLine($"Boooooo!!!!\r\nSee Exception:\r\n{ex}");
             }
+
             return result;
         }
 
@@ -153,6 +172,27 @@ namespace MasterCsharpHosted.Client
             var apiResult = await Client.PostAsJsonAsync($"api/OpenAi/explain/{userName}", code);
             var result = await apiResult.Content.ReadAsStringAsync();
             return result;
+        }
+
+        public async IAsyncEnumerable<string> GetExplanationStream(string code, string userName = "guesUser")
+        {
+            var apiResult = await Client.PostAsJsonAsync($"api/OpenAi/explainStream/{userName}", code);
+            await foreach (var result in apiResult.Content.ReadFromJsonAsyncEnumerable<string>())
+            {
+                yield return result;
+            }
+
+        }
+    }
+
+    public static class HttpContentExtensions
+    {
+        public static async IAsyncEnumerable<T> ReadFromJsonAsyncEnumerable<T>(this HttpContent content)
+        {
+            await foreach (var item in JsonSerializer.DeserializeAsyncEnumerable<T>(await content.ReadAsStreamAsync()))
+            {
+                yield return item;
+            }
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿if (!require.getConfig().paths.vs)
-    require.config({ paths: { 'vs': "_content/BlazorMonaco/lib/monaco-editor/min/vs" } });
+﻿//var require = { paths: { vs: '_content/BlazorMonaco/lib/monaco-editor/min/vs' } };
 
 require(["vs/editor/editor.main"], function () {
     monaco.languages.registerCompletionItemProvider("csharp", getcsharpCompletionProvider(monaco));

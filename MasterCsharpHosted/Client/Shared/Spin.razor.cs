@@ -30,6 +30,8 @@ namespace MasterCsharpHosted.Client.Shared
         public bool IsWorking { get; set; }
         [Parameter]
         public SpinStyle SpinStyle { get; set; }
+        [Parameter]
+        public string Content { get; set; }
         private string Css => Enum.GetName(SpinStyle)?.ToLower() ?? "";
     }
     public enum SpinStyle

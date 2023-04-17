@@ -18,7 +18,7 @@ namespace MasterCsharpHosted.Client.Pages
 {
     public partial class Console : AppComponentBase/*, IDisposable*/
     {
-        
+
         [Inject]
         private ICodeClient CodeClient { get; set; }
         [Inject]
@@ -28,8 +28,8 @@ namespace MasterCsharpHosted.Client.Pages
 
         private string _cssClass = "inactive";
         private bool _isMenuOpen;
-        private readonly List<string> _themeOptions = new() {"vs", "vs-dark", "hc-black"};
-       
+        private readonly List<string> _themeOptions = new() { "vs", "vs-dark", "hc-black" };
+
         protected override Task OnInitializedAsync()
         {
             //AppState.PropertyChanged += HandleAppStateStateChange;
@@ -74,8 +74,8 @@ namespace MasterCsharpHosted.Client.Pages
         {
             _snippetCode = code;
             var modalResult =
-                await ModalService.OpenAsync<SaveSnippetForm>(options: new ModalOptions {Location = Location.TopRight});
-            if (modalResult is not {IsSuccess: true}) return;
+                await ModalService.OpenAsync<SaveSnippetForm>(options: new ModalOptions { Location = Location.TopRight });
+            if (modalResult is not { IsSuccess: true }) return;
             var saveData = modalResult.Parameters?.Get<string>("CombinedValues");
             if (string.IsNullOrEmpty(saveData)) return;
             HandleSave(saveData);
@@ -85,7 +85,8 @@ namespace MasterCsharpHosted.Client.Pages
         {
             var confirm = await ModalService.ConfirmAsync(new ModalConfirmOptions($"Delete Snippet ({snippet.Name})")
             {
-                ConfirmButton = new ConfirmButton("Yep, ditch it"), DeclineButton = new DeclineButton("Noooo!!!")
+                ConfirmButton = new ConfirmButton("Yep, ditch it"),
+                DeclineButton = new DeclineButton("Noooo!!!")
             });
             if (!confirm) return;
             AppState.DeleteUserSnippet(snippet);
@@ -115,11 +116,23 @@ namespace MasterCsharpHosted.Client.Pages
             StateHasChanged();
 
         }
+
+        private bool _isOpen;
+
+        private void HandleExplainRequest()
+        {
+            _isOpen = true;
+            StateHasChanged();
+        }
         private async void HandleExplain(string explain)
         {
-            var modalparams = new ModalParameters() {{"Content", explain}};
-            var modalOptions = new ModalOptions() {CloseOnOuterClick = true, Title = "GPT-3 Explanation"};
+            _isOpen = false;
+            System.Console.WriteLine($"Explanation provided: {explain}");
+            var modalparams = new ModalParameters() { { "Content", explain } };
+            var modalOptions = new ModalOptions() { CloseOnOuterClick = true, Title = "GPT-3 Explanation" };
+            
             await ModalService.OpenAsync<ExplanationView>(modalparams, modalOptions);
+            
         }
         private void HandleThemeChange(string theme)
         {
@@ -133,9 +146,9 @@ namespace MasterCsharpHosted.Client.Pages
 
         private async void ShowGetCodeFromGithub()
         {
-            var modalOptions = new ModalOptions {Location = Location.TopLeft, Width = "30rem"};
+            var modalOptions = new ModalOptions { Location = Location.TopLeft, Width = "30rem" };
             var requestContent = await ModalService.OpenAsync<GitHubForm>(options: modalOptions);
-            if (requestContent is {IsSuccess: true})
+            if (requestContent is { IsSuccess: true })
             {
                 var org = requestContent.Parameters?.Get<string>("Organization") ?? "";
                 var repo = requestContent.Parameters?.Get<string>("Repo") ?? "";
@@ -145,7 +158,7 @@ namespace MasterCsharpHosted.Client.Pages
             StateHasChanged();
         }
 
-        protected override List<string> InterestingProperties => new() {nameof(AppState.Content)};
+        protected override List<string> InterestingProperties => new() { nameof(AppState.Content) };
 
         //private void HandleAppStateStateChange(object _, PropertyChangedEventArgs args)
         //{

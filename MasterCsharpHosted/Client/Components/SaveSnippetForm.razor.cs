@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using MasterCsharpHosted.Shared.Services;
+﻿using MasterCsharpHosted.Shared.Services;
 using Microsoft.AspNetCore.Components;
 
 namespace MasterCsharpHosted.Client.Components
@@ -28,7 +24,7 @@ namespace MasterCsharpHosted.Client.Components
             }
             string combinedValues = $"{_name}|{_description}";
             OnSave.InvokeAsync(combinedValues);
-            var results = new ModalResults(true, new ModalParameters() {{"CombinedValues", combinedValues}});
+            var results = new ModalResults(true, new ModalParameters {{"CombinedValues", combinedValues}});
             ModalService.Close(results);
         }
 

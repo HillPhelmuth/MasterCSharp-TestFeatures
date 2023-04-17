@@ -22,6 +22,7 @@ namespace MasterCsharpHosted.Shared
         private string treeContent;
         private List<FullSyntaxTree> _fullSyntaxTrees = new();
         private CodeOutputModel challengeOutput;
+        private string _explainContent;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -138,6 +139,16 @@ namespace MasterCsharpHosted.Shared
             set
             {
                 challengeOutput = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string ExplainContent
+        {
+            get => _explainContent;
+            set
+            {
+                _explainContent = value;
                 OnPropertyChanged();
             }
         }

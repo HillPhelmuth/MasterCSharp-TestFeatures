@@ -1,22 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using BlazorMonaco;
 using BlazorMonaco.Editor;
 using MasterCsharpHosted.Shared;
-using MasterCsharpHosted.Shared.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Newtonsoft.Json;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 using Range = BlazorMonaco.Range;
 
 namespace MasterCsharpHosted.Client.Components
 {
-    public partial class CodeEditor : IDisposable
+    public partial class MasterCodeEditor
     {
         [Inject]
         private ICodeClient PublicClient { get; set; }
@@ -24,19 +21,17 @@ namespace MasterCsharpHosted.Client.Components
         private PublicClient TempClient { get; set; }
         [Inject]
         private AppState AppState { get; set; }
-        [Inject]
-        private IJSRuntime Js { get; set; }
-
+        
         [Parameter]
-        public string CodeSnippet { get; set; }
+        public EventCallback<string> Submit { get; set; }
         [Parameter]
-        public EventCallback<string> OnSubmit { get; set; }
+        public EventCallback<string> Save { get; set; }
         [Parameter]
-        public EventCallback<string> OnSave { get; set; }
+        public EventCallback<string> Analyze { get; set; }
         [Parameter]
-        public EventCallback<string> OnAnalyze { get; set; }
+        public EventCallback<string> Explain { get; set; }
         [Parameter]
-        public EventCallback<string> OnExplain { get; set; }
+        public EventCallback ExplainBegin { get; set; }
         private StandaloneCodeEditor _editor = new();
         private string[] _deltaDecorationIds;
         private bool _shouldRender;
@@ -79,9 +74,9 @@ namespace MasterCsharpHosted.Client.Components
         }
 
         private ActionDescriptor AddActionDescriptor(string id, string label, int[] keycodes, string precon,
-            string context, string menuGroup, double menuOrder, Action<BlazorMonaco.Editor.CodeEditor, int[]> action)
+            string context, string menuGroup, double menuOrder, Action<CodeEditor, int[]> action)
         {
-            return new ActionDescriptor()
+            return new ActionDescriptor
             {
                 Id = id,
                 Label = label,
@@ -93,36 +88,36 @@ namespace MasterCsharpHosted.Client.Components
                 Run = editor => action(editor, keycodes)
             };
         }
-        protected async Task EditorOnDidInit(StandaloneCodeEditor editorBase)
+        protected async Task EditorOnDidInit()
         {
             await _editor.SetValue(AppState.Snippet);
             await Global.SetTheme("vs-dark");
-            
-            await _editor.AddAction(AddActionDescriptor("executeAction", "Execute Code", new[] { (int)KeyCode.Ctrl | (int)KeyCode.Enter },
+
+            await _editor.AddAction(AddActionDescriptor("executeAction", "Execute Code", new[] { (int)KeyMod.CtrlCmd| (int)KeyCode.Enter },
                 null, null, "navigation", 1.5, ExecuteAction));
-            await _editor.AddAction(AddActionDescriptor("Analyze", "Analyze Code", new[] { (int)KeyCode.Ctrl | (int)KeyCode.KeyA },
+            await _editor.AddAction(AddActionDescriptor("Analyze", "Analyze Code", new[] { (int)KeyMod.CtrlCmd| (int)KeyCode.KeyA },
                 null, null, "navigation", 2.0, ExecuteAction));
-            await _editor.AddAction(AddActionDescriptor("Undo", "Undo", new[] { (int)KeyCode.Ctrl | (int)KeyCode.KeyZ }, null, null, "navigation", 3.5, ExecuteAction));
-            await _editor.AddAction(AddActionDescriptor("Redo", "Redo", new[] { (int)KeyCode.Ctrl | (int)KeyCode.KeyY }, null, null, "navigation", 4.5, ExecuteAction));
-            await _editor.AddAction(AddActionDescriptor("ZoomIn", "Zoom in", new[] { (int)KeyCode.Ctrl | (int)KeyCode.Period }, null, null, "navigation", 5.5, ExecuteAction));
-            await _editor.AddAction(AddActionDescriptor("ZoomOut", "Zoom out", new[] { (int)KeyCode.Ctrl | (int)KeyCode.Comma }, null, null, "navigation", 6.5, ExecuteAction));
-            await _editor.AddAction(AddActionDescriptor("Suggest", "Request Suggestion", new[] { (int)KeyCode.Ctrl | (int)KeyCode.KeyJ }, null, null, "navigation", 7.5, ExecuteAction));
-            await _editor.AddAction(AddActionDescriptor("SignatureHelp", "Request Signature Help", new[] { (int)KeyCode.Ctrl | (int)KeyCode.KeyL }, null, null, "navigation", 8.5, ExecuteAction));
+            await _editor.AddAction(AddActionDescriptor("Undo", "Undo", new[] { (int)KeyMod.CtrlCmd| (int)KeyCode.KeyZ }, null, null, "navigation", 3.5, ExecuteAction));
+            await _editor.AddAction(AddActionDescriptor("Redo", "Redo", new[] { (int)KeyMod.CtrlCmd| (int)KeyCode.KeyY }, null, null, "navigation", 4.5, ExecuteAction));
+            await _editor.AddAction(AddActionDescriptor("ZoomIn", "Zoom in", new[] { (int)KeyMod.CtrlCmd| (int)KeyCode.Period }, null, null, "navigation", 5.5, ExecuteAction));
+            await _editor.AddAction(AddActionDescriptor("ZoomOut", "Zoom out", new[] { (int)KeyMod.CtrlCmd| (int)KeyCode.Comma }, null, null, "navigation", 6.5, ExecuteAction));
+            await _editor.AddAction(AddActionDescriptor("Suggest", "Request Suggestion", new[] { (int)KeyMod.CtrlCmd| (int)KeyCode.KeyJ }, null, null, "navigation", 7.5, ExecuteAction));
+            await _editor.AddAction(AddActionDescriptor("SignatureHelp", "Request Signature Help", new[] { (int)KeyMod.CtrlCmd| (int)KeyCode.KeyL }, null, null, "navigation", 8.5, ExecuteAction));
             if (!string.IsNullOrEmpty(AppState.CurrentUser?.UserName))
             {
-                await _editor.AddAction(AddActionDescriptor("Save", "Save Code", new[] { (int)KeyCode.Ctrl | (int)KeyCode.KeyS }, null, null, "navigation", 9.5, ExecuteAction));
+                await _editor.AddAction(AddActionDescriptor("Save", "Save Code", new[] { (int)KeyMod.CtrlCmd| (int)KeyCode.KeyS }, null, null, "navigation", 9.5, ExecuteAction));
             }
 
             await _editor.AddAction(AddActionDescriptor("Decompile", "Compile and Decompile",
-                new[] {(int)KeyCode.Alt | (int) KeyCode.KeyD},
+                new[] { (int)KeyMod.Alt| (int)KeyCode.KeyD },
                 null, null, "navigation", 10.5, ExecuteAction));
             if (!string.IsNullOrEmpty(AppState.CurrentUser?.UserName))
             {
-                await _editor.AddAction(AddActionDescriptor("Explain", "Ask for an explanation from OpenAI gpt-3", new[] { (int)KeyCode.Ctrl | (int)KeyCode.KeyE }, null, null, "navigation", 11.5, ExecuteAction));
+                await _editor.AddAction(AddActionDescriptor("Explain", "Ask GPT-3.5 to Explain", new[] { (int)KeyMod.CtrlCmd| (int)KeyCode.KeyE }, null, null, "navigation", 3.0, ExecuteAction));
             }
         }
 
-        
+
         private async Task CompileAndDecompile()
         {
             var code = await _editor.GetValue();
@@ -133,6 +128,7 @@ namespace MasterCsharpHosted.Client.Components
 
         private async Task RequestExplain()
         {
+            await ExplainBegin.InvokeAsync();
             var code = await _editor.GetValue();
             var model = await _editor.GetModel();
             var selection = await _editor.GetSelection();
@@ -143,7 +139,8 @@ namespace MasterCsharpHosted.Client.Components
             Console.WriteLine($"Selected Text:\n{text}");
             var requestText = string.IsNullOrWhiteSpace(text) ? code : text;
             var explanation = await TempClient.GetExplanation(requestText);
-            await OnExplain.InvokeAsync(explanation);
+            
+            await Explain.InvokeAsync(explanation);
         }
         private async Task ZoomInTask()
         {
@@ -160,22 +157,22 @@ namespace MasterCsharpHosted.Client.Components
         }
 
         private async void HandleExecute() => await SubmitCodeDefault();
-        private async void ExecuteAction(BlazorMonaco.Editor.CodeEditor ed = null, int[] keyCodes = null)
+        private async void ExecuteAction(CodeEditor ed = null, int[] keyCodes = null)
         {
             var keyTotal = keyCodes?.Sum();
             var editorAction = keyTotal switch
             {
-                (int)KeyCode.Ctrl | (int)KeyCode.Enter => SubmitCodeDefault(),
-                (int)KeyCode.Ctrl | (int)KeyCode.KeyJ => Suggest(),
-                (int)KeyCode.Ctrl | (int)KeyCode.KeyA => SubmitForAnalysis(),
-                (int)KeyCode.Ctrl | (int)KeyCode.KeyS => SaveTask(),
-                (int)KeyCode.Ctrl | (int)KeyCode.Comma => ZoomOutTask(),
-                (int)KeyCode.Ctrl | (int)KeyCode.Period => ZoomInTask(),
-                (int)KeyCode.Ctrl | (int)KeyCode.KeyZ => Undo(),
-                (int)KeyCode.Ctrl | (int)KeyCode.KeyY => Redo(),
-                (int)KeyCode.Ctrl | (int)KeyCode.KeyL => SuggestSignature(),
-                (int)KeyCode.Ctrl | (int)KeyCode.KeyE => RequestExplain(),
-                (int)KeyCode.Alt | (int)KeyCode.KeyD => CompileAndDecompile(),
+                (int)KeyMod.CtrlCmd | (int)KeyCode.Enter => SubmitCodeDefault(),
+                (int)KeyMod.CtrlCmd | (int)KeyCode.KeyJ => Suggest(),
+                (int)KeyMod.CtrlCmd | (int)KeyCode.KeyA => SubmitForAnalysis(),
+                (int)KeyMod.CtrlCmd | (int)KeyCode.KeyS => SaveTask(),
+                (int)KeyMod.CtrlCmd | (int)KeyCode.Comma => ZoomOutTask(),
+                (int)KeyMod.CtrlCmd | (int)KeyCode.Period => ZoomInTask(),
+                (int)KeyMod.CtrlCmd | (int)KeyCode.KeyZ => Undo(),
+                (int)KeyMod.CtrlCmd | (int)KeyCode.KeyY => Redo(),
+                (int)KeyMod.CtrlCmd | (int)KeyCode.KeyL => SuggestSignature(),
+                (int)KeyMod.CtrlCmd | (int)KeyCode.KeyE => RequestExplain(),
+                (int)KeyMod.Alt | (int)KeyCode.KeyD => CompileAndDecompile(),
                 _ => SubmitCodeDefault()
             };
             await editorAction;
@@ -185,7 +182,7 @@ namespace MasterCsharpHosted.Client.Components
         private async Task SaveTask()
         {
             var code = await _editor.GetValue();
-            await OnSave.InvokeAsync(code);
+            await Save.InvokeAsync(code);
         }
 
         private async void EditorDidChangeCursorPosition(CursorPositionChangedEvent eventArgs)
@@ -207,7 +204,7 @@ namespace MasterCsharpHosted.Client.Components
                 {
                     var decoration = new ModelDeltaDecoration
                     {
-                        Range = new BlazorMonaco.Range(pos.LineNumber, pos.Column, pos.LineNumber, lineEndCol),
+                        Range = new Range(pos.LineNumber, pos.Column, pos.LineNumber, lineEndCol),
                         Options = new ModelDecorationOptions
                         {
                             IsWholeLine = true,
@@ -227,9 +224,9 @@ namespace MasterCsharpHosted.Client.Components
         private async Task SubmitCodeDefault()
         {
             var code = await _editor.GetValue();
-            if (OnSubmit.HasDelegate)
+            if (Submit.HasDelegate)
             {
-                await OnSubmit.InvokeAsync(code);
+                await Submit.InvokeAsync(code);
                 return;
             }
 
@@ -243,16 +240,16 @@ namespace MasterCsharpHosted.Client.Components
             var result = await PublicClient.GetCodeAnalysis(code);
             AppState.SetAnalysisResults(result.SyntaxTree, result.FullSyntaxTrees);
             AppState.Snippet = code;
-            await OnAnalyze.InvokeAsync("Go");
+            await Analyze.InvokeAsync("Go");
         }
 
         private async Task SubmitForSimpleAnalysis(string code)
         {
             AppState.FullSyntaxTrees = await PublicClient.GetFullAnalysis(code);
-            var settings = new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore, PreserveReferencesHandling = PreserveReferencesHandling.All };
+            var settings = new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore, PreserveReferencesHandling = PreserveReferencesHandling.All };
             AppState.TreeContent = JsonConvert.SerializeObject(AppState.FullSyntaxTrees, Formatting.Indented, settings);
             Console.WriteLine(AppState.TreeContent[..100]);
-            await OnAnalyze.InvokeAsync("Go");
+            await Analyze.InvokeAsync("Go");
         }
         private async Task Undo() => await _editor.Trigger("whatever...", "undo", "whatever...");
         private async Task Redo() => await _editor.Trigger("whatever...", "redo", "whatever...");

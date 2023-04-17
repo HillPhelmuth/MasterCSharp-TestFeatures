@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using MasterCsharpHosted.Server.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -17,7 +18,9 @@ namespace MasterCsharpHosted.Server.Controllers
         [HttpPost("explain/{userName}")]
         public async ValueTask<string> ExplainCode([FromBody] string code, [FromRoute] string userName)
         {
-            return await _openAiCodeService.ExplainAsync(code, userName);
+            return await _openAiCodeService.ExplainCodeAsync(code, userName);
         }
+
+        
     }
 }

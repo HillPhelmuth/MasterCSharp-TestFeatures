@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using BlazorMonaco;
+using BlazorMonaco.Editor;
 using MasterCsharpHosted.Shared;
 using Microsoft.AspNetCore.Components;
 
@@ -53,8 +54,8 @@ namespace MasterCsharpHosted.Client.Pages
         }
         private bool _showEdit = true;
         #region Editor
-        private MonacoEditor _editor = new();
-        protected StandaloneEditorConstructionOptions EditorOptionsSmall(MonacoEditor editor)
+        private StandaloneCodeEditor _editor = new();
+        protected StandaloneEditorConstructionOptions EditorOptionsSmall(CodeEditor editor)
         {
             return new()
             {
@@ -68,16 +69,30 @@ namespace MasterCsharpHosted.Client.Pages
 
             };
         }
-
-        protected async Task EditorOnDidInit(MonacoEditorBase editorBase)
+        private ActionDescriptor AddActionDescriptor(string id, string label, int[] keycodes, string precon,
+            string context, string menuGroup, double menuOrder, Action<BlazorMonaco.Editor.CodeEditor, int[]> action)
+        {
+            return new ActionDescriptor()
+            {
+                Id = id,
+                Label = label,
+                Keybindings = keycodes,
+                Precondition = precon,
+                ContextMenuGroupId = menuGroup,
+                ContextMenuOrder = (float)menuOrder,
+                KeybindingContext = context,
+                Run = editor => action(editor, keycodes)
+            };
+        }
+        protected async Task EditorOnDidInit()
         {
             await _editor.SetValue(AppState.SyntaxTreeInfo?.SourceCode ?? AppState.Snippet);
-            await _editor.AddAction("Analyze", "Analyze Code", new[] { (int)KeyMode.CtrlCmd | (int)KeyCode.Enter },
+            await _editor.AddAction(AddActionDescriptor("Analyze", "Analyze Code", new[] { (int)KeyCode.Ctrl | (int)KeyCode.Enter },
                 null, null, "navigation", 1.5,
                 async (e, codes) =>
                 {
                     await SubmitForAnalysis();
-                });
+                }));
             
         }
 

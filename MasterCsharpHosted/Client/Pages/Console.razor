@@ -1,5 +1,6 @@
 ﻿@page "/practice"
 @using MasterCsharpHosted.Shared.Services
+
 @inherits AppComponentBase
 <div class="menu-slider">
     <div class="menu @_cssClass">
@@ -18,7 +19,7 @@
                 <MySelect TItem="string" OptionsList="_themeOptions" @bind-SelectedValue="AppState.EditorTheme" OnSelectItem="HandleThemeChange" />
             </div>
            
-            <CodeEditor OnSave="SaveSnippet" OnAnalyze="HandleAnalyze" OnExplain="HandleExplain" />
+            <MasterCodeEditor Save="SaveSnippet" Analyze="HandleAnalyze" Explain="HandleExplain" ExplainBegin="HandleExplainRequest" />
            
         </div>
         <div>
@@ -43,6 +44,12 @@
             <div>
                 <p>Upload .dll to decompile</p>
                 <InputFile OnChange="UploadFile"></InputFile>
+            </div>
+        }
+        @if (_isOpen)
+        {
+            <div style="position: fixed;top: 50%;left: 50%;transform: translate(-50%, -50%);">
+                <Spin SpinStyle="SpinStyle.Lines" Content="Asking AI to Explain..."></Spin>
             </div>
         }
     </div>

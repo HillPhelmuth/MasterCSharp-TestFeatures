@@ -1,5 +1,4 @@
-﻿
-<div>
+﻿<div>
     <StandaloneCodeEditor Id="main-editor" CssClass="my-editor" @ref="_editor" OnDidChangeCursorPosition="EditorDidChangeCursorPosition" ConstructionOptions="EditorOptionsRoslyn" OnDidInit="EditorOnDidInit" />
 </div>
 @if (AppState.SyntaxTreeInfo != null || (AppState.FullSyntaxTrees != null && AppState.FullSyntaxTrees.Any()))

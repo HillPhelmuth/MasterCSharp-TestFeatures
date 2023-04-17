@@ -1,10 +1,7 @@
 ﻿<div class="explain-wrapper">
-    <ul>
-        @foreach (var item in _contentItems)
-        {
-            <li>@item</li>
-        }
-    </ul>
+    <p>
+        @((MarkupString)AsHtml(Content))
+    </p>
 </div>
 
 @code {
