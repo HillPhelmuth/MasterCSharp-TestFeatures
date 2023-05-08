@@ -8,6 +8,18 @@ namespace MasterCsharpHosted.Server.Services
 {
     public class CompileResources
     {
+        public CompileResources()
+        {
+            Parallel.Invoke(
+                () =>
+                {
+                    Console.WriteLine("Invoke For Parallel 1");
+                },
+                () =>
+                {
+                    Console.WriteLine("Invoke For Parallel 2");
+                });
+        }
         public List<PortableExecutableReference> PortableExecutableReferences
         {
             get

@@ -121,7 +121,7 @@ namespace MasterCsharpHosted.Client.Pages
 
         private void HandleExplainRequest()
         {
-            _isOpen = true;
+            _isOpen = !_isOpen;
             StateHasChanged();
         }
         private async void HandleExplain(string explain)

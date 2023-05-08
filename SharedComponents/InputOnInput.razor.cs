@@ -11,5 +11,7 @@ namespace SharedComponents
     {
         [Parameter]
         public int Width { get; set; } = 120;
+        [Parameter]
+        public string Placeholder { get; set; } = "";
     }
 }

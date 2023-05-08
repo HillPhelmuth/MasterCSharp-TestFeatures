@@ -1,0 +1,151 @@
+﻿@inherits AppComponentBase
+@typeparam TItem where TItem : ICodeGen
+<div class="form">
+   
+    @if (CodeGenItem is ICodeGenClass codeGenClass)
+    {
+        <EditForm Model="codeGenClass" OnValidSubmit="Submit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <p>
+                Name:<br />
+                <InputOnInput Width="200" @bind-Value="codeGenClass.Name"></InputOnInput>
+            </p>
+            <div class="card ">
+                <h5 class="text-center" style="font-weight: bold">Properties</h5>
+                <Tooltip Text="Add Property">
+                    <button type="button" @onclick=@(() => AddPropOrParam(codeGenClass))><img height="24" width="24" src="icons/plus-40.png" alt="Add" />Add Property</button>
+                </Tooltip>
+                <Tooltip Text="Remove Property">
+                    <button type="button" @onclick=@(() => RemovePropOrParam(codeGenClass))><img height="24" width="24" src="icons/minus-40.png" alt="Remove" />Remove</button>
+                </Tooltip>
+                <div class="prop-grid">
+                    @foreach (var prp in codeGenClass.ParamsOrProps)
+                    {
+                    <div>
+                        <InputOnInput Width="200" Placeholder="Type" @bind-Value="@prp.Type"></InputOnInput>
+                    </div>
+                    <div>
+                        <InputOnInput Width="200" Placeholder="Name" @bind-Value="@prp.Name"></InputOnInput>
+                    </div>
+                    }
+                </div>
+            </div>
+            <div style="border: 1px solid black;">
+                <h5 class="text-center" style="font-weight: bold">Methods</h5>
+                <Tooltip Text="Add Method">
+                    <button type="button" @onclick=AddMethod><img height="24" width="24" src="icons/plus-40.png" alt="Add" />Add Method</button>
+                </Tooltip>
+                <Tooltip Text="Remove Method">
+                    <button type="button" @onclick=RemoveMethod><img height="24" width="24" src="icons/minus-40.png" alt="Remove" />Remove</button>
+                </Tooltip>
+                @foreach (var method in codeGenClass.Methods)
+                {
+                    <div class="card method">
+                        <div class="prop-grid">
+                            <p>
+                                Name:<br />
+                                <InputOnInput @bind-Value="method.Name"></InputOnInput>
+                            </p>
+                            <p>
+                                Return Type:<br />
+                                <InputOnInput @bind-Value="method.ReturnType"></InputOnInput>
+                            </p>
+                        </div>
+                        <h6 class="text-center">Add Parameters</h6>
+                        <Tooltip Text="Add Parameter">
+                            <button type="button" @onclick=@(() => AddPropOrParam(method))><img height="24" width="24" src="icons/plus-40.png" alt="Add" /></button>
+                        </Tooltip>
+                        <Tooltip Text="Remove Parameter">
+                            <button type="button" @onclick=@(() => RemovePropOrParam(method))><img height="24" width="24" src="icons/minus-40.png" alt="Remove" /></button>
+                        </Tooltip>
+                        <div class="prop-grid">
+                            @foreach (var prp in method.ParamsOrProps)
+                            {
+                                <div>
+                                   Type: <InputOnInput Placeholder="Type" @bind-Value="@prp.Type"></InputOnInput>
+                                </div>
+                                <div>
+                                  Name: <InputOnInput Placeholder="Name" @bind-Value="@prp.Name"></InputOnInput>
+                                </div>
+                            }
+                        </div>
+
+                        <label style="width:100%">
+                            Instructions:<br />
+                            <InputTextArea DisplayName="Instructions" placeholder="Provide very detailed instructions" @bind-Value="method.Instructions"></InputTextArea>
+                            <span class="helper"></span>
+                        </label>
+                        <br />
+                    </div>
+                }
+            </div>
+            <label style="width:100%">
+                Instructions:<br />
+                <InputTextArea DisplayName="Instructions" placeholder="Provide very detailed instructions" @bind-Value="codeGenClass.Instructions"></InputTextArea>
+                <span class="helper"></span>
+            </label>
+            <br />
+            <button type="submit">Generate Code</button>
+        </EditForm>
+    }
+    else if (CodeGenItem is ICodeGenMethod codeGenMethod)
+    {
+        <EditForm Model="codeGenMethod" OnValidSubmit="Submit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="prop-grid card method">
+                <p>
+                    Name:<br />
+                    <InputOnInput @bind-Value="codeGenMethod.Name"></InputOnInput>
+                </p>
+                <p>
+                    Return Type:<br />
+                    <InputOnInput @bind-Value="codeGenMethod.ReturnType"></InputOnInput>
+                </p>
+            </div>
+            <h5 class="text-center" style="font-weight: bold">Parameters</h5>
+            <Tooltip Text="Add Parameter">
+                <button type="button" @onclick=@(() => AddPropOrParam(codeGenMethod))><img height="24" width="24" src="icons/plus-40.png" alt="Add" /></button>
+            </Tooltip>
+            <Tooltip Text="Remove Parameter">
+                <button type="button" @onclick=@(() => RemovePropOrParam(codeGenMethod))><img height="24" width="24" src="icons/minus-40.png" alt="Remove" /></button>
+            </Tooltip>
+            <div class="prop-grid card property">
+                @foreach (var prp in codeGenMethod.ParamsOrProps)
+                {
+                    <div>
+                        <InputOnInput Placeholder="Type" @bind-Value="@prp.Type"></InputOnInput>
+                    </div>
+                    <div>
+                        <InputOnInput Placeholder="Name" @bind-Value="@prp.Name"></InputOnInput>
+                    </div>
+                }
+            </div>
+
+            <label style="width:100%">
+                Instructions:<br />
+                <InputTextArea DisplayName="Instructions" placeholder="Provide very detailed instructions" @bind-Value="codeGenMethod.Instructions"></InputTextArea>
+                <span class="helper"></span>
+            </label>
+            <br />
+            <button type="submit">Generate Code</button>
+        </EditForm>
+    }
+    else if (CodeGenItem is ICodeGen codeGen)
+    {
+        <EditForm Model="codeGen" OnValidSubmit="Submit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <label style="width:100%">
+                Instructions:<br />
+                <InputTextArea DisplayName="Instructions" placeholder="Provide very detailed instructions" @bind-Value="codeGen.Instructions"></InputTextArea>
+                <span class="helper"></span>
+            </label>
+            <br />
+            <button type="submit">Generate Code</button>
+        </EditForm>
+    }
+
+</div>

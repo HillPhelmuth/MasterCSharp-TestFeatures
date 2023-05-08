@@ -174,6 +174,19 @@ namespace MasterCsharpHosted.Client
             return result;
         }
 
+        public async Task<string> GetDocumentation(string code, string userName = "guestUser")
+        {
+            var apiResult = await Client.PostAsJsonAsync($"api/OpenAi/document/{userName}", code);
+            var result = await apiResult.Content.ReadAsStringAsync();
+            return result;
+        }
+
+        public async Task<string> GetGeneratedCode(CodeGenForm codeGenForm, string userName = "guestUser")
+        {
+            var apiResult = await Client.PostAsJsonAsync($"api/OpenAi/generateCode/{userName}", codeGenForm);
+            var result = await apiResult.Content.ReadAsStringAsync();
+            return result;
+        }
         public async IAsyncEnumerable<string> GetExplanationStream(string code, string userName = "guesUser")
         {
             var apiResult = await Client.PostAsJsonAsync($"api/OpenAi/explainStream/{userName}", code);

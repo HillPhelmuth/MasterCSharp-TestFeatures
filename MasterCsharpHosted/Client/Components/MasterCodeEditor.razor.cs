@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using BlazorMonaco;
 using BlazorMonaco.Editor;
 using MasterCsharpHosted.Shared;
+using MasterCsharpHosted.Shared.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Newtonsoft.Json;
@@ -32,6 +34,8 @@ namespace MasterCsharpHosted.Client.Components
         public EventCallback<string> Explain { get; set; }
         [Parameter]
         public EventCallback ExplainBegin { get; set; }
+        [Inject]
+        private ModalService ModalService { get; set; }
         private StandaloneCodeEditor _editor = new();
         private string[] _deltaDecorationIds;
         private bool _shouldRender;
@@ -97,7 +101,7 @@ namespace MasterCsharpHosted.Client.Components
                 null, null, "navigation", 1.5, ExecuteAction));
             await _editor.AddAction(AddActionDescriptor("Analyze", "Analyze Code", new[] { (int)KeyMod.CtrlCmd| (int)KeyCode.KeyA },
                 null, null, "navigation", 2.0, ExecuteAction));
-            await _editor.AddAction(AddActionDescriptor("Undo", "Undo", new[] { (int)KeyMod.CtrlCmd| (int)KeyCode.KeyZ }, null, null, "navigation", 3.5, ExecuteAction));
+            await _editor.AddAction(AddActionDescriptor("Undo", "Undo", new[] { (int)KeyMod.CtrlCmd| (int)KeyCode.KeyZ }, null, null, "navigation", 4.0, ExecuteAction));
             await _editor.AddAction(AddActionDescriptor("Redo", "Redo", new[] { (int)KeyMod.CtrlCmd| (int)KeyCode.KeyY }, null, null, "navigation", 4.5, ExecuteAction));
             await _editor.AddAction(AddActionDescriptor("ZoomIn", "Zoom in", new[] { (int)KeyMod.CtrlCmd| (int)KeyCode.Period }, null, null, "navigation", 5.5, ExecuteAction));
             await _editor.AddAction(AddActionDescriptor("ZoomOut", "Zoom out", new[] { (int)KeyMod.CtrlCmd| (int)KeyCode.Comma }, null, null, "navigation", 6.5, ExecuteAction));
@@ -108,12 +112,12 @@ namespace MasterCsharpHosted.Client.Components
                 await _editor.AddAction(AddActionDescriptor("Save", "Save Code", new[] { (int)KeyMod.CtrlCmd| (int)KeyCode.KeyS }, null, null, "navigation", 9.5, ExecuteAction));
             }
 
-            await _editor.AddAction(AddActionDescriptor("Decompile", "Compile and Decompile",
+            await _editor.AddAction(AddActionDescriptor("Generate", "Ask GPT-4 to Generate Code",
                 new[] { (int)KeyMod.Alt| (int)KeyCode.KeyD },
-                null, null, "navigation", 10.5, ExecuteAction));
+                null, null, "navigation", 3.5, ExecuteAction));
             if (!string.IsNullOrEmpty(AppState.CurrentUser?.UserName))
             {
-                await _editor.AddAction(AddActionDescriptor("Explain", "Ask GPT-3.5 to Explain", new[] { (int)KeyMod.CtrlCmd| (int)KeyCode.KeyE }, null, null, "navigation", 3.0, ExecuteAction));
+                await _editor.AddAction(AddActionDescriptor("Explain", "Ask GPT-4 to Explain", new[] { (int)KeyMod.CtrlCmd| (int)KeyCode.KeyE }, null, null, "navigation", 3.0, ExecuteAction));
             }
         }
 
@@ -126,6 +130,39 @@ namespace MasterCsharpHosted.Client.Components
             StateHasChanged();
         }
 
+        private async Task RequestCodeGeneration()
+        {
+            var options = new ModalOptions {Height = "90vh", Width = "75vw"};
+            var result = await ModalService.OpenAsync<GenerateCodeModal>(options:options);
+            if (!result?.IsSuccess ?? false)
+            {
+                //await ExplainBegin.InvokeAsync();
+                return;
+            }
+            var prompt = result.Parameters.Get<string>("GeneratedPrompt");
+            await ExplainBegin.InvokeAsync();
+            var model = await _editor.GetModel();
+            var position = await _editor.GetPosition();
+            
+            var code = await _editor.GetValue();
+            var codeGenForm = new CodeGenForm
+            {
+                Prompt = prompt,
+                CodeSnippet = code
+            };
+            var documentation = await TempClient.GetGeneratedCode(codeGenForm);
+            await model.ApplyEdits(new List<IdentifiedSingleEditOperation>
+            {
+                new()
+                {
+                    Range = new Range(position.LineNumber, position.Column, position.LineNumber, position.Column),
+                    Text = documentation
+                }
+            });
+            //await _editor.SetValue($"{code}\n{documentation}");
+            await ExplainBegin.InvokeAsync();
+            StateHasChanged();
+        }
         private async Task RequestExplain()
         {
             await ExplainBegin.InvokeAsync();
@@ -172,7 +209,7 @@ namespace MasterCsharpHosted.Client.Components
                 (int)KeyMod.CtrlCmd | (int)KeyCode.KeyY => Redo(),
                 (int)KeyMod.CtrlCmd | (int)KeyCode.KeyL => SuggestSignature(),
                 (int)KeyMod.CtrlCmd | (int)KeyCode.KeyE => RequestExplain(),
-                (int)KeyMod.Alt | (int)KeyCode.KeyD => CompileAndDecompile(),
+                (int)KeyMod.Alt | (int)KeyCode.KeyD => RequestCodeGeneration(),
                 _ => SubmitCodeDefault()
             };
             await editorAction;
@@ -291,5 +328,255 @@ namespace MasterCsharpHosted.Client.Components
             AppState.PropertyChanged -= HandleAppStateStateChange;
             AppState.OnSubmitCode -= HandleExecute;
         }
+
+        private string formatted = """
+             public static string formatDuration(int seconds)
+    {
+        switch (seconds)
+        {
+            case 0:
+                return "now";
+            case 1:
+                return "1 second";
+            case <= 59:
+                return $"{seconds} seconds";
+        }
+
+    var years = 0;
+    var days = 0;
+    var time = TimeSpan.FromSeconds(seconds);
+    var sb = new StringBuilder();
+        if (time.Days > 365)
+        {
+            years = time.Days / 365;
+            days = time.Days % 365;
+        }
+        else
+    days = time.Days;
+
+switch (years)
+{
+    case 1:
+        sb.Append($"1 year");
+        break;
+    case > 1:
+        sb.Append($"{years} years");
+        break;
+}
+if (years > 0)
+{
+    switch (days)
+    {
+        case 0 when time.Hours == 0 && time.Minutes == 0 && time.Seconds == 0:
+            return sb.ToString();
+        case 0 when time.Hours == 0 && time.Minutes == 0 && time.Seconds > 0:
+            sb.Append($" and {time.Seconds} second" + $"{(time.Seconds == 1 ? "" : "s")}");
+            return sb.ToString();
+        case 0 when time.Hours == 0 && time.Minutes > 0 && time.Seconds == 0:
+            sb.Append($" and {time.Minutes} minutes");
+            return sb.ToString();
+        case 0 when time.Hours > 0 && time.Minutes == 0 && time.Seconds == 0:
+            sb.Append($" and {time.Hours} hours");
+            return sb.ToString();
+        case > 0 when time.Hours == 0 && time.Minutes == 0 && time.Seconds == 0:
+            sb.Append($" and {days} days");
+            return sb.ToString();
+        default:
+            sb.Append(", ");
+            break;
+    }
+}
+
+switch (days)
+{
+    case 1:
+        sb.Append("1 day");
+        break;
+    case > 1:
+        sb.Append($"{days} days");
+        break;
+}
+if (days > 0)
+{
+    switch (time.Hours)
+    {
+        case 0 when time.Minutes == 0 && time.Seconds > 0:
+            sb.Append($" and {time.Seconds} second" + $"{(time.Seconds == 1 ? "" : "s")}");
+            return sb.ToString();
+        case 0 when time.Minutes > 0 && time.Seconds == 0:
+            sb.Append($" and {time.Seconds} minute" + $"{(time.Minutes == 1 ? "" : "s")}");
+            return sb.ToString();
+        case > 0 when time.Minutes == 0 && time.Seconds == 0:
+            sb.Append($" and {time.Seconds} hour" + $"{(time.Hours == 1 ? "" : "s")}");
+            return sb.ToString();
+        default:
+            sb.Append(", ");
+            break;
+    }
+}
+
+switch (time.Hours)
+{
+    case 1:
+        sb.Append("1 hour");
+        break;
+    case > 1:
+        sb.Append($"{time.Hours} hours");
+        break;
+}
+if (time.Hours > 0)
+{
+    switch (time.Minutes)
+    {
+        case 0 when time.Seconds > 0:
+            sb.Append($" and {time.Seconds} second" + $"{(time.Seconds == 1 ? "" : "s")}");
+            return sb.ToString();
+        case > 0 when time.Seconds == 0:
+            sb.Append($" and {time.Minutes} minute" + $"{(time.Minutes == 1 ? "" : "s")}");
+            return sb.ToString();
+        default:
+            sb.Append(", ");
+            break;
+    }
+}
+
+switch (time.Minutes)
+{
+    case 1:
+        sb.Append("1 minute");
+        break;
+    case > 1:
+        sb.Append($"{time.Minutes} minute" + $"{(time.Minutes == 1 ? "" : "s")}");
+        break;
+}
+
+if (time.Minutes <= 0 || time.Seconds <= 0) return sb.ToString();
+sb.Append($" and {time.Seconds} second" + $"{(time.Seconds == 1 ? "" : "s")}");
+return sb.ToString();
+    }public static string formatDuration(int seconds)
+{
+    switch (seconds)
+    {
+        case 0:
+            return "now";
+        case 1:
+            return "1 second";
+        case <= 59:
+            return $"{seconds} seconds";
+    }
+
+    var years = 0;
+    var days = 0;
+    var time = TimeSpan.FromSeconds(seconds);
+    var sb = new StringBuilder();
+    if (time.Days > 365)
+    {
+        years = time.Days / 365;
+        days = time.Days % 365;
+    }
+    else
+        days = time.Days;
+
+    switch (years)
+    {
+        case 1:
+            sb.Append($"1 year");
+            break;
+        case > 1:
+            sb.Append($"{years} years");
+            break;
+    }
+    if (years > 0)
+    {
+        switch (days)
+        {
+            case 0 when time.Hours == 0 && time.Minutes == 0 && time.Seconds == 0:
+                return sb.ToString();
+            case 0 when time.Hours == 0 && time.Minutes == 0 && time.Seconds > 0:
+                sb.Append($" and {time.Seconds} second" + $"{(time.Seconds == 1 ? "" : "s")}");
+                return sb.ToString();
+            case 0 when time.Hours == 0 && time.Minutes > 0 && time.Seconds == 0:
+                sb.Append($" and {time.Minutes} minutes");
+                return sb.ToString();
+            case 0 when time.Hours > 0 && time.Minutes == 0 && time.Seconds == 0:
+                sb.Append($" and {time.Hours} hours");
+                return sb.ToString();
+            case > 0 when time.Hours == 0 && time.Minutes == 0 && time.Seconds == 0:
+                sb.Append($" and {days} days");
+                return sb.ToString();
+            default:
+                sb.Append(", ");
+                break;
+        }
+    }
+
+    switch (days)
+    {
+        case 1:
+            sb.Append("1 day");
+            break;
+        case > 1:
+            sb.Append($"{days} days");
+            break;
+    }
+    if (days > 0)
+    {
+        switch (time.Hours)
+        {
+            case 0 when time.Minutes == 0 && time.Seconds > 0:
+                sb.Append($" and {time.Seconds} second" + $"{(time.Seconds == 1 ? "" : "s")}");
+                return sb.ToString();
+            case 0 when time.Minutes > 0 && time.Seconds == 0:
+                sb.Append($" and {time.Seconds} minute" + $"{(time.Minutes == 1 ? "" : "s")}");
+                return sb.ToString();
+            case > 0 when time.Minutes == 0 && time.Seconds == 0:
+                sb.Append($" and {time.Seconds} hour" + $"{(time.Hours == 1 ? "" : "s")}");
+                return sb.ToString();
+            default:
+                sb.Append(", ");
+                break;
+        }
+    }
+
+    switch (time.Hours)
+    {
+        case 1:
+            sb.Append("1 hour");
+            break;
+        case > 1:
+            sb.Append($"{time.Hours} hours");
+            break;
+    }
+    if (time.Hours > 0)
+    {
+        switch (time.Minutes)
+        {
+            case 0 when time.Seconds > 0:
+                sb.Append($" and {time.Seconds} second" + $"{(time.Seconds == 1 ? "" : "s")}");
+                return sb.ToString();
+            case > 0 when time.Seconds == 0:
+                sb.Append($" and {time.Minutes} minute" + $"{(time.Minutes == 1 ? "" : "s")}");
+                return sb.ToString();
+            default:
+                sb.Append(", ");
+                break;
+        }
+    }
+
+    switch (time.Minutes)
+    {
+        case 1:
+            sb.Append("1 minute");
+            break;
+        case > 1:
+            sb.Append($"{time.Minutes} minute" + $"{(time.Minutes == 1 ? "" : "s")}");
+            break;
+    }
+
+    if (time.Minutes <= 0 || time.Seconds <= 0) return sb.ToString();
+    sb.Append($" and {time.Seconds} second" + $"{(time.Seconds == 1 ? "" : "s")}");
+    return sb.ToString();
+}
+""";
     }
 }

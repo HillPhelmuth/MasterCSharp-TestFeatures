@@ -131,8 +131,25 @@ namespace MasterCsharpHosted.Shared
             ResourceURLs = new Dictionary<string, string> { { "Extension Methods (C# Programming Guide)", "https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/extension-methods" }, { "How to implement and call a custom extension method (C# Programming Guide)", "https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/how-to-implement-and-call-a-custom-extension-method" } }
         };
 
+        public static readonly CodeSamples AsynchronousProgramming = new()
+        {
+            SampleSection = "AsynchronousProgrammingSamples",
+            Samples = new List<CodeSample>
+            {
+                new("Async Await", AsyncAwait,
+                    @"<p>Async and Await are keywords in C# that simplify working with asynchronous code. Asynchronous programming allows you to perform time-consuming operations, like fetching data from a remote server or accessing a database, without blocking the main thread. This way, your application remains responsive to user interactions.</p><p>The async keyword is added to a method signature to indicate that the method contains asynchronous operations. It's important to note that an async method must return a Task or a Task<T> (where T is the return type), or simply void (though it's not recommended, as you can't await a void method or handle exceptions properly).</p><p>The await keyword is used to pause the execution of an async method until a given asynchronous operation is completed. When using await, the control is returned to the caller, allowing other operations to continue.</p><p>In the given example, we have an async method called FetchDataAsync that simulates fetching data with a 2-second delay using Task.Delay(2000). The Main method, also marked as async, calls FetchDataAsync using the await keyword. The execution of the Main method pauses at the await line until FetchDataAsync is completed, and then it continues with the next line, printing ""Finished."".</p>",
+                    "AN Async-Await Example program"),
+                new("Parallel Task Library", ParallelTaskLibrary,
+                    @"<p>The Task Parallel Library (TPL) is a set of APIs in the System.Threading and System.Threading.Tasks namespaces that simplifies parallel programming in .NET. TPL provides a higher-level abstraction over lower-level threading constructs, making it easier to write efficient and scalable parallel code.</p><p>The primary goal of TPL is to make optimal use of available hardware resources (such as multiple CPU cores) to perform computationally-intensive work in parallel, improving the overall performance and responsiveness of applications.</p><p>In the given example, we use the Parallel.Invoke method to execute two independent actions concurrently. The PrintNumbers method is called twice with different sets of input parameters. The Parallel.Invoke method takes care of creating and synchronizing tasks internally, so you don't need to deal with low-level threading details.</p><p>It's important to note that TPL is best suited for CPU-bound operations where the workload can be evenly distributed across multiple cores. For I/O-bound operations, it's recommended to use async and await keywords for a more efficient, non-blocking approach.</p>",
+                    "Task Parallel Library Example"),
+                new("Cancellation Token", CancellationToken,
+                    @"<p>A CancellationToken is a structure in C# that enables cooperative cancellation of operations. It's often used in combination with the Task Parallel Library (TPL) or async and await keywords to provide a way to cancel long-running or resource-intensive tasks.</p><p>A CancellationToken is created through a CancellationTokenSource, which acts as a controller for the cancellation process. You can pass the cancellation token to methods that support it, and those methods can periodically check for a cancellation request and respond accordingly.</p><p>In the given example, we create a CancellationTokenSource and a corresponding CancellationToken. We then start a task that executes the PrintNumbers method, which accepts a CancellationToken as a parameter. Inside the PrintNumbers method, we call the cancellationToken.ThrowIfCancellationRequested() method, which checks if a cancellation has been requested and throws an OperationCanceledException if so.</p><p>In the Main method, the CancellationTokenSource.CancelAfter() method is used to automatically trigger cancellation after a specified time period (3 seconds in this case) to signal the cancellation. We then handle the OperationCanceledException and print a message indicating that the task was canceled.</p>",
+                    "CancellationToken usage Example")
+
+            },
+        };
         #region Code Snippet Strings
-        
+
         private const string ARRAYLIST =
             "ArrayList al = new ArrayList();\nal.Add(1);\nal.Add(\"Example\");\nal.Add(true);\nreturn al;";
 
@@ -361,6 +378,129 @@ class Client{
 
 }
 Client.Main();";
+
+        public const string AsyncAwait = """"
+        using System;
+        using System.Threading.Tasks;
+
+        public class AsyncAwaitDemo
+        {
+            public static async Task Main(string[] args)
+            {
+                Console.WriteLine("Starting...");
+                await FetchDataAsync();
+                Console.WriteLine("Finished.");
+            }
+
+            public static async Task FetchDataAsync()
+            {
+                Console.WriteLine("Fetching data...");
+                await Task.Delay(2000);
+                Console.WriteLine("Data fetched.");
+            }
+        }
+
+        """";
+        public const string ParallelTaskLibrary = """"
+        using System;
+        using System.Threading.Tasks;
+
+        public class TPLExample
+        {
+            public static void Main(string[] args)
+            {
+                Parallel.Invoke(
+                    () => PrintNumbers(1, 5),
+                    () => PrintNumbers(6, 10)
+                );
+            }
+
+            public static void PrintNumbers(int start, int end)
+            {
+                for (int i = start; i <= end; i++)
+                {
+                    Console.WriteLine($"Number {i}");
+                }
+            }
+        }
+        """";
+        public const string CancellationToken = """"
+            using System;
+        using System.Threading;
+        using System.Threading.Tasks;
+
+        public class CancellationTokenExample
+        {
+            public static async Task Main(string[] args)
+            {
+                CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+                CancellationToken cancellationToken = cancellationTokenSource.Token;
+
+                Task task = Task.Run(() => PrintNumbers(cancellationToken));
+
+                Console.WriteLine("Task will be canceled automatically after 3 seconds...");
+                cancellationTokenSource.CancelAfter(TimeSpan.FromSeconds(3));
+
+                try
+                {
+                    await task;
+                }
+                catch (OperationCanceledException)
+                {
+                    Console.WriteLine("Task was canceled.");
+                }
+            }
+
+            public static void PrintNumbers(CancellationToken cancellationToken)
+            {
+                for (int i = 1; i <= 10; i++)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    Console.WriteLine($"Number {i}");
+                    Thread.Sleep(500);
+                }
+            }
+        }
+        """";
     }
 }
 #endregion
+/*
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+
+public class CancellationTokenExample
+{
+    public static async Task Main(string[] args)
+    {
+        CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        CancellationToken cancellationToken = cancellationTokenSource.Token;
+
+        Task task = Task.Run(() => PrintNumbers(cancellationToken));
+
+        Console.WriteLine("Task will be canceled automatically after 3 seconds...");
+        cancellationTokenSource.CancelAfter(TimeSpan.FromSeconds(3));
+
+        try
+        {
+            await task;
+        }
+        catch (OperationCanceledException)
+        {
+            Console.WriteLine("Task was canceled.");
+        }
+    }
+
+    public static void PrintNumbers(CancellationToken cancellationToken)
+    {
+        for (int i = 1; i <= 10; i++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            Console.WriteLine($"Number {i}");
+            Thread.Sleep(500);
+        }
+    }
+}
+
+ */

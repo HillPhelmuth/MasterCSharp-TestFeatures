@@ -18,6 +18,10 @@ namespace SharedComponents
         
         [Parameter]
         public EventCallback<TItem> Click { get; set; }
+        [Parameter]
+        public TItem? SelectedItem { get; set; }
+        [Parameter]
+        public EventCallback<TItem> SelectedItemChanged { get; set; }
         private Dictionary<string, TItem> _itemNames = new();
         private string? _text;
         private bool _isOpen;

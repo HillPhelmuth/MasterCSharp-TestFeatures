@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Markdig;
 using MasterCsharpHosted.Shared;
 using Microsoft.AspNetCore.Components;
 
@@ -12,7 +13,7 @@ namespace MasterCsharpHosted.Client.Components
         [Parameter] public string Content { get; set; } = "";
 
         [Inject] private AppState AppState { get; set; } = default!;
-
+        
         private List<string> _contentItems = new();
         protected override Task OnInitializedAsync()
         {
@@ -37,7 +38,9 @@ namespace MasterCsharpHosted.Client.Components
 
         private static string AsHtml(string content)
         {
-            return content.Replace("\r\n", "<br/>").Replace("\n", "<br/>");
+            var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
+            var html = Markdown.ToHtml(content, pipeline);
+            return html;
         }
     }
 }

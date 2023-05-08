@@ -87,7 +87,19 @@
             }
         </ul>
     </li>
-
+    <li class="top">
+        <span>Asynchronous Programming</span>
+        <ul class="inner-list">
+            @foreach (var snippet in CodeSnippets.AsynchronousProgramming.Samples)
+            {
+                <li class="inner" @key="snippet.Name">
+                    <Tooltip Text="@snippet.ToolTip">
+                        <button @onmouseup="@(()=> MouseOverContent(snippet.Description))" @onclick="@(() => AppState.UpdateSnippet(snippet.Code))">@snippet.Name</button>
+                    </Tooltip>
+                </li>
+            }
+        </ul>
+    </li>
     <li class="top">
         <span>Classes</span>
         <ul class="inner-list">

@@ -412,21 +412,7 @@ namespace CodeSyntaxModule
             List<SyntaxNode> syntaxNodes = enm.Fields.Select(CreateFieldNode).ToList();
             
             return syntaxNodes;
-            //foreach (var field in enm.Fields)
-            //{
-            //    SyntaxNode node = new SyntaxNode(field.Id, field.GroupId, new Point(240 * _rowColumns[field.RootLevel + 1], 220 * field.RootLevel + 1))
-            //    {
-            //        Name = field.Name,
-            //        RawCode = field.RawCode,
-            //        Type = field.Type,
-            //        NodeKind = NodeKind.Field,
-            //        Row = field.RootLevel,
-            //        Column = field.Column
-            //    };
-            //    node.AddNodePorts();
-            //    result.Add(node);
-            //}
-            //return result;
+            
         }
         private SyntaxNode CreateFieldNode(PropertyInfo field)
         {

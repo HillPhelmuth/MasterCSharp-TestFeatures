@@ -459,7 +459,7 @@
     "name": "Smart Call",
     "difficulty": "Easier",
     "description": "<p>Write a simple method to help determine whether to call a poker bet, i.e. the call will average more than 0. The method will date a double that represents the odds of your hand winning the pot, and integer representing the pot size, and an integer for the bet to call.      To illustrate, IsSmartCall(0.2, 50, 9) should yield true, since the net profit is 1 (0.2 * 50 - 9), and 1 > 0.</p>",
-    "examples": "IsSmartCall(0.2, 50, 9) ➞ true\r\nIsSmartCall(0.9, 1, 2) ➞ false\r\nIsSmartCall(0.9, 3, 2) ➞ true",
+    "examples": "IsSmartCall(0.2, 50, 9) ➞ true\nIsSmartCall(0.9, 1, 2) ➞ false\nIsSmartCall(0.9, 3, 2) ➞ true",
     "snippet": "public static bool IsSmartCall(double odds, int pot, int call)\n{\n\t//solution here\n}",
     "solution": "public static bool IsSmartCall(double odds, int pot, int call)\n{\n\treturn odds * pot > call;\n}",
     "tests": [
@@ -930,13 +930,10 @@
   {
     "name": " Encode Duplicates",
     "difficulty": "Mid",
-    "description":
-      "<p>The goal of this exercise is to convert a string to a new string where each character in the new string is \"(\" if that character appears only once in the original string, or \")\" if that character appears more than once in the original string. Ignore capitalization when determining if a character is a duplicate.</p>",
-    "examples":
-      "<p>\"din\"      =>  \"(((\"</p> <p>\"recede\"   =>  \"()()()\"</p> <p>\"Success\"  =>  \")())())\"</p> <p>\"(( @\"     =>  \"))((\"</p>",
+    "description": "<p>The goal of this exercise is to convert a string to a new string where each character in the new string is \"(\" if that character appears only once in the original string, or \")\" if that character appears more than once in the original string. Ignore capitalization when determining if a character is a duplicate.</p>",
+    "examples": "<p>\"din\"      =>  \"(((\"</p> <p>\"recede\"   =>  \"()()()\"</p> <p>\"Success\"  =>  \")())())\"</p> <p>\"(( @\"     =>  \"))((\"</p>",
     "snippet": "public static string EncodeDups(string word)\n{\n\t//solution here\n}",
-    "solution":
-      "public static string EncodeDups(string word)\n{\n\tvar newWord = \"\";\n\tvar uniqueArray = word.ToUpper().ToCharArray()\n\t\t.GroupBy(p => p)\n\t\t.Where(g => g.Count() > 1)\n\t\t.Select(g => g.Key);\n\n\tforeach (var other in word.ToUpper().ToCharArray())\n\t{\n\t\tif (uniqueArray.Contains(other))\n\t\t\tnewWord = newWord + \")\";\n\t\telse\n\t\t\tnewWord = newWord + \"(\";\n\t}\n\n\treturn newWord;\n\n}",
+    "solution": "public static string EncodeDups(string word)\n{\n\tvar newWord = \"\";\n\tvar uniqueArray = word.ToUpper().ToCharArray()\n\t\t.GroupBy(p => p)\n\t\t.Where(g => g.Count() > 1)\n\t\t.Select(g => g.Key);\n\n\tforeach (var other in word.ToUpper().ToCharArray())\n\t{\n\t\tif (uniqueArray.Contains(other))\n\t\t\tnewWord = newWord + \")\";\n\t\telse\n\t\t\tnewWord = newWord + \"(\";\n\t}\n\n\treturn newWord;\n\n}",
     "tests": [
       {
         "append": "return EncodeDups(\"din\" );",
@@ -985,6 +982,62 @@
       {
         "append": "\nConsole.WriteLine(SumOfInts(-39, -11));",
         "testAgainst": "-50"
+      }
+    ],
+    "addedBy": "adam holm",
+    "userCompleted": false
+  },
+  {
+    "name": "Me Human, Can Read",
+    "difficulty": "Hard",
+    "description": "<p>Write a function which formats a duration, given as a number of seconds, in a human-friendly way.</p> <br/><hr/><div><p>The resulting expression is made of components like 4 seconds, 1 year, etc. In general, a positive integer and one of the valid units of time, separated by a space. The unit of time is used in plural if the integer is greater than 1.</p><p>The components are separated by a comma and a space (\", \"). Except the last component, which is separated by \" and \", just like it would be written in English.</p><p>A more significant units of time will occur before than a least significant one. Therefore, 1 second and 1 year is not correct, but 1 year and 1 second is.</p><p>Different components have different unit of times. So there is not repeated units like in 5 seconds and 1 second.</p><p>A component will not appear at all if its value happens to be zero. Hence, 1 minute and 0 seconds is not valid, but it should be just 1 minute.</p><p>A unit of time must be used \"as much as possible\". It means that the function should not return 61 seconds, but 1 minute and 1 second instead. Formally, the duration specified by of a component must not be greater than any valid more significant unit of time.</p></div>",
+    "examples": "",
+    "snippet": "public static string formatDuration(int seconds)\n{\n\t//Enter Code here\n}",
+    "solution": "public static string formatDuration(int seconds)\n    {\n        switch (seconds)\n        {\n            case 0:\n                return \"now\";\n            case 1:\n                return \"1 second\";\n            case <= 59:\n                return $\"{seconds} seconds\";\n        }\n\n    var years = 0;\n    var days = 0;\n    var time = TimeSpan.FromSeconds(seconds);\n    var sb = new StringBuilder();\n        if (time.Days > 365)\n        {\n            years = time.Days / 365;\n            days = time.Days % 365;\n        }\n        else\n    days = time.Days;\n\nswitch (years)\n{\n    case 1:\n        sb.Append($\"1 year\");\n        break;\n    case > 1:\n        sb.Append($\"{years} years\");\n        break;\n}\nif (years > 0)\n{\n    switch (days)\n    {\n        case 0 when time.Hours == 0 && time.Minutes == 0 && time.Seconds == 0:\n            return sb.ToString();\n        case 0 when time.Hours == 0 && time.Minutes == 0 && time.Seconds > 0:\n            sb.Append($\" and {time.Seconds} second\" + $\"{(time.Seconds == 1 ? \"\" : \"s\")}\");\n            return sb.ToString();\n        case 0 when time.Hours == 0 && time.Minutes > 0 && time.Seconds == 0:\n            sb.Append($\" and {time.Minutes} minutes\");\n            return sb.ToString();\n        case 0 when time.Hours > 0 && time.Minutes == 0 && time.Seconds == 0:\n            sb.Append($\" and {time.Hours} hours\");\n            return sb.ToString();\n        case > 0 when time.Hours == 0 && time.Minutes == 0 && time.Seconds == 0:\n            sb.Append($\" and {days} days\");\n            return sb.ToString();\n        default:\n            sb.Append(\", \");\n            break;\n    }\n}\n\nswitch (days)\n{\n    case 1:\n        sb.Append(\"1 day\");\n        break;\n    case > 1:\n        sb.Append($\"{days} days\");\n        break;\n}\nif (days > 0)\n{\n    switch (time.Hours)\n    {\n        case 0 when time.Minutes == 0 && time.Seconds > 0:\n            sb.Append($\" and {time.Seconds} second\" + $\"{(time.Seconds == 1 ? \"\" : \"s\")}\");\n            return sb.ToString();\n        case 0 when time.Minutes > 0 && time.Seconds == 0:\n            sb.Append($\" and {time.Seconds} minute\" + $\"{(time.Minutes == 1 ? \"\" : \"s\")}\");\n            return sb.ToString();\n        case > 0 when time.Minutes == 0 && time.Seconds == 0:\n            sb.Append($\" and {time.Seconds} hour\" + $\"{(time.Hours == 1 ? \"\" : \"s\")}\");\n            return sb.ToString();\n        default:\n            sb.Append(\", \");\n            break;\n    }\n}\n\nswitch (time.Hours)\n{\n    case 1:\n        sb.Append(\"1 hour\");\n        break;\n    case > 1:\n        sb.Append($\"{time.Hours} hours\");\n        break;\n}\nif (time.Hours > 0)\n{\n    switch (time.Minutes)\n    {\n        case 0 when time.Seconds > 0:\n            sb.Append($\" and {time.Seconds} second\" + $\"{(time.Seconds == 1 ? \"\" : \"s\")}\");\n            return sb.ToString();\n        case > 0 when time.Seconds == 0:\n            sb.Append($\" and {time.Minutes} minute\" + $\"{(time.Minutes == 1 ? \"\" : \"s\")}\");\n            return sb.ToString();\n        default:\n            sb.Append(\", \");\n            break;\n    }\n}\n\nswitch (time.Minutes)\n{\n    case 1:\n        sb.Append(\"1 minute\");\n        break;\n    case > 1:\n        sb.Append($\"{time.Minutes} minute\" + $\"{(time.Minutes == 1 ? \"\" : \"s\")}\");\n        break;\n}\n\nif (time.Minutes <= 0 || time.Seconds <= 0) return sb.ToString();\nsb.Append($\" and {time.Seconds} second\" + $\"{(time.Seconds == 1 ? \"\" : \"s\")}\");\nreturn sb.ToString();\n    }public static string formatDuration(int seconds)\n{\n    switch (seconds)\n    {\n        case 0:\n            return \"now\";\n        case 1:\n            return \"1 second\";\n        case <= 59:\n            return $\"{seconds} seconds\";\n    }\n\n    var years = 0;\n    var days = 0;\n    var time = TimeSpan.FromSeconds(seconds);\n    var sb = new StringBuilder();\n    if (time.Days > 365)\n    {\n        years = time.Days / 365;\n        days = time.Days % 365;\n    }\n    else\n        days = time.Days;\n\n    switch (years)\n    {\n        case 1:\n            sb.Append($\"1 year\");\nbreak;\n        case > 1:\n            sb.Append($\"{years} years\");\n            break;\n    }\n    if (years > 0)\n    {\n        switch (days)\n        {\n            case 0 when time.Hours == 0 && time.Minutes == 0 && time.Seconds == 0:\n                return sb.ToString();\n            case 0 when time.Hours == 0 && time.Minutes == 0 && time.Seconds > 0:\n                sb.Append($\" and {time.Seconds} second\" + $\"{(time.Seconds == 1 ? \"\" : \"s\")}\");\n                return sb.ToString();\n            case 0 when time.Hours == 0 && time.Minutes > 0 && time.Seconds == 0:\n                sb.Append($\" and {time.Minutes} minutes\");\n                return sb.ToString();\n            case 0 when time.Hours > 0 && time.Minutes == 0 && time.Seconds == 0:\n                sb.Append($\" and {time.Hours} hours\");\n                return sb.ToString();\n            case > 0 when time.Hours == 0 && time.Minutes == 0 && time.Seconds == 0:\n                sb.Append($\" and {days} days\");\n                return sb.ToString();\n            default:\n                sb.Append(\", \");\n                break;\n        }\n    }\n\n    switch (days)\n    {\n        case 1:\n            sb.Append(\"1 day\");\n            break;\n        case > 1:\n            sb.Append($\"{days} days\");\n            break;\n    }\n    if (days > 0)\n    {\n        switch (time.Hours)\n        {\n            case 0 when time.Minutes == 0 && time.Seconds > 0:\n                sb.Append($\" and {time.Seconds} second\" + $\"{(time.Seconds == 1 ? \"\" : \"s\")}\");\n                return sb.ToString();\n            case 0 when time.Minutes > 0 && time.Seconds == 0:\n                sb.Append($\" and {time.Seconds} minute\" + $\"{(time.Minutes == 1 ? \"\" : \"s\")}\");\n                return sb.ToString();\n            case > 0 when time.Minutes == 0 && time.Seconds == 0:\n                sb.Append($\" and {time.Seconds} hour\" + $\"{(time.Hours == 1 ? \"\" : \"s\")}\");\n                return sb.ToString();\n            default:\n                sb.Append(\", \");\n                break;\n        }\n    }\n\n    switch (time.Hours)\n    {\n        case 1:\n            sb.Append(\"1 hour\");\n            break;\n        case > 1:\n            sb.Append($\"{time.Hours} hours\");\n            break;\n    }\n    if (time.Hours > 0)\n    {\n        switch (time.Minutes)\n        {\n            case 0 when time.Seconds > 0:\n                sb.Append($\" and {time.Seconds} second\" + $\"{(time.Seconds == 1 ? \"\" : \"s\")}\");\n                return sb.ToString();\n            case > 0 when time.Seconds == 0:\n                sb.Append($\" and {time.Minutes} minute\" + $\"{(time.Minutes == 1 ? \"\" : \"s\")}\");\n                return sb.ToString();\n            default:\n                sb.Append(\", \");\n                break;\n        }\n    }\n\n    switch (time.Minutes)\n    {\n        case 1:\n            sb.Append(\"1 minute\");\n            break;\n        case > 1:\n            sb.Append($\"{time.Minutes} minute\" + $\"{(time.Minutes == 1 ? \"\" : \"s\")}\");\n            break;\n    }\n\n    if (time.Minutes <= 0 || time.Seconds <= 0) return sb.ToString();\n    sb.Append($\" and {time.Seconds} second\" + $\"{(time.Seconds == 1 ? \"\" : \"s\")}\");\n    return sb.ToString();\n}",
+    "tests": [
+      {
+        "append": "\nreturn formatDuration(0);",
+        "testAgainst": "now"
+      },
+      {
+        "append": "\nreturn formatDuration(62);",
+        "testAgainst": "1 minute and 2 seconds"
+      },
+      {
+        "append": "\nreturn formatDuration(120);",
+        "testAgainst": "2 minutes"
+      },
+      {
+        "append": "\nreturn formatDuration(3662);",
+        "testAgainst": "1 hour, 1 minute and 2 seconds"
+      },
+      {
+        "append": "\nreturn formatDuration(15731080);",
+        "testAgainst": "182 days, 1 hour, 44 minutes and 40 seconds"
+      },
+      {
+        "append": "\nreturn formatDuration(132030240);",
+        "testAgainst": "4 years, 68 days, 3 hours and 4 minutes"
+      },
+      {
+        "append": "\nreturn formatDuration(205851834);",
+        "testAgainst": "6 years, 192 days, 13 hours, 3 minutes and 54 seconds"
+      },
+      {
+        "append": "\nreturn formatDuration(253374061);",
+        "testAgainst": "8 years, 12 days, 13 hours, 41 minutes and 1 second"
+      },
+      {
+        "append": "\nreturn formatDuration(242062374);",
+        "testAgainst": "7 years, 246 days, 15 hours, 32 minutes and 54 seconds"
+      },
+      {
+        "append": "\nreturn formatDuration(101956166);",
+        "testAgainst": "3 years, 85 days, 1 hour, 9 minutes and 26 seconds"
+      },
+      {
+        "append": "\nreturn formatDuration(33243586);",
+        "testAgainst": "1 year, 19 days, 18 hours, 19 minutes and 46 seconds"
       }
     ],
     "addedBy": "adam holm",

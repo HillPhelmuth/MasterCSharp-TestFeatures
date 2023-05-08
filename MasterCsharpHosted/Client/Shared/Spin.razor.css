@@ -1,4 +1,6 @@
-﻿
+﻿.spin-content {
+    color: blue;
+}
 .circle,
 .circle:after {
     border-radius: 50%;

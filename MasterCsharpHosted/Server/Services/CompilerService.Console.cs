@@ -26,7 +26,7 @@ namespace MasterCsharpHosted.Server.Services
             var compilation = CSharpCompilation.Create("DynamicCode")
                 .WithOptions(new CSharpCompilationOptions(OutputKind.ConsoleApplication))
                 .AddReferences(_references)
-                .AddSyntaxTrees(CSharpSyntaxTree.ParseText(source, new CSharpParseOptions(LanguageVersion.Preview)));
+                .AddSyntaxTrees(CSharpSyntaxTree.ParseText(source, new CSharpParseOptions(LanguageVersion.Latest)));
 
             ImmutableArray<Diagnostic> diagnostics = compilation.GetDiagnostics();
 

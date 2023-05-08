@@ -68,6 +68,7 @@ public class ModalService
     }
     public void CloseSelf(ModalResults results = null)
     {
+        results ??= ModalResults.Empty(false);
         Close(results);
     }
 

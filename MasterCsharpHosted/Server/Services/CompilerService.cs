@@ -101,7 +101,7 @@ namespace MasterCsharpHosted.Server.Services
                 {
                     var errorOutput = errorDiagnostics.Aggregate("", (current, diag) => current + HttpUtility.HtmlEncode(diag));
 
-                    CodeOutput = $"COMPILE ERROR: {errorOutput}";
+                    CodeOutput = $"COMPILE ERROR: (errors: {errorDiagnostics.Count()}) {errorOutput}";
                     
                 }
             }
@@ -165,7 +165,7 @@ namespace MasterCsharpHosted.Server.Services
                     "System.Threading.Tasks",
                     "System.Numerics",
                     "Microsoft.CodeAnalysis",
-                    "Microsoft.CodeAnalysis.CSharp"
+                    "Microsoft.CodeAnalysis.CSharp",
                 }),
                 runningCompilation
             );
@@ -173,13 +173,19 @@ namespace MasterCsharpHosted.Server.Services
             errorDiagnostics = scriptCompilation.GetDiagnostics().Where(x => x.Severity == DiagnosticSeverity.Error);
             if (errorDiagnostics.Any())
             {
+                errorDiagnostics.Concat(scriptCompilation.GetDeclarationDiagnostics()).Concat(scriptCompilation.GetDiagnostics());
+                errorDiagnostics = errorDiagnostics.Distinct();
                 return (false, null);
             }
 
             using var outputAssembly = new MemoryStream();
             var emitResult = scriptCompilation.Emit(outputAssembly);
 
-            if (!emitResult.Success) return (false, null);
+            if (!emitResult.Success)
+            {
+                errorDiagnostics = emitResult.Diagnostics.Where(x => x.Severity == DiagnosticSeverity.Error);
+                return (false, null);
+            }
             submissionIndex++;
             runningCompilation = scriptCompilation;
             var script = Assembly.Load(outputAssembly.ToArray());

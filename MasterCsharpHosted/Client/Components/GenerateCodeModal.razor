@@ -1,0 +1,37 @@
+﻿@inherits AppComponentBase
+
+<h4 class="text-center">Request AI Generated Code</h4>
+<h5 class="text-center">Generated code will be added at the Selected location in code window</h5>
+@if (!isStarted)
+{
+    <div>
+        <EditForm Model="_selectTypeForm" OnValidSubmit="Submit">
+            @*<InputSelect @bind-Value="_selectTypeForm.CodeGenType">
+                <option value="@CodeGenType.Snippet">Snippet</option>
+                <option value="@CodeGenType.Method">Method</option>
+                <option value="@CodeGenType.Class">Class</option>
+            </InputSelect>*@
+            <MySelect OptionsList="CodeGenTypes" @bind-SelectedValue="_selectTypeForm.CodeGenType"></MySelect>
+            <button type="submit">Next</button>
+        </EditForm>
+    </div>
+}
+else
+{
+    @if (_selectTypeForm.CodeGenType == CodeGenType.Class)
+    {
+        var codeGenItem = new CodeGenClass();
+        <GenerateCodeForm TItem="CodeGenClass" CodeGenItem="codeGenItem" PromptGenerated="HandleGenerateSystemPrompt"></GenerateCodeForm>
+    }
+    else if (_selectTypeForm.CodeGenType == CodeGenType.Method)
+    {
+        var codeGenItem = new CodeGenMethod();
+        <GenerateCodeForm TItem="CodeGenMethod" CodeGenItem="codeGenItem" PromptGenerated="HandleGenerateSystemPrompt"></GenerateCodeForm>
+    }
+    else
+    {
+        var codeGenItem = new CodeGenSnippet();
+        <GenerateCodeForm TItem="CodeGenSnippet" CodeGenItem="codeGenItem" PromptGenerated="HandleGenerateSystemPrompt"></GenerateCodeForm>
+    }
+
+}
