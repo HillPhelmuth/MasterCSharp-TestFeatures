@@ -36,7 +36,7 @@ Assume the explaination is part of a larger markdown file and does not require a
                 N = 1,
                 Messages = messages,
                 User = userName,
-                Model = "gpt-4"
+                Model = "gpt-4o"
             };
             Console.WriteLine("Starting stream response.");
             var response = await _openAiService.ChatCompletion.CreateCompletion(chatRequest);
@@ -73,7 +73,7 @@ Assume the explaination is part of a larger markdown file and does not require a
                 N = 1,
                 Messages = messages,
                 User = userName,
-                Model = "gpt-4"
+                Model = "gpt-4o"
             };
             var response = await _openAiService.ChatCompletion.CreateCompletion(chatRequest);
             if (!response.Successful)
@@ -94,7 +94,7 @@ Assume the explaination is part of a larger markdown file and does not require a
                 N = 1,
                 Messages = messages,
                 User = userName,
-                Model = "gpt-4"
+                Model = "gpt-4o"
             };
             Console.WriteLine("Starting stream response.");
             var response = await _openAiService.ChatCompletion.CreateCompletion(chatRequest);
